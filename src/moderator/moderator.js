@@ -145,7 +145,7 @@ moderatorBot.on("chat_member", async (ctx) => {
     if (member && member.status === "member") {
         const welcomeMsg = `👋 *Welcome to VFPE Community, ${member.user.first_name}!*\n\n` +
             `🌿 This is the official space of Verify Plug Europe.\n\n` +
-            `🔍 Use @VFPE_bot to find verified clubs.\n` +
+            `🔍 Use @VPFE_bot to find verified clubs.\n` +
             `📋 Use /rules to read the group rules.`;
         await ctx.reply(welcomeMsg, { parse_mode: "Markdown" });
     }
