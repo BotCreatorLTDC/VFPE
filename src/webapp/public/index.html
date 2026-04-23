@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VFPE - Europe's Verified Club Directory</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -21,6 +23,10 @@
         </header>
 
         <main>
+            <div id="map-container">
+                <div id="map"></div>
+            </div>
+
             <section id="search-section">
                 <input type="text" id="search-input" placeholder="Search by city or club name...">
                 <div class="filters">

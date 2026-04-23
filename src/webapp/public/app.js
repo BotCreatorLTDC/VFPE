@@ -14,6 +14,42 @@ document.addEventListener('DOMContentLoaded', () => {
     const applyForm = document.getElementById('apply-form');
 
     let allClubs = [];
+    let map;
+    let markers = [];
+
+    const cityCoords = {
+        'Madrid': [40.4168, -3.7038],
+        'Barcelona': [41.3851, 2.1734],
+        'Valencia': [39.4699, -0.3763],
+        'Sevilla': [37.3891, -5.9845],
+        'Berlin': [52.5200, 13.4050],
+        'Amsterdam': [52.3676, 4.9041]
+    };
+
+    function initMap() {
+        if (map) return;
+        map = L.map('map', { zoomControl: false }).setView([40.4168, -3.7038], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    }
+
+    function updateMapMarkers(clubs) {
+        if (!map) return;
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
+        const citiesWithClubs = [...new Set(clubs.map(c => c.city))];
+        citiesWithClubs.forEach(city => {
+            const coords = cityCoords[city];
+            if (coords) {
+                const marker = L.marker(coords).addTo(map);
+                marker.on('click', () => {
+                    searchInput.value = city;
+                    filterClubs();
+                    map.setView(coords, 10);
+                });
+                markers.push(marker);
+            }
+        });
+    }
 
     // Fetch clubs from API
     async function fetchClubs() {
@@ -28,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 statusMessage.textContent = "";
                 renderClubs(allClubs);
+                updateMapMarkers(allClubs);
             }
         } catch (err) {
             statusMessage.textContent = "Connection error. Please try again.";
@@ -133,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Initialize
+    initMap();
     fetchClubs();
 
     // Telegram WebApp integration
