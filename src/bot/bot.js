@@ -90,7 +90,7 @@ bot.command("verify", async (ctx) => {
 });
 
 bot.command("community", async (ctx) => {
-    await ctx.reply("Join our community group: [VFPE Community](https://t.me/your_community_link)", { parse_mode: "Markdown" });
+    await ctx.reply("Join our community group: [VFPE Community](https://t.me/+vHqaWGNOnEJkOWM0)", { parse_mode: "Markdown" });
 });
 
 bot.command("about", async (ctx) => {
@@ -205,7 +205,7 @@ bot.callbackQuery(/^info_(\d+)$/, async (ctx) => {
 
 // Other Callbacks
 bot.callbackQuery("menu_community", async (ctx) => {
-    await ctx.reply("Join our community group: [VFPE Community](https://t.me/your_community_link)", { parse_mode: "Markdown" });
+    await ctx.reply("Join our community group: [VFPE Community](https://t.me/+vHqaWGNOnEJkOWM0)", { parse_mode: "Markdown" });
     await ctx.answerCallbackQuery();
 });
 

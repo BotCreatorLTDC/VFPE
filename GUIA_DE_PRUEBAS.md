@@ -7,8 +7,8 @@ Esta guía detalla el funcionamiento de los componentes del sistema para facilit
 ## 🔗 Enlaces Directos
 *   **Bot Principal:** [@VPFE_bot](https://t.me/VPFE_bot)
 *   **Bot Moderador:** [@VPFE_mod_bot](https://t.me/VPFE_mod_bot)
-*   **Grupo de Comunidad:** [VFPE Community](https://t.me/verifyplug_group)
-*   **Canal de Publicaciones:** [VFPE Channel](https://t.me/verifyplugchannel)
+*   **Grupo de Comunidad:** [VFPE Community](https://t.me/+vHqaWGNOnEJkOWM0)
+*   **Canal de Publicaciones:** [VFPE Channel](https://t.me/+C3a94m0YWChhOGE0)
 *   **Mini App (Web):** [https://vfpe.onrender.com/](https://vfpe.onrender.com/)
 
 ---

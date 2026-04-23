@@ -150,6 +150,39 @@ hr { border: 0; border-top: 1px solid #333; margin: 20px 0; }
 .verification-info h4 { margin-bottom: 10px; color: var(--primary); }
 .verification-info p { font-size: 0.85rem; color: #aaa; }
 
+#apply-section {
+    text-align: center;
+    margin-top: 50px;
+    padding: 30px;
+    background: #111;
+    border-radius: 20px;
+    border: 1px dashed #333;
+}
+
+#apply-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: var(--text-dim);
+}
+
+#open-apply-modal {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#open-apply-modal:hover {
+    background: var(--primary);
+    color: black;
+    box-shadow: 0 0 20px rgba(194, 232, 18, 0.3);
+}
+
 /* Modals */
 .modal {
     display: none;
