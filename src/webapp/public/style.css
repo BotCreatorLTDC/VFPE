@@ -94,12 +94,17 @@ header {
 }
 
 .custom-marker span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     color: black;
     font-weight: 900;
     font-size: 1rem;
     font-family: 'Outfit', sans-serif;
+    margin: 0;
+    padding: 0;
     line-height: 1;
-    display: block;
 }
 
 #search-input {
