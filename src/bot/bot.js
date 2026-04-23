@@ -9,6 +9,12 @@ const ADMIN_IDS = (process.env.ADMIN_IDS || "").split(',').map(id => id.trim());
 bot.use(session({ initial: () => ({}) }));
 bot.use(conversations());
 
+bot.catch((err) => {
+    const ctx = err.ctx;
+    console.error(`Error while handling update ${ctx.update.update_id}:`);
+    console.error(err.error);
+});
+
 const isAdmin = (ctx) => ADMIN_IDS.includes(ctx.from?.id.toString());
 
 /**
@@ -45,7 +51,8 @@ async function verifyClubConversation(conversation, ctx) {
 
     await ctx.reply(summary, { parse_mode: "Markdown", reply_markup: keyboard });
     
-    conversation.session.pendingClub = { name: clubName, city, username, instagram };
+    // Fix: Save to session correctly
+    ctx.session.pendingClub = { name: clubName, city, username, instagram };
 }
 
 bot.use(createConversation(verifyClubConversation));
