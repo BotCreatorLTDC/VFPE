@@ -62,6 +62,8 @@ const strings = {
     }
 };
 
+const isAdmin = (ctx) => ADMIN_IDS.includes(ctx.from?.id.toString());
+
 bot.use(session({ initial: () => ({ lang: 'es' }) }));
 bot.use(conversations());
 
