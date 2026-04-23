@@ -70,22 +70,36 @@ header {
     background: var(--primary);
     width: 35px !important;
     height: 35px !important;
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 15px rgba(194, 232, 18, 0.3);
     border: 2px solid white;
-    margin-top: -35px; /* Adjust anchor */
+    position: relative;
+}
+
+/* The "tail" of the pin */
+.custom-marker::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 10px solid white;
 }
 
 .custom-marker span {
-    transform: rotate(45deg);
     color: black;
     font-weight: 900;
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-family: 'Outfit', sans-serif;
+    line-height: 1;
+    display: block;
 }
 
 #search-input {
