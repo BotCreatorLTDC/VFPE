@@ -1,7 +1,20 @@
-require('dotenv').config();
 const cron = require('node-cron');
+const https = require('https');
 const { Bot } = require('grammy');
 const { query } = require('../shared/db');
+
+const WEBAPP_URL = process.env.WEBAPP_URL;
+
+// Keep-alive ping to prevent Render from sleeping
+if (WEBAPP_URL) {
+    cron.schedule('* * * * *', () => {
+        https.get(WEBAPP_URL, (res) => {
+            console.log(`[Auto-Ping] Status: ${res.statusCode} - Server Kept Alive`);
+        }).on('error', (err) => {
+            console.error('[Auto-Ping] Error:', err.message);
+        });
+    });
+}
 
 const bot = new Bot(process.env.MAIN_BOT_TOKEN);
 const COMMUNITY_GROUP_ID = process.env.COMMUNITY_GROUP_ID;
