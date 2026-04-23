@@ -40,7 +40,15 @@ document.addEventListener('DOMContentLoaded', () => {
         citiesWithClubs.forEach(city => {
             const coords = cityCoords[city];
             if (coords) {
-                const marker = L.marker(coords).addTo(map);
+                const count = clubs.filter(c => c.city === city).length;
+                
+                const markerIcon = L.divIcon({
+                    html: `<span>${count}</span>`,
+                    className: 'custom-marker',
+                    iconSize: [30, 30]
+                });
+
+                const marker = L.marker(coords, { icon: markerIcon }).addTo(map);
                 marker.on('click', () => {
                     searchInput.value = city;
                     filterClubs();

@@ -65,6 +65,20 @@ header {
     background: var(--bg-color) !important;
 }
 
+/* Custom Marker Styles */
+.custom-marker {
+    background: var(--primary);
+    border: 2px solid white;
+    border-radius: 50%;
+    color: black;
+    font-weight: 800;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(194, 232, 18, 0.5);
+}
+
 #search-input {
     width: 100%;
     padding: 15px;
