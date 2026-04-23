@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFPE - Europe's Verified Club Directory</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>VFPE</h1>
+            <p>Europe's Verified Club Directory</p>
+        </div>
+        <div class="stats">
+            <span id="club-count">0</span> Verified Clubs 🇪🇸 🇩🇪 🇳🇱
+        </div>
+    </header>
+
+    <main>
+        <section id="search-section">
+            <input type="text" id="search-input" placeholder="Search by city or club name...">
+            <div class="filters">
+                <select id="country-filter">
+                    <option value="all">All Countries</option>
+                    <option value="ES">Spain</option>
+                    <option value="DE">Germany</option>
+                    <option value="NL">Netherlands</option>
+                </select>
+                <label class="toggle">
+                    <input type="checkbox" id="verified-only" checked>
+                    <span class="slider"></span> Verified Only
+                </label>
+            </div>
+        </section>
+
+        <section id="club-list" class="grid">
+            <!-- Club cards will be injected here -->
+        </section>
+
+        <section id="apply-section">
+            <h3>Is your club not listed?</h3>
+            <button id="open-apply-modal">Apply for Verification →</button>
+        </section>
+    </main>
+
+    <!-- Apply Modal -->
+    <div id="apply-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Apply for Verification</h2>
+            <form id="apply-form">
+                <input type="text" name="name" placeholder="Your club's name" required>
+                <input type="text" name="city" placeholder="e.g. Madrid, Barcelona..." required>
+                <select name="country" required>
+                    <option value="" disabled selected>Select country</option>
+                    <option value="ES">Spain</option>
+                    <option value="DE">Germany</option>
+                    <option value="NL">Netherlands</option>
+                </select>
+                <input type="text" name="telegram_username" placeholder="@yourclub" required>
+                <input type="text" name="instagram" placeholder="@yourclub (optional)">
+                <textarea name="description" placeholder="Brief description of your club (max 200 chars)" maxlength="200"></textarea>
+                <p class="disclaimer">⚠️ VFPE is a directory platform. We do not sell, distribute, or facilitate the acquisition of any substance. All clubs listed are legal cannabis social clubs operating under Spanish or applicable European law.</p>
+                <button type="submit">Submit Verification Request</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>v1.0 — VFPE — Safe. Real. Trusted.</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
