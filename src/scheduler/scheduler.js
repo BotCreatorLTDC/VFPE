@@ -9,7 +9,7 @@ const CHANNEL_ID = process.env.CHANNEL_ID;
 
 cron.schedule('0 */12 * * *', async () => {
     const msg = `🔍 *Looking for a verified club?*\n\n` +
-        `Use @VFPEbot — find verified cannabis social clubs in Madrid, Barcelona, and across Europe.\n\n` +
+        `Use @VFPE_bot — find verified cannabis social clubs in Madrid, Barcelona, and across Europe.\n\n` +
         `✅ Verified contacts only. No scams.`;
     try {
         await bot.api.sendMessage(COMMUNITY_GROUP_ID, msg, { parse_mode: "Markdown" });
@@ -49,7 +49,7 @@ cron.schedule('0 10 * * 1', async () => {
                 `✅ ${lastWeekClubs.length} clubs verified\n` +
                 `${list}\n\n` +
                 `🔍 Browse the full directory:\n` +
-                `→ @VFPEbot\n\n` +
+                `→ @VFPE_bot\n\n` +
                 `#VFPE #WeeklyUpdate`;
             await bot.api.sendMessage(CHANNEL_ID, summary, { parse_mode: "Markdown" });
             console.log("Sent weekly summary to channel");

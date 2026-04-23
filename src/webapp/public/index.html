@@ -8,42 +8,69 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <h1>VFPE</h1>
-            <p>Europe's Verified Club Directory</p>
-        </div>
-        <div class="stats">
-            <span id="club-count">0</span> Verified Clubs 🇪🇸 🇩🇪 🇳🇱
-        </div>
-    </header>
-
-    <main>
-        <section id="search-section">
-            <input type="text" id="search-input" placeholder="Search by city or club name...">
-            <div class="filters">
-                <select id="country-filter">
-                    <option value="all">All Countries</option>
-                    <option value="ES">Spain</option>
-                    <option value="DE">Germany</option>
-                    <option value="NL">Netherlands</option>
-                </select>
-                <label class="toggle">
-                    <input type="checkbox" id="verified-only" checked>
-                    <span class="slider"></span> Verified Only
-                </label>
+    <!-- Main Screen -->
+    <div id="main-screen">
+        <header>
+            <div class="logo">
+                <h1>VFPE</h1>
+                <p>Europe's Verified Club Directory</p>
             </div>
-        </section>
+            <div class="stats">
+                <span id="club-count">...</span> Verified Clubs 🇪🇸 🇩🇪 🇳🇱
+            </div>
+        </header>
 
-        <section id="club-list" class="grid">
-            <!-- Club cards will be injected here -->
-        </section>
+        <main>
+            <section id="search-section">
+                <input type="text" id="search-input" placeholder="Search by city or club name...">
+                <div class="filters">
+                    <select id="country-filter">
+                        <option value="all">All Countries</option>
+                        <option value="ES">Spain</option>
+                        <option value="DE">Germany</option>
+                        <option value="NL">Netherlands</option>
+                    </select>
+                    <label class="toggle">
+                        <input type="checkbox" id="verified-only" checked disabled>
+                        <span class="slider"></span> Verified Only
+                    </label>
+                </div>
+            </section>
 
-        <section id="apply-section">
-            <h3>Is your club not listed?</h3>
-            <button id="open-apply-modal">Apply for Verification →</button>
-        </section>
-    </main>
+            <div id="status-message"></div>
+
+            <section id="club-list" class="grid">
+                <!-- Club cards will be injected here -->
+            </section>
+
+            <section id="apply-section">
+                <h3>Is your club not listed?</h3>
+                <button id="open-apply-modal">Apply for Verification →</button>
+            </section>
+        </main>
+    </div>
+
+    <!-- Detail Screen -->
+    <div id="detail-screen" class="screen-overlay">
+        <div class="detail-header">
+            <button id="close-detail">← Back to Directory</button>
+        </div>
+        <div class="detail-content">
+            <div class="verified-badge-large">✅ VERIFIED</div>
+            <h2 id="detail-name"></h2>
+            <p id="detail-location" class="location-large"></p>
+            <hr>
+            <p id="detail-description"></p>
+            <div class="detail-ctas">
+                <a id="detail-tg-link" href="#" class="cta-primary">💬 Contact on Telegram</a>
+                <a id="detail-ig-link" href="#" class="cta-secondary">📸 Instagram</a>
+            </div>
+            <div class="verification-info">
+                <h4>About VFPE verification</h4>
+                <p>This club has been manually verified by our team. We ensure the contact is real and the club is operating legally under local laws.</p>
+            </div>
+        </div>
+    </div>
 
     <!-- Apply Modal -->
     <div id="apply-modal" class="modal">
