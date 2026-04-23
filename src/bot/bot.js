@@ -4,10 +4,16 @@ const { conversations, createConversation } = require('@grammyjs/conversations')
 const { query } = require('../shared/db');
 
 const bot = new Bot(process.env.MAIN_BOT_TOKEN);
+const ADMIN_IDS = (process.env.ADMIN_IDS || "").split(',').map(id => id.trim());
 
 bot.use(session({ initial: () => ({}) }));
 bot.use(conversations());
 
+const isAdmin = (ctx) => ADMIN_IDS.includes(ctx.from?.id.toString());
+
+/**
+ * Conversation for Club Verification
+ */
 async function verifyClubConversation(conversation, ctx) {
     await ctx.reply("✅ *Club Verification Request*\n\nLet's get your club listed on VFPE.\n\nFirst — what's the name of your club?\n(Type and send)", { parse_mode: "Markdown" });
     const { message: nameMsg } = await conversation.wait();
@@ -44,20 +50,86 @@ async function verifyClubConversation(conversation, ctx) {
 
 bot.use(createConversation(verifyClubConversation));
 
+// Main Menu Keyboard
 const mainMenu = new InlineKeyboard()
     .text("🗺 Find a Club", "menu_find").row()
     .text("👥 Community", "menu_community").row()
     .text("✅ Get Verified", "menu_verify").row()
     .text("ℹ️ About VFPE", "menu_about");
 
+// Start Command
 bot.command("start", async (ctx) => {
     const welcome = `🌿 *Welcome to VFPE — Verify Plug Europe*\n\n` +
         `The only verified directory of cannabis social clubs in Europe.\n\n` +
         `Select your city and access verified contacts directly.\n\n` +
         `👇 *Choose an option:*`;
+    
     await ctx.reply(welcome, { parse_mode: "Markdown", reply_markup: mainMenu });
 });
 
+/**
+ * ADMIN COMMANDS
+ */
+bot.command("admin", async (ctx) => {
+    if (!isAdmin(ctx)) return;
+
+    const res = await query("SELECT id, name, city FROM clubs WHERE status = 'pending' LIMIT 5");
+    const pending = res.rows;
+
+    if (pending.length === 0) {
+        return ctx.reply("✅ No pending verification requests.");
+    }
+
+    await ctx.reply("🛠 *Admin Panel - Pending Requests:*", { parse_mode: "Markdown" });
+
+    for (const club of pending) {
+        const kb = new InlineKeyboard()
+            .text("✅ Approve", `approve_${club.id}`)
+            .text("❌ Reject", `reject_${club.id}`);
+        
+        await ctx.reply(`🏷 *${club.name}*\n📍 ${club.city}`, { parse_mode: "Markdown", reply_markup: kb });
+    }
+});
+
+// Admin Callbacks
+bot.callbackQuery(/^approve_(\d+)$/, async (ctx) => {
+    if (!isAdmin(ctx)) return;
+    const clubId = ctx.match[1];
+    
+    const clubRes = await query("SELECT * FROM clubs WHERE id = $1", [clubId]);
+    const club = clubRes.rows[0];
+
+    if (club) {
+        await query("UPDATE clubs SET status = 'verified', verified_at = CURRENT_TIMESTAMP WHERE id = $1", [clubId]);
+        await ctx.editMessageText(`✅ *${club.name}* has been verified and added to the directory!`, { parse_mode: "Markdown" });
+
+        // Post to Channel!
+        const channelMsg = `🆕 *NEW VERIFIED CLUB*\n\n` +
+            `✅ *${club.name}* has just been verified and added to the VFPE directory.\n\n` +
+            `📍 ${club.city}\n` +
+            `💬 Contact: ${club.telegram_username}\n\n` +
+            `🌿 Europe's verified club directory keeps growing.\n` +
+            `→ Find all clubs: @VFPEbot\n\n` +
+            `#VFPE #NewClub #${club.city.replace(/\s+/g, '')}`;
+        
+        try {
+            await bot.api.sendMessage(process.env.CHANNEL_ID, channelMsg, { parse_mode: "Markdown" });
+        } catch (e) {
+            console.error("Failed to post to channel:", e);
+        }
+    }
+    await ctx.answerCallbackQuery();
+});
+
+bot.callbackQuery(/^reject_(\d+)$/, async (ctx) => {
+    if (!isAdmin(ctx)) return;
+    const clubId = ctx.match[1];
+    await query("UPDATE clubs SET status = 'rejected' WHERE id = $1", [clubId]);
+    await ctx.editMessageText("❌ Request rejected.", { parse_mode: "Markdown" });
+    await ctx.answerCallbackQuery();
+});
+
+// Handlers
 bot.callbackQuery("menu_find", async (ctx) => {
     const countries = new InlineKeyboard()
         .text("🇪🇸 España", "country_ES")
