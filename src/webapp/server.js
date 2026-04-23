@@ -11,6 +11,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Serve Presentation assets and HTML
+app.use('/assets', express.static(path.join(__dirname, '../../assets')));
+app.get('/presentation', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../PRESENTACION.html'));
+});
+
 app.get('/api/clubs', async (req, res) => {
     try {
         const clubsRes = await query("SELECT * FROM clubs WHERE status = 'verified'");
