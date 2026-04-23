@@ -45,7 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const markerIcon = L.divIcon({
                     html: `<span>${count}</span>`,
                     className: 'custom-marker',
-                    iconSize: [30, 30]
+                    iconSize: [35, 35],
+                    iconAnchor: [17, 35]
                 });
 
                 const marker = L.marker(coords, { icon: markerIcon }).addTo(map);
