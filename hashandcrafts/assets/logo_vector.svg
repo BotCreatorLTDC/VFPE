@@ -1,0 +1,37 @@
+<svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background (Optional for preview) -->
+    <rect width="500" height="500" rx="40" fill="#070F0D"/>
+    
+    <!-- Stylized Tech Leaf -->
+    <g id="leaf-icon">
+        <!-- Main Stem -->
+        <path d="M250 400V250" stroke="#10B981" stroke-width="8" stroke-linecap="round"/>
+        
+        <!-- Central Leaf -->
+        <path d="M250 100C250 100 220 180 220 250C220 320 250 350 250 350C250 350 280 320 280 250C280 180 250 100 250 100Z" fill="#10B981" fill-opacity="0.2" stroke="#10B981" stroke-width="4"/>
+        
+        <!-- Lateral Leaves (Tech Style) -->
+        <path d="M250 300L150 220M250 300L350 220" stroke="#10B981" stroke-width="6" stroke-linecap="round"/>
+        <path d="M250 250L120 150M250 250L380 150" stroke="#10B981" stroke-width="6" stroke-linecap="round"/>
+        
+        <!-- Circuit Nodes -->
+        <circle cx="150" cy="220" r="8" fill="#10B981">
+            <animate attributeName="r" values="8;10;8" dur="2s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="350" cy="220" r="8" fill="#10B981">
+            <animate attributeName="r" values="8;10;8" dur="2s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="120" cy="150" r="8" fill="#10B981">
+            <animate attributeName="r" values="8;10;8" dur="2s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="380" cy="150" r="8" fill="#10B981">
+            <animate attributeName="r" values="8;10;8" dur="2s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="250" cy="100" r="10" fill="#10B981">
+            <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" />
+        </circle>
+    </g>
+    
+    <!-- Brand Name -->
+    <text x="250" y="460" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="32" font-weight="bold" letter-spacing="8">HASH&amp;CRAFTS</text>
+</svg>

@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;600&display=swap');
+
+:root {
+    --bg-deep: #0B201A;
+    --bg-slate: #121212;
+    --accent: #10b981;
+    --text-silk: #F0F2F1;
+    --text-muted: #8a9a94;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Square Container */
+.editorial-container {
+    width: 1080px;
+    height: 1080px;
+    background: var(--bg-deep);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+}
+
+/* Subtle Film Grain */
+.editorial-container::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: url('https://grainy-gradients.vercel.app/noise.svg');
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 100px;
+    display: none;
+    flex-direction: column;
+    z-index: 5;
+    color: var(--text-silk);
+}
+
+.slide.active {
+    display: flex;
+}
+
+/* Typography */
+h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 90px;
+    font-weight: 900;
+    line-height: 0.95;
+    margin-bottom: 40px;
+    letter-spacing: -2px;
+}
+
+h1 span {
+    font-style: italic;
+    color: var(--accent);
+}
+
+h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 65px;
+    margin-bottom: 30px;
+}
+
+p {
+    font-size: 30px;
+    line-height: 1.5;
+    font-weight: 300;
+    color: var(--text-muted);
+}
+
+.highlight {
+    color: var(--text-silk);
+    font-weight: 600;
+}
+
+/* Decorative Elements */
+.line-accent {
+    width: 120px;
+    height: 1px;
+    background: var(--accent);
+    margin-bottom: 40px;
+}
+
+.corner-logo {
+    position: absolute;
+    top: 60px;
+    right: 60px;
+    height: 60px;
+    opacity: 0.8;
+}
+
+.slide-count {
+    position: absolute;
+    bottom: 60px;
+    left: 100px;
+    font-size: 18px;
+    letter-spacing: 5px;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* Layout Variations */
+.center-content {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.asymmetric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 60px;
+    margin-top: 60px;
+    text-align: left;
+}
+
+.stat-item {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 20px;
+}
+
+.stat-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 80px;
+    color: var(--text-silk);
+}
+
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 40px;
+}
+
+.tag {
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 10px 20px;
+}
+
+/* Helper UI */
+.nav-panel {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+    z-index: 100;
+}
+.nav-panel button {
+    padding: 10px 20px;
+    cursor: pointer;
+}

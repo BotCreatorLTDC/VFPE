@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editorial Design - Hash&Crafts</title>
+    <link rel="stylesheet" href="editorial.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="nav-panel">
+        <button onclick="changeSlide(-1)">PREV</button>
+        <button onclick="changeSlide(1)">NEXT</button>
+        <button onclick="download()" style="background: #10b981; color: #000; font-weight: bold;">DESCARGAR</button>
+        <span id="slide-info" style="color:white; margin-left: 10px; font-family: sans-serif;">Slide 1/8</span>
+    </div>
+
+    <div class="editorial-container" id="export-area">
+        <img src="assets/logo-img.png" class="corner-logo" alt="Logo">
+
+        <!-- Slide 1: Cover -->
+        <div class="slide active center-content">
+            <div class="line-accent"></div>
+            <h1>HASH<span>&</span>CRAFTS</h1>
+            <p style="text-transform: uppercase; letter-spacing: 10px; font-weight: 400; color: #fff;">Digital Atelier</p>
+            <p style="margin-top: 20px; font-style: italic;">Elevando el estándar del sector cannábico.</p>
+            <div class="slide-count">01</div>
+        </div>
+
+        <!-- Slide 2: Profile -->
+        <div class="slide">
+            <div class="line-accent"></div>
+            <h2>La fusión de <span>técnica</span> y oficio.</h2>
+            <p class="highlight">Soy un desarrollador experto que entiende las texturas del sector.</p>
+            <p style="margin-top: 40px;">No solo escribo código; esculpo soluciones digitales pensadas para la realidad de tu club.</p>
+            <div class="slide-count">02</div>
+        </div>
+
+        <!-- Slide 3: Philosophy -->
+        <div class="slide">
+            <div class="line-accent"></div>
+            <h2>Código <span>Artesanal</span>.</h2>
+            <div class="asymmetric-grid">
+                <p style="font-size: 24px;">Rechazamos lo genérico. Nuestra metodología se basa en la atención al detalle y la robustez técnica.</p>
+                <div style="border-left: 1px solid rgba(255,255,255,0.1); padding-left: 40px;">
+                    <p style="color: #fff; margin-bottom: 20px;">✓ Privacidad Total</p>
+                    <p style="color: #fff; margin-bottom: 20px;">✓ Sin Plantillas</p>
+                    <p style="color: #fff;">✓ UX de Alta Gama</p>
+                </div>
+            </div>
+            <div class="slide-number">03</div>
+        </div>
+
+        <!-- Slide 4: Services -->
+        <div class="slide">
+            <div class="line-accent"></div>
+            <h2>Servicios <span>Core</span>.</h2>
+            <div class="tag-list">
+                <div class="tag">MiniApps Telegram</div>
+                <div class="tag">Webs & E-commerce</div>
+                <div class="tag">Bots de Gestión</div>
+                <div class="tag">Landings de Impacto</div>
+            </div>
+            <p style="margin-top: 60px; font-size: 24px; color: #fff;">Arquitecturas digitales diseñadas para el crecimiento real.</p>
+            <div class="slide-count">04</div>
+        </div>
+
+        <!-- Slide 5: Stack -->
+        <div class="slide">
+            <div class="line-accent"></div>
+            <h2>El <span>Atelier</span> Digital.</h2>
+            <p>Nuestras herramientas de precisión:</p>
+            <div class="tag-list" style="max-width: 600px;">
+                <span style="color: var(--accent); font-weight: 600;">Next.js / Node.js / Supabase / Telegram Bot API / PostgreSQL / WebSockets</span>
+            </div>
+            <div class="slide-count">05</div>
+        </div>
+
+        <!-- Slide 6: Why -->
+        <div class="slide">
+            <div class="line-accent"></div>
+            <h2>¿Por qué <span>nosotros</span>?</h2>
+            <div class="asymmetric-grid">
+                <div class="stat-item">
+                    <p style="color: #fff;">Deeper Understanding</p>
+                    <p style="font-size: 18px;">Conocemos los flujos reales de tu dispensario.</p>
+                </div>
+                <div class="stat-item">
+                    <p style="color: #fff;">Resilient Infrastructure</p>
+                    <p style="font-size: 18px;">Soluciones preparadas para esquivar la censura digital.</p>
+                </div>
+            </div>
+            <div class="slide-count">06</div>
+        </div>
+
+        <!-- Slide 7: Stats -->
+        <div class="slide center-content">
+            <h2>Efecto <span>Inmediato</span>.</h2>
+            <div style="display: flex; gap: 80px; margin-top: 40px;">
+                <div style="text-align: left;">
+                    <div class="stat-val">-70%</div>
+                    <p>Gestión Manual</p>
+                </div>
+                <div style="text-align: left;">
+                    <div class="stat-val" style="color: var(--accent);">+Growth</div>
+                    <p>Optimización</p>
+                </div>
+            </div>
+            <div class="slide-count">07</div>
+        </div>
+
+        <!-- Slide 8: CTA -->
+        <div class="slide center-content">
+            <h1>HABLEMOS.</h1>
+            <p style="font-style: italic; font-size: 36px; color: #fff;">Tu próximo proyecto artesanal comienza aquí.</p>
+            <div style="margin-top: 80px; padding: 20px 40px; border: 1px solid var(--accent); color: var(--accent); font-weight: bold; letter-spacing: 5px; text-transform: uppercase;">
+                DM para Consultoría Gratuita
+            </div>
+            <div class="slide-count">08</div>
+        </div>
+
+    </div>
+
+    <script>
+        let current = 0;
+        const slides = document.querySelectorAll('.slide');
+        const info = document.getElementById('slide-info');
+
+        function changeSlide(n) {
+            slides[current].classList.remove('active');
+            current = (current + n + slides.length) % slides.length;
+            slides[current].classList.add('active');
+            info.innerText = `Slide ${current + 1}/${slides.length}`;
+        }
+
+        async function download(isBatch = false) {
+            const btn = document.querySelector('button[onclick="download()"]');
+            if (!isBatch) {
+                btn.innerText = "CAPTURING...";
+                btn.disabled = true;
+            }
+
+            const area = document.getElementById('export-area');
+            try {
+                const canvas = await html2canvas(area, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: "#0B201A"
+                });
+                const link = document.createElement('a');
+                link.download = `HashAndCrafts_Editorial_${current + 1}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            } catch (err) {
+                if (!isBatch) alert("Error al descargar. Asegúrate de que las imágenes estén cargadas correctamente.");
+            } finally {
+                if (!isBatch) {
+                    btn.innerText = "ESTA";
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        async function downloadAll() {
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            
+            if (!confirm("Se descargarán 8 archivos. Permite las descargas múltiples en tu navegador.")) {
+                btn.disabled = false;
+                return;
+            }
+
+            for (let i = 0; i < slides.length; i++) {
+                btn.innerText = `PROCESANDO ${i+1}/${slides.length}...`;
+                changeSlide(i - current);
+                await new Promise(r => setTimeout(r, 600));
+                await download(true);
+            }
+
+            btn.innerText = originalText;
+            btn.disabled = false;
+            alert("¡Todas las imágenes han sido descargadas!");
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+        });
+    </script>
+</body>
+</html>

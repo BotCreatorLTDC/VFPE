@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Carousel - Hash&Crafts</title>
+    <link rel="stylesheet" href="instagram.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <!-- Helper UI (Not part of the square) -->
+    <div class="manual-nav">
+        <button onclick="changeSlide(-1)">PREV</button>
+        <button onclick="changeSlide(1)">NEXT</button>
+        <button onclick="downloadImage()" style="background: var(--forest-accent); color: #000; font-weight: 800;">DESCARGAR IMAGEN</button>
+        <span style="color:white; margin-left: 10px; font-family: sans-serif;" id="status">Slide 1/8</span>
+    </div>
+
+    <div class="instagram-container" id="capture-area">
+        <div class="bg-texture"></div>
+        <div class="overlay"></div>
+
+        <!-- Slide 1: Portada -->
+        <div class="insta-slide active">
+            <img src="assets/logo-img.png" alt="Logo" style="height: 250px; margin-bottom: 50px;">
+            <h1>ELEVANDO EL ESTÁNDAR DIGITAL</h1>
+            <p style="color: var(--forest-accent); font-weight: 600; text-transform: uppercase; letter-spacing: 5px;">Hash&Crafts</p>
+        </div>
+
+        <!-- Slide 2: ¿Quién soy? -->
+        <div class="insta-slide">
+            <h2>¿QUIÉN SOY?</h2>
+            <div class="content-box">
+                <p style="font-size: 40px;">Soy un <strong>desarrollador experto</strong> que fusiona la artesanía del código con el conocimiento real del sector cannábico.</p>
+            </div>
+            <div class="watermark">
+                <img src="assets/logo-img.png">
+                <span>Hash&Crafts</span>
+            </div>
+            <div class="slide-number">02/08</div>
+        </div>
+
+        <!-- Slide 3: Filosofía -->
+        <div class="insta-slide">
+            <h2>FILOSOFÍA</h2>
+            <div class="content-box">
+                <h3 style="color: #fff; font-size: 36px; margin-bottom: 20px;">Código Artesanal</h3>
+                <p>No usamos plantillas. Cada proyecto es una pieza única diseñada para superar las barreras del sector.</p>
+            </div>
+            <div class="slide-number">03/08</div>
+        </div>
+
+        <!-- Slide 4: Servicios -->
+        <div class="insta-slide">
+            <h2 style="font-size: 50px;">SERVICIOS CORE</h2>
+            <div class="grid-insta">
+                <div class="grid-item">
+                    <span>📱</span>
+                    <h3>MiniApps</h3>
+                </div>
+                <div class="grid-item">
+                    <span>🌐</span>
+                    <h3>Web & Ecom</h3>
+                </div>
+                <div class="grid-item">
+                    <span>🤖</span>
+                    <h3>Bots</h3>
+                </div>
+                <div class="grid-item">
+                    <span>🚀</span>
+                    <h3>Landings</h3>
+                </div>
+            </div>
+            <div class="slide-number">04/08</div>
+        </div>
+
+        <!-- Slide 5: Tech Stack -->
+        <div class="insta-slide">
+            <h2>TECH STACK</h2>
+            <div class="tag-cloud">
+                <span class="tag">React</span>
+                <span class="tag">Next.js</span>
+                <span class="tag">Node.js</span>
+                <span class="tag">Telegram API</span>
+                <span class="tag">Supabase</span>
+                <span class="tag">PostgreSQL</span>
+            </div>
+            <p style="margin-top: 50px; font-style: italic; opacity: 0.7;">Vanguardia tecnológica</p>
+            <div class="slide-number">05/08</div>
+        </div>
+
+        <!-- Slide 6: Por qué nosotros -->
+        <div class="insta-slide">
+            <h2 style="font-size: 50px;">¿POR QUÉ H&C?</h2>
+            <div class="content-box" style="border-left: 15px solid var(--forest-accent); text-align: left;">
+                <p style="margin-bottom: 30px;"><strong>✓ Conocimiento Real:</strong> Entendemos los flujos de tu club.</p>
+                <p><strong>✓ Anti-Censura:</strong> Soluciones robustas ante bloqueos.</p>
+            </div>
+            <div class="slide-number">06/08</div>
+        </div>
+
+        <!-- Slide 7: El Futuro -->
+        <div class="insta-slide">
+            <h2>RESULTADOS</h2>
+            <div style="display: flex; gap: 50px; margin-top: 40px;">
+                <div>
+                    <span style="font-size: 100px; font-weight: 800; color: #fff;">-70%</span>
+                    <p style="font-size: 24px; color: var(--text-secondary);">Gestión Manual</p>
+                </div>
+                <div>
+                    <span style="font-size: 100px; font-weight: 800; color: var(--forest-accent);">+GROWTH</span>
+                    <p style="font-size: 24px; color: var(--text-secondary);">Tecnológico</p>
+                </div>
+            </div>
+            <div class="slide-number">07/08</div>
+        </div>
+
+        <!-- Slide 8: CTA -->
+        <div class="insta-slide">
+            <img src="assets/logo-img.png" alt="Logo" style="height: 200px; margin-bottom: 40px;">
+            <h1 style="font-size: 60px;">¿HABLAMOS?</h1>
+            <p style="margin-bottom: 40px;">Agenda tu <strong>CONSULTORÍA GRATUITA</strong></p>
+            <div style="background: var(--forest-accent); color: #000; padding: 30px 60px; border-radius: 100px; font-weight: 800; font-size: 30px;">
+                DM PARA EMPEZAR
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let current = 0;
+        const slides = document.querySelectorAll('.insta-slide');
+        const status = document.getElementById('status');
+
+        function changeSlide(n) {
+            slides[current].classList.remove('active');
+            current = (current + n + slides.length) % slides.length;
+            slides[current].classList.add('active');
+            status.innerText = `Slide ${current + 1}/${slides.length}`;
+        }
+
+        async function downloadImage() {
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "PROCESANDO...";
+            btn.disabled = true;
+
+            const captureArea = document.getElementById('capture-area');
+            
+            try {
+                const canvas = await html2canvas(captureArea, {
+                    scale: 2, // High resolution
+                    useCORS: true,
+                    backgroundColor: "#070f0d"
+                });
+                
+                const link = document.createElement('a');
+                link.download = `HashAndCrafts_IG_Slide_${current + 1}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            } catch (err) {
+                console.error("Error capturando la imagen:", err);
+                alert("Error al generar la imagen. Si usas Chrome, intenta abrir el archivo con un servidor local (Live Server) o usa Firefox.");
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+        });
+    </script>
+</body>
+</html>
