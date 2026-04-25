@@ -12,13 +12,14 @@ async function startApp() {
     mainBot.start().catch(err => console.error("Main Bot Error:", err));
 
     // Start Moderator Bot
-    const moderatorBot = require('./moderator/moderator');
-    moderatorBot.start().catch(err => console.error("Moderator Bot Error:", err));
+    // FIX: moderator now exports { start, moderatorBot } instead of just the bot instance
+    const moderator = require('./moderator/moderator');
+    moderator.start().catch(err => console.error("Moderator Bot Error:", err));
 
     // Start Web App
     require('./webapp/server');
 
-    // Start Scheduler
+    // Start Scheduler (must be after bot so module cache has bot instance)
     require('./scheduler/scheduler');
 
     console.log("All services are starting up...");

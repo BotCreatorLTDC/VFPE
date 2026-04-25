@@ -1,18 +1,25 @@
 -- VFPE Database Schema for PostgreSQL
+-- Country values use ISO 2-letter codes: 'ES', 'DE', 'NL', etc.
 
 -- Table for verified and pending clubs
 CREATE TABLE IF NOT EXISTS clubs (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     city TEXT NOT NULL,
-    country TEXT NOT NULL,
+    country TEXT NOT NULL CHECK (LENGTH(country) = 2), -- ISO 2-letter code
     telegram_username TEXT NOT NULL,
     instagram TEXT,
     description TEXT,
-    status TEXT DEFAULT 'pending', -- 'pending', 'verified', 'rejected'
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'verified', 'rejected')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     verified_at TIMESTAMP
 );
+
+-- FIX: Index on the most frequent query pattern (city + status lookups)
+CREATE INDEX IF NOT EXISTS idx_clubs_city_status ON clubs(city, status);
+
+-- FIX: Index for weekly summary query (verified_at range scan)
+CREATE INDEX IF NOT EXISTS idx_clubs_verified_at ON clubs(verified_at) WHERE status = 'verified';
 
 -- Table for group members and moderation
 CREATE TABLE IF NOT EXISTS users (
@@ -23,17 +30,22 @@ CREATE TABLE IF NOT EXISTS users (
     last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Table for moderation rules (keywords, patterns)
+-- Table for moderation rules (keywords, patterns) — read dynamically by moderator bot
 CREATE TABLE IF NOT EXISTS moderation_rules (
     id SERIAL PRIMARY KEY,
-    rule_type TEXT NOT NULL, -- 'keyword', 'regex'
-    pattern TEXT NOT NULL,
-    action TEXT DEFAULT 'delete' -- 'delete', 'warn', 'ban'
+    rule_type TEXT NOT NULL CHECK (rule_type IN ('keyword', 'regex')),
+    pattern TEXT NOT NULL UNIQUE,
+    action TEXT DEFAULT 'delete' CHECK (action IN ('delete', 'warn', 'ban'))
 );
 
 -- Initial moderation rules based on spec
-INSERT INTO moderation_rules (rule_type, pattern) 
+INSERT INTO moderation_rules (rule_type, pattern)
 SELECT 'keyword', pattern FROM (
-    VALUES ('vendo'), ('sell'), ('selling'), ('precio'), ('price'), ('€/g'), ('compra'), ('buy'), ('buying'), ('delivery'), ('entrega')
+    VALUES
+        ('vendo'), ('sell'), ('selling'),
+        ('precio'), ('price'), ('€/g'), ('/g'),
+        ('compra'), ('buy'), ('buying'),
+        ('delivery'), ('entrega'),
+        ('whatsapp'), ('wp:'), ('wa:')
 ) AS t(pattern)
 WHERE NOT EXISTS (SELECT 1 FROM moderation_rules WHERE pattern = t.pattern);

@@ -129,14 +129,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Filter logic
+    // FIX: country filter now uses ISO codes ('ES', 'DE', 'NL') matching what's stored in DB
     function filterClubs() {
         const searchTerm = searchInput.value.toLowerCase();
-        const country = countryFilter.value;
+        const country = countryFilter.value; // already 'all' | 'ES' | 'DE' | 'NL'
         
         const filtered = allClubs.filter(club => {
             const matchesSearch = club.name.toLowerCase().includes(searchTerm) || 
                                  club.city.toLowerCase().includes(searchTerm);
-            const matchesCountry = country === 'all' || club.country === country;
+            // Normalize both sides to uppercase for safe comparison
+            const matchesCountry = country === 'all' || 
+                                   (club.country || '').toUpperCase() === country.toUpperCase();
             return matchesSearch && matchesCountry;
         });
         
@@ -158,8 +161,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Form submission
     applyForm.onsubmit = async (e) => {
         e.preventDefault();
+        const submitBtn = applyForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+
         const formData = new FormData(applyForm);
         const data = Object.fromEntries(formData.entries());
+
+        // FIX: Validate @username format on client side too
+        if (!data.telegram_username.startsWith('@')) {
+            data.telegram_username = '@' + data.telegram_username;
+        }
 
         try {
             const response = await fetch('/api/verify', {
@@ -169,12 +181,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const result = await response.json();
             if (result.success) {
-                alert("Request received! We'll review your club within 24-48 hours.");
+                alert("✅ Request received! We'll review your club within 24-48 hours.");
                 applyModal.style.display = "none";
                 applyForm.reset();
+            } else {
+                alert('❌ Error: ' + (result.error || 'Unknown error'));
             }
         } catch (err) {
-            alert("Error submitting request.");
+            alert("❌ Connection error. Please try again.");
+            console.error('Submit error:', err);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Verification Request';
         }
     };
 
