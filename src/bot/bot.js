@@ -123,6 +123,7 @@ async function verifyClubConversation(conversation, ctx) {
 bot.use(createConversation(verifyClubConversation));
 
 const getMainMenu = (ctx) => new InlineKeyboard()
+    .webApp("📱 Open Directory", `${process.env.WEBAPP_URL || 'https://vfpe.onrender.com'}/index.html`).row()
     .text(t(ctx, 'menu_find'), "menu_find").row()
     .text(t(ctx, 'menu_community'), "menu_community").row()
     .text(t(ctx, 'menu_verify'), "menu_verify").row()
