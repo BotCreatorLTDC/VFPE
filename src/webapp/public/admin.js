@@ -1,133 +1,163 @@
-let adminSecret = localStorage.getItem('vfpe_admin_secret') || '';
+const tg = window.Telegram.WebApp;
+let adminId = null;
 let allClubs = [];
-let currentFilter = 'all';
+let currentFilter = 'pending';
 
-const authOverlay = document.getElementById('auth-overlay');
-const dashboard = document.querySelector('.dashboard-container');
-const secretInput = document.getElementById('admin-secret-input');
-const loginBtn = document.getElementById('login-btn');
-const authError = document.getElementById('auth-error');
+const authLoading = document.getElementById('auth-loading');
+const adminApp = document.getElementById('admin-app');
+const clubsList = document.getElementById('clubs-list');
+const analyticsView = document.getElementById('analytics-view');
+const tabItems = document.querySelectorAll('.tab-item');
 
-const clubsBody = document.getElementById('clubs-body');
-const navItems = document.querySelectorAll('.nav-item');
-const viewTitle = document.getElementById('view-title');
-
-const statTotal = document.getElementById('stat-total');
 const statPending = document.getElementById('stat-pending');
-const statVerified = document.getElementById('stat-verified');
+const statClicks = document.getElementById('stat-clicks');
 
-// Check auth on load
-if (adminSecret) {
-    verifyAuth();
-}
+// Initialize Telegram WebApp
+tg.expand();
+tg.ready();
 
-loginBtn.onclick = () => {
-    adminSecret = secretInput.value;
-    verifyAuth();
-};
-
-async function verifyAuth() {
-    try {
-        const response = await fetch('/api/admin/clubs', {
-            headers: { 'x-admin-secret': adminSecret }
-        });
-        
-        if (response.ok) {
-            localStorage.setItem('vfpe_admin_secret', adminSecret);
-            authOverlay.style.display = 'none';
-            dashboard.style.display = 'flex';
-            fetchClubs();
-        } else {
-            authError.textContent = '❌ Invalid secret key.';
-            localStorage.removeItem('vfpe_admin_secret');
-        }
-    } catch (e) {
-        authError.textContent = '❌ Connection error.';
+// Get Admin ID from Telegram
+if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+    adminId = tg.initDataUnsafe.user.id;
+    verifyAdmin();
+} else {
+    // For local testing if not in Telegram
+    const urlParams = new URLSearchParams(window.location.search);
+    adminId = urlParams.get('admin_id');
+    if (adminId) verifyAdmin();
+    else {
+        authLoading.innerHTML = `<p style="color: #ff4d4d;">❌ Error: Open this from Telegram /admin</p>`;
     }
 }
 
-async function fetchClubs() {
+async function verifyAdmin() {
     try {
-        const response = await fetch('/api/admin/clubs', {
-            headers: { 'x-admin-secret': adminSecret }
-        });
-        allClubs = await response.json();
-        updateStats();
-        renderTable();
+        const response = await fetch(`/api/admin/clubs?admin_id=${adminId}`);
+        if (response.ok) {
+            authLoading.style.display = 'none';
+            adminApp.style.display = 'block';
+            fetchData();
+        } else {
+            authLoading.innerHTML = `<p style="color: #ff4d4d;">❌ Access Denied: You are not an admin.</p>`;
+        }
+    } catch (e) {
+        authLoading.innerHTML = `<p>⚠️ Connection Error. Retrying...</p>`;
+        setTimeout(verifyAdmin, 3000);
+    }
+}
+
+async function fetchData() {
+    try {
+        const [clubsRes, analyticsRes] = await Promise.all([
+            fetch(`/api/admin/clubs?admin_id=${adminId}`),
+            fetch(`/api/admin/analytics?admin_id=${adminId}`)
+        ]);
+        
+        allClubs = await clubsRes.json();
+        const analytics = await analyticsRes.json();
+        
+        updateStats(analytics);
+        renderView();
+        renderAnalytics(analytics);
     } catch (e) {
         console.error('Fetch error:', e);
     }
 }
 
-function updateStats() {
-    statTotal.textContent = allClubs.length;
+function updateStats(data) {
     statPending.textContent = allClubs.filter(c => c.status === 'pending').length;
-    statVerified.textContent = allClubs.filter(c => c.status === 'verified').length;
+    statClicks.textContent = data.clicks;
 }
 
-function renderTable() {
+function renderView() {
+    if (currentFilter === 'analytics') {
+        clubsList.style.display = 'none';
+        analyticsView.style.display = 'block';
+        return;
+    }
+
+    clubsList.style.display = 'flex';
+    analyticsView.style.display = 'none';
+
     const filtered = allClubs.filter(c => currentFilter === 'all' || c.status === currentFilter);
-    clubsBody.innerHTML = '';
+    clubsList.innerHTML = '';
+
+    if (filtered.length === 0) {
+        clubsList.innerHTML = `<div style="text-align:center; padding: 2rem; color: #8e8e93;">Empty list</div>`;
+        return;
+    }
 
     filtered.forEach(club => {
-        const row = document.createElement('tr');
-        const date = new Date(club.created_at).toLocaleDateString();
+        const card = document.createElement('div');
+        card.className = `club-card ${club.is_premium ? 'premium' : ''}`;
         
-        row.innerHTML = `
-            <td><strong>${club.name}</strong></td>
-            <td>${club.city}, ${club.country}</td>
-            <td>${club.telegram_username}</td>
-            <td><span class="status-badge status-${club.status}">${club.status.toUpperCase()}</span></td>
-            <td>${date}</td>
-            <td>
-                <div class="action-btns">
-                    ${club.status !== 'verified' ? `<button class="btn-action btn-approve" onclick="handleAction(${club.id}, 'approve')">Approve</button>` : ''}
-                    ${club.status === 'pending' ? `<button class="btn-action btn-reject" onclick="handleAction(${club.id}, 'reject')">Reject</button>` : ''}
-                    <button class="btn-action btn-delete" onclick="handleAction(${club.id}, 'delete')">Delete</button>
-                </div>
-            </td>
+        card.innerHTML = `
+            <div class="card-header">
+                <h3>${club.name}</h3>
+                <span class="loc">📍 ${club.city}, ${club.country}</span>
+            </div>
+            <div class="card-meta">
+                <span>💬 ${club.telegram_username}</span>
+                <span>🖱 ${club.click_count || 0} clicks</span>
+            </div>
+            <div class="card-actions">
+                ${club.status === 'pending' ? `
+                    <button class="btn-m btn-approve" onclick="handleAction(${club.id}, 'approve')">Approve</button>
+                    <button class="btn-m btn-reject" onclick="handleAction(${club.id}, 'reject')">Reject</button>
+                ` : `
+                    <button class="btn-m btn-promote" onclick="handleAction(${club.id}, 'promote')">
+                        ${club.is_premium ? '💎 UNPROMOTE' : '⭐ PROMOTE TO PREMIUM'}
+                    </button>
+                `}
+                <button class="btn-m btn-delete" onclick="handleAction(${club.id}, 'delete')">Permanently Delete</button>
+            </div>
         `;
-        clubsBody.appendChild(row);
+        clubsList.appendChild(card);
     });
 }
 
+function renderAnalytics(data) {
+    const citiesList = document.getElementById('top-cities-list');
+    const clubsListAn = document.getElementById('top-clubs-list');
+
+    citiesList.innerHTML = data.topCities.map(c => `<li><span class="n">${c.city}</span> <span class="v">${c.count} clubs</span></li>`).join('');
+    clubsListAn.innerHTML = data.topClubs.map(c => `<li><span class="n">${c.name}</span> <span class="v">${c.click_count} clicks</span></li>`).join('');
+}
+
 async function handleAction(id, action) {
-    if (action === 'delete' && !confirm('Are you sure you want to permanently delete this club?')) return;
+    if (action === 'delete' && !confirm('Are you sure?')) return;
+    
+    tg.MainButton.setText('Processing...');
+    tg.MainButton.show();
 
     try {
         const response = await fetch('/api/admin/action', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                'x-admin-secret': adminSecret
+                'x-admin-id': adminId
             },
             body: JSON.stringify({ id, action })
         });
         
         if (response.ok) {
-            fetchClubs(); // Refresh
-        } else {
-            alert('Action failed.');
+            fetchData();
+            tg.HapticFeedback.notificationOccurred('success');
         }
     } catch (e) {
-        alert('Connection error.');
+        alert('Action failed');
+    } finally {
+        tg.MainButton.hide();
     }
 }
 
-// Navigation
-navItems.forEach(item => {
+tabItems.forEach(item => {
     item.onclick = () => {
-        navItems.forEach(n => n.classList.remove('active'));
+        tabItems.forEach(t => t.classList.remove('active'));
         item.classList.add('active');
         currentFilter = item.dataset.filter;
-        viewTitle.textContent = item.textContent;
-        renderTable();
+        renderView();
     };
 });
 
-document.getElementById('refresh-btn').onclick = fetchClubs;
-
-document.getElementById('logout-btn').onclick = () => {
-    localStorage.removeItem('vfpe_admin_secret');
-    window.location.reload();
-};
+document.getElementById('refresh-btn').onclick = fetchData;

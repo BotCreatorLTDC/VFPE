@@ -309,3 +309,18 @@ form button:active { transform: translateY(0); }
 .close { float: right; font-size: 28px; cursor: pointer; color: white; }
 
 footer { text-align: center; padding: 40px 20px; color: var(--text-dim); font-size: 0.75rem; }
+
+
+/* --- NEW FEATURES: GEO & PREMIUM --- */
+.club-card.premium { border-color: #ffcc00 !important; box-shadow: 0 5px 20px rgba(255, 204, 0, 0.15); }
+.club-card.premium .badge { background: #ffcc00 !important; }
+.club-card { transition: all 0.3s ease; }
+.club-card:hover { transform: translateY(-3px); }
+
+#near-me-btn {
+    position: absolute; bottom: 20px; right: 20px; z-index: 1000;
+    background: var(--primary); color: black; border: none;
+    width: 45px; height: 45px; border-radius: 50%; font-size: 1.2rem;
+    cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+}

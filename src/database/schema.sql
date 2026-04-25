@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS clubs (
     instagram TEXT,
     description TEXT,
     status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'verified', 'rejected')),
+    is_premium BOOLEAN DEFAULT FALSE,
+    click_count INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     verified_at TIMESTAMP
 );

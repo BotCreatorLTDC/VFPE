@@ -90,17 +90,29 @@ document.addEventListener('DOMContentLoaded', () => {
             statusMessage.textContent = "";
         }
 
-        clubs.forEach(club => {
+        // Sort: Premium first
+        const sorted = [...clubs].sort((a, b) => (b.is_premium ? 1 : 0) - (a.is_premium ? 1 : 0));
+
+        sorted.forEach(club => {
             const card = document.createElement('div');
-            card.className = 'club-card';
+            card.className = `club-card ${club.is_premium ? 'premium' : ''}`;
             card.innerHTML = `
-                <span class="badge">VERIFIED</span>
+                <span class="badge">${club.is_premium ? '⭐ PREMIUM' : 'VERIFIED'}</span>
                 <h2>${club.name}</h2>
                 <p class="location">📍 ${club.city}, ${club.country}</p>
             `;
-            card.onclick = () => showDetail(club);
+            card.onclick = () => {
+                logClick(club.id);
+                showDetail(club);
+            };
             clubList.appendChild(card);
         });
+    }
+
+    async function logClick(id) {
+        try {
+            fetch(`/api/clubs/click/${id}`, { method: 'POST' });
+        } catch (e) {}
     }
 
     function showDetail(club) {
@@ -194,6 +206,30 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Submit Verification Request';
         }
+    };
+
+    // Geolocation "Near Me"
+    const nearMeBtn = document.createElement('button');
+    nearMeBtn.id = 'near-me-btn';
+    nearMeBtn.innerHTML = '📍';
+    nearMeBtn.title = 'Clubs near me';
+    document.getElementById('map-container').appendChild(nearMeBtn);
+
+    nearMeBtn.onclick = () => {
+        if (!navigator.geolocation) return alert('Geolocation not supported');
+        
+        nearMeBtn.innerHTML = '⌛';
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const { latitude, longitude } = pos.coords;
+            map.setView([latitude, longitude], 12);
+            
+            // Add user marker
+            L.circle([latitude, longitude], { radius: 200, color: '#00d26a' }).addTo(map);
+            nearMeBtn.innerHTML = '📍';
+        }, (err) => {
+            alert('Could not get location');
+            nearMeBtn.innerHTML = '📍';
+        });
     };
 
     // Initialize

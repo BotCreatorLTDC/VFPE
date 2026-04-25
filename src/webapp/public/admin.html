@@ -2,81 +2,59 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VFPE Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VFPE Mobile Admin</title>
     <link rel="stylesheet" href="admin.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div id="auth-overlay" class="overlay">
-        <div class="auth-card">
-            <h2>🔐 Admin Access</h2>
-            <p>Enter the secret key to manage VFPE ecosystem.</p>
-            <input type="password" id="admin-secret-input" placeholder="Enter Secret Key...">
-            <button id="login-btn">Unlock Dashboard</button>
-            <p id="auth-error" class="error"></p>
-        </div>
+<body class="mobile-admin">
+    <div id="auth-loading" class="full-screen-msg">
+        <div class="spinner"></div>
+        <p>Authenticating Admin...</p>
     </div>
 
-    <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="logo-area">
+    <div id="admin-app" style="display: none;">
+        <header class="app-header">
+            <div class="brand">
                 <h1>VFPE</h1>
-                <span>Admin Panel</span>
+                <span>ADMIN HQ</span>
             </div>
-            <nav>
-                <button class="nav-item active" data-filter="all">📦 All Clubs</button>
-                <button class="nav-item" data-filter="pending">⏳ Pending</button>
-                <button class="nav-item" data-filter="verified">✅ Verified</button>
-                <button class="nav-item" data-filter="rejected">❌ Rejected</button>
-            </nav>
-            <div class="sidebar-footer">
-                <button id="logout-btn">Logout</button>
+            <button id="refresh-btn">🔄</button>
+        </header>
+
+        <section class="quick-stats">
+            <div class="stat-bubble" id="stat-pending-bubble">
+                <span class="val" id="stat-pending">0</span>
+                <span class="lbl">Pending</span>
             </div>
-        </aside>
+            <div class="stat-bubble">
+                <span class="val" id="stat-clicks">0</span>
+                <span class="lbl">Total Clicks</span>
+            </div>
+        </section>
 
-        <main class="content">
-            <header class="main-header">
-                <div class="header-info">
-                    <h2 id="view-title">All Clubs</h2>
-                    <p id="club-count-total">Loading statistics...</p>
-                </div>
-                <div class="header-actions">
-                    <button id="refresh-btn">🔄 Refresh Data</button>
-                </div>
-            </header>
+        <nav class="tab-bar">
+            <button class="tab-item active" data-filter="pending">⏳ Inbox</button>
+            <button class="tab-item" data-filter="verified">✅ Active</button>
+            <button class="tab-item" data-filter="analytics">📊 Stats</button>
+            <button class="tab-item" data-filter="all">📦 All</button>
+        </nav>
 
-            <section class="stats-grid">
-                <div class="stat-card">
-                    <h3>Total</h3>
-                    <p id="stat-total">-</p>
-                </div>
-                <div class="stat-card pending">
-                    <h3>Pending</h3>
-                    <p id="stat-pending">-</p>
-                </div>
-                <div class="stat-card verified">
-                    <h3>Verified</h3>
-                    <p id="stat-verified">-</p>
-                </div>
-            </section>
+        <main id="main-view">
+            <div id="clubs-list" class="card-list">
+                <!-- Cards injected here -->
+            </div>
 
-            <div class="table-container">
-                <table id="clubs-table">
-                    <thead>
-                        <tr>
-                            <th>Club Name</th>
-                            <th>Location</th>
-                            <th>Contact</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="clubs-body">
-                        <!-- Content injected by JS -->
-                    </tbody>
-                </table>
+            <div id="analytics-view" class="analytics-container" style="display: none;">
+                <div class="analytics-card">
+                    <h3>Top Cities</h3>
+                    <ul id="top-cities-list"></ul>
+                </div>
+                <div class="analytics-card">
+                    <h3>Most Popular Clubs</h3>
+                    <ul id="top-clubs-list"></ul>
+                </div>
             </div>
         </main>
     </div>
