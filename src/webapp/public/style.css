@@ -324,3 +324,4 @@ footer { text-align: center; padding: 40px 20px; color: var(--text-dim); font-si
     cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     display: flex; align-items: center; justify-content: center;
 }
+.brand-logo { height: 50px; width: auto; border-radius: 8px; margin-bottom: 5px; }

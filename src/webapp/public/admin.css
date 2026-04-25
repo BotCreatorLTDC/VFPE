@@ -200,3 +200,4 @@ li {
 li:last-child { border: none; }
 li .n { font-weight: 600; }
 li .v { color: var(--accent); font-weight: 700; }
+.brand-logo-m { height: 40px; width: auto; border-radius: 6px; }
