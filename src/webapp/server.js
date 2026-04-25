@@ -164,6 +164,21 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
     }
 });
 
+// FULL UPDATE for Admins
+app.post('/api/admin/update', adminAuth, async (req, res) => {
+    const { id, name, city, country, telegram_username, instagram, description } = req.body;
+    
+    try {
+        await query(
+            "UPDATE clubs SET name = $1, city = $2, country = $3, telegram_username = $4, instagram = $5, description = $6 WHERE id = $7",
+            [name, city, country, telegram_username, instagram || null, description || null, id]
+        );
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: "Admin update failed" });
+    }
+});
+
 // Health check endpoint for Render
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });

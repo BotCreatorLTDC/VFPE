@@ -106,15 +106,63 @@ function renderView() {
                     <button class="btn-m btn-reject" onclick="handleAction(${club.id}, 'reject')">Reject</button>
                 ` : `
                     <button class="btn-m btn-promote" onclick="handleAction(${club.id}, 'promote')">
-                        ${club.is_premium ? '💎 UNPROMOTE' : '⭐ PROMOTE TO PREMIUM'}
+                        ${club.is_premium ? '💎 UNPROMOTE' : '⭐ PROMOTE'}
                     </button>
                 `}
-                <button class="btn-m btn-delete" onclick="handleAction(${club.id}, 'delete')">Permanently Delete</button>
+                <button class="btn-m btn-edit" onclick="openEditModal(${club.id})">✏️ Edit</button>
+                <button class="btn-m btn-delete" onclick="handleAction(${club.id}, 'delete')">Delete</button>
             </div>
         `;
         clubsList.appendChild(card);
     });
 }
+
+function openEditModal(id) {
+    const club = allClubs.find(c => c.id === id);
+    if (!club) return;
+    document.getElementById('edit-id').value = club.id;
+    document.getElementById('edit-name').value = club.name;
+    document.getElementById('edit-city').value = club.city;
+    document.getElementById('edit-country').value = club.country;
+    document.getElementById('edit-tg').value = club.telegram_username;
+    document.getElementById('edit-ig').value = club.instagram || '';
+    document.getElementById('edit-desc').value = club.description || '';
+    document.getElementById('edit-modal').style.display = 'flex';
+}
+
+document.getElementById('close-modal').onclick = () => {
+    document.getElementById('edit-modal').style.display = 'none';
+};
+
+document.getElementById('edit-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const data = {
+        id: document.getElementById('edit-id').value,
+        name: document.getElementById('edit-name').value,
+        city: document.getElementById('edit-city').value,
+        country: document.getElementById('edit-country').value,
+        telegram_username: document.getElementById('edit-tg').value,
+        instagram: document.getElementById('edit-ig').value,
+        description: document.getElementById('edit-desc').value
+    };
+
+    const res = await fetch('/api/admin/update', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'x-admin-id': adminId
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        document.getElementById('edit-modal').style.display = 'none';
+        fetchData();
+        tg.HapticFeedback.notificationOccurred('success');
+    } else {
+        alert('Update failed');
+    }
+};
 
 function renderAnalytics(data) {
     const citiesList = document.getElementById('top-cities-list');
