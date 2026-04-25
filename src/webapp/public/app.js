@@ -22,8 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
         'Barcelona': [41.3851, 2.1734],
         'Valencia': [39.4699, -0.3763],
         'Sevilla': [37.3891, -5.9845],
+        'Bilbao': [43.2630, -2.9350],
+        'Málaga': [36.7213, -4.4214],
         'Berlin': [52.5200, 13.4050],
-        'Amsterdam': [52.3676, 4.9041]
+        'Hamburg': [53.5511, 9.9937],
+        'Amsterdam': [52.3676, 4.9041],
+        'Rotterdam': [51.9225, 4.4792]
     };
 
     function initMap() {

@@ -67,13 +67,21 @@ header {
     background: var(--primary);
     width: 35px !important;
     height: 35px !important;
-    border-radius: 50%;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     border: 2px solid white;
-    position: relative;
+}
+
+.custom-marker span {
+    transform: rotate(45deg);
+    color: black;
+    font-weight: 900;
+    font-size: 1rem;
+    display: block;
 }
 
 #search-input {
