@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFPE - Instagram Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
+        
+        :root {
+            --bg: #000000;
+            --accent: #00d26a;
+            --card-bg: #111;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            background: var(--bg); 
+            color: white; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            padding-bottom: 50px;
+        }
+
+        .download-header {
+            position: sticky; top: 0; width: 100%; background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px); padding: 20px; z-index: 1000;
+            display: flex; justify-content: center; border-bottom: 1px solid #222;
+        }
+
+        .btn-download-all {
+            background: var(--accent); color: black; border: none;
+            padding: 12px 25px; border-radius: 50px; font-weight: 800;
+            cursor: pointer; font-size: 1rem; box-shadow: 0 0 20px rgba(0, 210, 106, 0.3);
+            transition: transform 0.2s;
+        }
+        .btn-download-all:active { transform: scale(0.95); }
+
+        .ig-feed { max-width: 500px; width: 100%; padding: 20px; }
+
+        .ig-post {
+            background: var(--card-bg); border-radius: 20px;
+            margin-bottom: 40px; overflow: hidden; border: 1px solid #222;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .post-header { padding: 15px; display: flex; align-items: center; gap: 10px; }
+        .post-header img { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent); }
+        .post-header span { font-weight: 600; font-size: 0.9rem; }
+
+        .post-image { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; background: #000; }
+        
+        .post-content { padding: 20px; }
+        .post-content h2 { color: var(--accent); font-size: 1.4rem; margin-bottom: 8px; }
+        .post-content p { color: #aaa; font-size: 0.95rem; line-height: 1.4; }
+
+        .post-footer { padding: 15px; border-top: 1px solid #222; font-size: 0.8rem; color: #555; text-align: right; }
+
+        h1.main-title { margin: 40px 0; font-size: 2.5rem; text-align: center; color: var(--accent); }
+
+        @media (max-width: 600px) {
+            .ig-feed { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="download-header">
+        <button class="btn-download-all" onclick="downloadAllImages()">📥 Descargar todas las diapositivas</button>
+    </div>
+
+    <h1 class="main-title">VFPE Social Kit</h1>
+
+    <div class="ig-feed">
+        <!-- SLIDE 1 -->
+        <div class="ig-post">
+            <div class="post-header"><img src="assets/logo.jpg"> <span>Verify Plug Europe</span></div>
+            <img src="assets/presentacion/start-en-bot.jpg" class="post-image">
+            <div class="post-content">
+                <h2>01. Onboarding</h2>
+                <p>Nuestra puerta de entrada nativa en Telegram. Rápido, seguro y multilingüe.</p>
+            </div>
+            <div class="post-footer">Slide 1/7</div>
+        </div>
+
+        <!-- SLIDE 2 -->
+        <div class="ig-post">
+            <div class="post-header"><img src="assets/logo.jpg"> <span>Verify Plug Europe</span></div>
+            <img src="assets/presentacion/pagina-principal-miniapp.jpg" class="post-image">
+            <div class="post-content">
+                <h2>02. Exploración</h2>
+                <p>Mapa interactivo con geolocalización en tiempo real para encontrar clubes cercanos.</p>
+            </div>
+            <div class="post-footer">Slide 2/7</div>
+        </div>
+
+        <!-- SLIDE 3 -->
+        <div class="ig-post">
+            <div class="post-header"><img src="assets/logo.jpg"> <span>Verify Plug Europe</span></div>
+            <img src="assets/presentacion/detalles-club.jpg" class="post-image">
+            <div class="post-content">
+                <h2>03. Confianza</h2>
+                <p>Fichas de clubes verificadas manualmente. Datos reales para usuarios reales.</p>
+            </div>
+            <div class="post-footer">Slide 3/7</div>
+        </div>
+
+        <!-- SLIDE 4 -->
+        <div class="ig-post">
+            <div class="post-header"><img src="assets/logo.jpg"> <span>Verify Plug Europe</span></div>
+            <img src="assets/presentacion/formulario-miniapp.jpg" class="post-image">
+            <div class="post-content">
+                <h2>04. Crecimiento</h2>
+                <p>Registro inteligente para nuevos clubes con validación de País y Ciudad.</p>
+            </div>
+            <div class="post-footer">Slide 4/7</div>
+        </div>
+
+        <!-- SLIDE 5 -->
+        <div class="ig-post">
+            <div class="post-header"><img src="assets/logo.jpg"> <span>Verify Plug Europe</span></div>
+            <img src="assets/presentacion/club-promocionado-y-ajustes-manage-my-club-visibles.jpg" class="post-image">
+            <div class="post-content">
+                <h2>05. Gestión</h2>
+                <p>Estatus Premium y autogestión de perfiles para dueños de clubes.</p>
+            </div>
+            <div class="post-footer">Slide 5/7</div>
+        </div>
+
+        <!-- SLIDE 6 -->
+        <div class="ig-post">
+            <div class="post-header"><img src="assets/logo.jpg"> <span>Verify Plug Europe</span></div>
+            <img src="assets/presentacion/admin-lista-de-club-y-club-promocionado.jpg" class="post-image">
+            <div class="post-content">
+                <h2>06. Control HQ</h2>
+                <p>Panel Administrativo completo para gestionar todo el ecosistema móvil.</p>
+            </div>
+            <div class="post-footer">Slide 6/7</div>
+        </div>
+
+        <!-- SLIDE 7 -->
+        <div class="ig-post">
+            <div class="post-header"><img src="assets/logo.jpg"> <span>Verify Plug Europe</span></div>
+            <img src="assets/presentacion/aprobarrechazar-club-desde-admin-miniapp.jpg" class="post-image">
+            <div class="post-content">
+                <h2>07. Moderación</h2>
+                <p>Aprobación y rechazo instantáneo de solicitudes para una red de calidad.</p>
+            </div>
+            <div class="post-footer">Slide 7/7</div>
+        </div>
+    </div>
+
+    <script>
+        function downloadAllImages() {
+            const images = [
+                'assets/presentacion/start-en-bot.jpg',
+                'assets/presentacion/pagina-principal-miniapp.jpg',
+                'assets/presentacion/detalles-club.jpg',
+                'assets/presentacion/formulario-miniapp.jpg',
+                'assets/presentacion/club-promocionado-y-ajustes-manage-my-club-visibles.jpg',
+                'assets/presentacion/admin-lista-de-club-y-club-promocionado.jpg',
+                'assets/presentacion/aprobarrechazar-club-desde-admin-miniapp.jpg'
+            ];
+
+            images.forEach((url, index) => {
+                setTimeout(() => {
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `VFPE_Slide_${index + 1}.jpg`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }, index * 500); // Pequeño retraso para evitar bloqueo del navegador
+            });
+            
+            alert('Iniciando descarga de las 7 diapositivas...');
+        }
+    </script>
+
+</body>
+</html>
