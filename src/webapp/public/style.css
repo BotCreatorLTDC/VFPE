@@ -3,11 +3,13 @@
 :root {
     --bg-color: #0a0a0a;
     --card-bg: #1a1a1a;
-    --primary: #c2e812;
+    --primary: #00d26a;
+    --primary-alt: #c2e812;
     --text-main: #ffffff;
     --text-dim: #a0a0a0;
     --accent: #2ecc71;
     --danger: #e74c3c;
+    --premium: #ffcc00;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,7 +32,7 @@ header {
     padding-bottom: 20px;
 }
 
-.logo h1 { font-size: 2rem; color: var(--primary); letter-spacing: -1px; }
+.logo img { height: 50px; width: auto; border-radius: 8px; margin-bottom: 5px; }
 .logo p { font-size: 0.8rem; color: var(--text-dim); }
 
 .stats {
@@ -48,6 +50,7 @@ header {
     overflow: hidden;
     margin-bottom: 30px;
     border: 1px solid #333;
+    position: relative;
 }
 
 #map {
@@ -56,16 +59,10 @@ header {
     z-index: 10;
 }
 
-/* Dark Map Filter */
 .leaflet-tile {
     filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
 }
 
-.leaflet-container {
-    background: var(--bg-color) !important;
-}
-
-/* Custom Marker Styles (Premium Pin) */
 .custom-marker {
     background: var(--primary);
     width: 35px !important;
@@ -74,37 +71,9 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 15px rgba(194, 232, 18, 0.3);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     border: 2px solid white;
     position: relative;
-}
-
-/* The "tail" of the pin */
-.custom-marker::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 10px solid white;
-}
-
-.custom-marker span {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: black;
-    font-weight: 900;
-    font-size: 1rem;
-    font-family: 'Outfit', sans-serif;
-    margin: 0;
-    padding: 0;
-    line-height: 1;
 }
 
 #search-input {
@@ -118,7 +87,7 @@ header {
     margin-bottom: 15px;
 }
 
-.filters { display: flex; gap: 15px; align-items: center; }
+.filters { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
 select { padding: 10px; border-radius: 8px; background: #222; color: white; border: 1px solid #444; }
 
 #status-message {
@@ -137,9 +106,19 @@ select { padding: 10px; border-radius: 8px; background: #222; color: white; bord
     border: 1px solid #333;
     position: relative;
     cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.club-card:hover { border-color: var(--primary); }
+.club-card:hover { border-color: var(--primary); transform: translateY(-3px); }
+
+.club-card.premium {
+    border-color: var(--premium) !important;
+    box-shadow: 0 5px 20px rgba(255, 204, 0, 0.15);
+}
+
+.club-card.premium .badge {
+    background: var(--premium) !important;
+}
 
 .badge {
     position: absolute;
@@ -162,7 +141,7 @@ select { padding: 10px; border-radius: 8px; background: #222; color: white; bord
     top: 0; left: 0;
     width: 100%; height: 100%;
     background: var(--bg-color);
-    z-index: 200;
+    z-index: 5000; /* Over everything */
     padding: 20px;
     overflow-y: auto;
 }
@@ -225,12 +204,6 @@ hr { border: 0; border-top: 1px solid #333; margin: 20px 0; }
     border: 1px dashed #333;
 }
 
-#apply-section h3 {
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-    color: var(--text-dim);
-}
-
 #open-apply-modal {
     background: transparent;
     color: var(--primary);
@@ -243,16 +216,10 @@ hr { border: 0; border-top: 1px solid #333; margin: 20px 0; }
     transition: all 0.3s ease;
 }
 
-#open-apply-modal:hover {
-    background: var(--primary);
-    color: black;
-    box-shadow: 0 0 20px rgba(194, 232, 18, 0.3);
-}
-
 /* Modals */
 .modal {
     display: none;
-    position: fixed; z-index: 300;
+    position: fixed; z-index: 6000;
     left: 0; top: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
 }
@@ -262,61 +229,24 @@ hr { border: 0; border-top: 1px solid #333; margin: 20px 0; }
     width: 90%; max-width: 450px; border-radius: 24px; border: 1px solid #333;
 }
 
-.modal-content h2 { margin-bottom: 20px; color: var(--primary); }
-
 .modal-content form input, 
 .modal-content form select, 
 .modal-content form textarea {
-    width: 100%;
-    padding: 14px;
-    margin-bottom: 15px;
-    background: #222;
-    border: 1px solid #333;
-    color: white;
-    border-radius: 12px;
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.9rem;
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.modal-content form input:focus, 
-.modal-content form select:focus, 
-.modal-content form textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 10px rgba(194, 232, 18, 0.2);
-}
-
-.modal-content form textarea { height: 100px; resize: none; }
-
-.disclaimer {
-    font-size: 0.75rem;
-    color: var(--text-dim);
-    margin-bottom: 20px;
-    line-height: 1.4;
+    width: 100%; padding: 14px; margin-bottom: 15px;
+    background: #222; border: 1px solid #333; color: white; border-radius: 12px;
 }
 
 form button {
     width: 100%; padding: 16px; background: var(--primary);
     color: black; border: none; border-radius: 12px;
     font-weight: 700; font-size: 1rem; cursor: pointer;
-    transition: transform 0.2s, background 0.3s;
 }
-
-form button:hover { background: #d4f72a; transform: translateY(-2px); }
-form button:active { transform: translateY(0); }
 
 .close { float: right; font-size: 28px; cursor: pointer; color: white; }
 
 footer { text-align: center; padding: 40px 20px; color: var(--text-dim); font-size: 0.75rem; }
 
-
-/* --- NEW FEATURES: GEO & PREMIUM --- */
-.club-card.premium { border-color: #ffcc00 !important; box-shadow: 0 5px 20px rgba(255, 204, 0, 0.15); }
-.club-card.premium .badge { background: #ffcc00 !important; }
-.club-card { transition: all 0.3s ease; }
-.club-card:hover { transform: translateY(-3px); }
-
+/* Floating Buttons */
 #near-me-btn {
     position: absolute; bottom: 20px; right: 20px; z-index: 1000;
     background: var(--primary); color: black; border: none;
@@ -324,8 +254,10 @@ footer { text-align: center; padding: 40px 20px; color: var(--text-dim); font-si
     cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     display: flex; align-items: center; justify-content: center;
 }
-.brand-logo { height: 50px; width: auto; border-radius: 8px; margin-bottom: 5px; }
 
 #owner-tools { position: fixed; bottom: 80px; left: 20px; z-index: 1000; }
-#open-edit-btn { background: #1a1a1a; color: #00d26a; border: 1px solid #00d26a; padding: 10px 20px; border-radius: 50px; font-weight: 700; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
-
+#open-edit-btn { 
+    background: #1a1a1a; color: var(--primary); border: 1px solid var(--primary); 
+    padding: 10px 20px; border-radius: 50px; font-weight: 700; font-size: 0.9rem; 
+    cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); 
+}
