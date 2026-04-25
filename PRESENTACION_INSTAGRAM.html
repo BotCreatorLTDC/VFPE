@@ -3,261 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VFPE - Instagram Carousel Creator</title>
+    <title>VFPE - Professional IG Carousel</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
         
         body { 
-            background: #111; 
-            color: white; 
-            font-family: 'Outfit', sans-serif; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            padding: 50px 20px;
+            background: #111; color: white; font-family: 'Outfit', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; padding: 50px 20px;
         }
 
         .controls {
-            position: fixed;
-            top: 20px;
-            z-index: 1000;
-            background: rgba(0,0,0,0.8);
-            padding: 15px 25px;
-            border-radius: 50px;
-            border: 1px solid #00d26a;
-            display: flex;
-            gap: 15px;
-            backdrop-filter: blur(10px);
+            position: fixed; top: 20px; z-index: 1000; background: rgba(0,0,0,0.8);
+            padding: 15px 25px; border-radius: 50px; border: 1px solid #00d26a;
+            display: flex; gap: 15px; backdrop-filter: blur(10px);
         }
 
         .btn-download {
-            background: #00d26a;
-            color: black;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: 800;
-            cursor: pointer;
-            font-size: 0.9rem;
+            background: #00d26a; color: black; border: none; padding: 10px 20px;
+            border-radius: 25px; font-weight: 800; cursor: pointer;
         }
 
-        /* Instagram Post Container (1080x1080) */
         .ig-post {
-            width: 800px;
-            height: 800px;
-            background: #000;
-            margin-bottom: 50px;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 30px; /* Reduced padding */
-            border: 1px solid #222;
+            width: 1000px; height: 1000px; /* Square 1:1 */
+            background: #000; margin-bottom: 50px; position: relative;
+            display: flex; align-items: center; padding: 60px;
+            border: 1px solid #222; overflow: hidden;
         }
 
         .ig-post::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 70% 10%, rgba(0, 210, 106, 0.1) 0%, transparent 40%);
-            pointer-events: none;
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at var(--grad-x, 50%) var(--grad-y, 50%), rgba(0, 210, 106, 0.1) 0%, transparent 60%);
         }
 
-        .slide-header { 
-            z-index: 1; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-        .slide-header .titles h2 { font-size: 1.8rem; font-weight: 900; color: #00d26a; margin: 0; text-transform: uppercase; }
-        .slide-header .titles p { font-size: 0.9rem; color: #888; margin: 0; }
-        .slide-num { font-size: 2rem; font-weight: 900; color: #222; }
+        /* Split Layout */
+        .content-box { width: 55%; z-index: 10; display: flex; flex-direction: column; justify-content: center; }
+        .image-box { width: 45%; z-index: 10; display: flex; justify-content: center; align-items: center; height: 100%; }
 
-        .slide-body {
-            z-index: 1;
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            padding: 10px 0;
-        }
+        .ig-post.reverse { flex-direction: row-reverse; --grad-x: 80%; }
+        .ig-post.normal { --grad-x: 20%; }
+
+        h2 { font-size: 3.5rem; font-weight: 900; color: #00d26a; line-height: 1; margin-bottom: 30px; text-transform: uppercase; }
+        .description { font-size: 1.4rem; color: #aaa; margin-bottom: 40px; }
+        
+        .bullets { list-style: none; padding: 0; }
+        .bullets li { font-size: 1.2rem; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; }
+        .bullets li::before { content: '✅'; font-size: 1.1rem; }
 
         .mockup {
-            height: 100%; /* Take all available space */
-            aspect-ratio: 9 / 19; /* Mobile ratio */
-            background: #000;
-            border-radius: 20px;
-            border: 4px solid #333;
-            padding: 5px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            height: 85%; aspect-ratio: 9/19; background: #111;
+            border-radius: 30px; border: 8px solid #222; padding: 10px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.9);
         }
+        .mockup img { width: 100%; height: 100%; object-fit: contain; border-radius: 20px; }
 
-        .mockup img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 15px;
-        }
+        .footer-info { position: absolute; bottom: 40px; left: 60px; display: flex; align-items: center; gap: 15px; opacity: 0.5; }
+        .footer-info img { height: 30px; border-radius: 5px; }
 
-        .slide-footer {
-            z-index: 1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 15px;
-            border-top: 1px solid #1a1a1a;
-        }
-
-        .brand { display: flex; align-items: center; gap: 10px; }
-        .brand img { height: 25px; border-radius: 5px; }
-        .brand span { font-weight: 700; font-size: 0.8rem; color: #aaa; }
-
-        /* Cover Slide remains special */
-        .slide-cover { justify-content: center; text-align: center; }
-        .slide-cover h1 { font-size: 5rem; color: #00d26a; font-weight: 900; }
+        /* Cover Slide */
+        .slide-cover { flex-direction: column; justify-content: center; text-align: center; }
+        .slide-cover h1 { font-size: 6rem; font-weight: 900; color: #00d26a; margin: 20px 0; }
     </style>
 </head>
 <body>
 
     <div class="controls">
-        <span style="display: flex; align-items: center; font-size: 0.9rem;">📸 Full-Height IG Carousel</span>
-        <button class="btn-download" onclick="downloadAll()">📥 DESCARGAR TODAS LAS DIAPOSITIVAS</button>
+        <button class="btn-download" onclick="downloadAll()">📥 DESCARGAR CARRUSEL PRO</button>
     </div>
 
     <!-- SLIDE 1: PORTADA -->
     <div class="ig-post slide-cover" id="slide-1">
-        <div class="slide-header" style="justify-content:center;">
-            <img src="assets/logo.jpg" style="height: 150px; border-radius: 25px; margin-bottom: 20px;">
-        </div>
+        <img src="assets/logo.jpg" style="height: 180px; border-radius: 30px;">
         <h1>VFPE</h1>
-        <p style="font-size: 1.5rem; color: #888;">The Mobile-First Ecosystem</p>
-        <p style="margin-top: 40px; color: #00d26a; font-weight: 800;">CARRUSEL DE PRODUCTO →</p>
+        <p style="font-size: 2rem; color: #888;">El futuro de la gestión de clubes en Europa</p>
+        <div style="margin-top: 60px; color: #00d26a; font-weight: 900; font-size: 1.2rem;">DESLIZA PARA CONOCER MÁS →</div>
     </div>
 
-    <!-- SLIDE 2: EL BOT -->
-    <div class="ig-post" id="slide-2">
-        <div class="slide-header">
-            <div class="titles">
-                <h2>Acceso Directo</h2>
-                <p>Integración nativa con Telegram</p>
-            </div>
-            <span class="slide-num">01</span>
+    <!-- SLIDE 2: BOT (Imagen a la derecha) -->
+    <div class="ig-post normal" id="slide-2">
+        <div class="content-box">
+            <h2>Acceso<br>Nativo</h2>
+            <p class="description">Todo empieza en Telegram. Olvida las descargas y los registros complicados.</p>
+            <ul class="bullets">
+                <li>Bot Multilingüe inteligente</li>
+                <li>Arranque instantáneo (/start)</li>
+                <li>Notificaciones en tiempo real</li>
+            </ul>
         </div>
-        <div class="slide-body">
-            <div class="mockup">
-                <img src="assets/presentacion/start-en-bot.jpg">
-            </div>
+        <div class="image-box">
+            <div class="mockup"><img src="assets/presentacion/start-en-bot.jpg"></div>
         </div>
-        <div class="slide-footer">
-            <div class="brand"><img src="assets/logo.jpg"><span>@VerifyPlugEU_bot</span></div>
-        </div>
+        <div class="footer-info"><img src="assets/logo.jpg"><span>@VerifyPlugEU_bot</span></div>
     </div>
 
-    <!-- SLIDE 3: EL MAPA -->
-    <div class="ig-post" id="slide-3">
-        <div class="slide-header">
-            <div class="titles">
-                <h2>Mapa & Geo</h2>
-                <p>Encuentra tu club ideal en segundos</p>
-            </div>
-            <span class="slide-num">02</span>
+    <!-- SLIDE 3: MAPA (Imagen a la izquierda) -->
+    <div class="ig-post reverse" id="slide-3">
+        <div class="content-box">
+            <h2>Explora el<br>Mapa</h2>
+            <p class="description">Encuentra el club perfecto cerca de ti en segundos.</p>
+            <ul class="bullets">
+                <li>Geolocalización por GPS</li>
+                <li>Pines inteligentes con conteo</li>
+                <li>Cobertura en España, Alemania y NL</li>
+            </ul>
         </div>
-        <div class="slide-body">
-            <div class="mockup">
-                <img src="assets/presentacion/pagina-principal-miniapp.jpg">
-            </div>
+        <div class="image-box">
+            <div class="mockup"><img src="assets/presentacion/pagina-principal-miniapp.jpg"></div>
         </div>
-        <div class="slide-footer">
-            <div class="brand"><img src="assets/logo.jpg"><span>Explore Europe</span></div>
-        </div>
+        <div class="footer-info"><img src="assets/logo.jpg"><span>Safe Exploration</span></div>
     </div>
 
-    <!-- SLIDE 4: DETALLES -->
-    <div class="ig-post" id="slide-4">
-        <div class="slide-header">
-            <div class="titles">
-                <h2>Fichas Verificadas</h2>
-                <p>Información real y segura</p>
-            </div>
-            <span class="slide-num">03</span>
+    <!-- SLIDE 4: TRUST -->
+    <div class="ig-post normal" id="slide-4">
+        <div class="content-box">
+            <h2>Confianza<br>Total</h2>
+            <p class="description">Verificación manual para garantizar seguridad absoluta.</p>
+            <ul class="bullets">
+                <li>Sello "Verified" oficial</li>
+                <li>Información legal contrastada</li>
+                <li>Contacto directo con el club</li>
+            </ul>
         </div>
-        <div class="slide-body">
-            <div class="mockup">
-                <img src="assets/presentacion/detalles-club.jpg">
-            </div>
+        <div class="image-box">
+            <div class="mockup"><img src="assets/presentacion/detalles-club.jpg"></div>
         </div>
-        <div class="slide-footer">
-            <div class="brand"><img src="assets/logo.jpg"><span>Safe. Real. Trusted.</span></div>
-        </div>
+        <div class="footer-info"><img src="assets/logo.jpg"><span>Trusted Directory</span></div>
     </div>
 
-    <!-- SLIDE 5: PREMIUM -->
-    <div class="ig-post" id="slide-5">
-        <div class="slide-header">
-            <div class="titles">
-                <h2>Estatus y Gestión</h2>
-                <p>Premium & Self-Management</p>
-            </div>
-            <span class="slide-num">04</span>
+    <!-- SLIDE 5: MANAGEMENT -->
+    <div class="ig-post reverse" id="slide-5">
+        <div class="content-box">
+            <h2>Auto-<br>Gestión</h2>
+            <p class="description">Los clubes tienen el control total de su perfil.</p>
+            <ul class="bullets">
+                <li>Botón de gestión para dueños</li>
+                <li>Edición de perfil en tiempo real</li>
+                <li>Sistema de promoción Premium</li>
+            </ul>
         </div>
-        <div class="slide-body">
-            <div class="mockup">
-                <img src="assets/presentacion/club-promocionado-y-ajustes-manage-my-club-visibles.jpg">
-            </div>
+        <div class="image-box">
+            <div class="mockup"><img src="assets/presentacion/club-promocionado-y-ajustes-manage-my-club-visibles.jpg"></div>
         </div>
-        <div class="slide-footer">
-            <div class="brand"><img src="assets/logo.jpg"><span>Grow your club</span></div>
-        </div>
+        <div class="footer-info"><img src="assets/logo.jpg"><span>Power to Clubs</span></div>
     </div>
 
     <!-- SLIDE 6: ADMIN -->
-    <div class="ig-post" id="slide-6">
-        <div class="slide-header">
-            <div class="titles">
-                <h2>Control HQ</h2>
-                <p>Administración y Analíticas</p>
-            </div>
-            <span class="slide-num">05</span>
+    <div class="ig-post normal" id="slide-6">
+        <div class="content-box">
+            <h2>Control<br>HQ</h2>
+            <p class="description">Gestión masiva y analíticas para administradores.</p>
+            <ul class="bullets">
+                <li>Dashboard de moderación</li>
+                <li>Métricas de clics y éxito</li>
+                <li>Control total del ecosistema</li>
+            </ul>
         </div>
-        <div class="slide-body">
-            <div class="mockup">
-                <img src="assets/presentacion/admin-lista-de-club-y-club-promocionado.jpg">
-            </div>
+        <div class="image-box">
+            <div class="mockup"><img src="assets/presentacion/admin-lista-de-club-y-club-promocionado.jpg"></div>
         </div>
-        <div class="slide-footer">
-            <div class="brand"><img src="assets/logo.jpg"><span>Power to Admins</span></div>
-        </div>
+        <div class="footer-info"><img src="assets/logo.jpg"><span>Admin Mastery</span></div>
     </div>
 
     <script>
         async function downloadAll() {
             const btn = document.querySelector('.btn-download');
-            btn.textContent = '⏳ GENERANDO IMÁGENES...';
+            btn.textContent = '⏳ GENERANDO PACK PRO...';
             btn.disabled = true;
 
             const slides = document.querySelectorAll('.ig-post');
-            
             for (let i = 0; i < slides.length; i++) {
                 const canvas = await html2canvas(slides[i], {
-                    scale: 2,
-                    useCORS: true,
-                    backgroundColor: '#000000'
+                    scale: 2, useCORS: true, backgroundColor: '#000000'
                 });
-                
                 const link = document.createElement('a');
-                link.download = `VFPE_Slide_${i+1}.jpg`;
+                link.download = `VFPE_Pro_Slide_${i+1}.jpg`;
                 link.href = canvas.toDataURL('image/jpeg', 0.9);
                 link.click();
                 await new Promise(r => setTimeout(r, 600));
             }
-
-            btn.textContent = '✅ DESCARGA COMPLETADA';
+            btn.textContent = '✅ PACK COMPLETADO';
             btn.disabled = false;
-            setTimeout(() => btn.textContent = '📥 DESCARGAR TODAS LAS DIAPOSITIVAS', 3000);
         }
     </script>
 </body>
