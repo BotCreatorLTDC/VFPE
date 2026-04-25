@@ -3,181 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VFPE - Instagram Edition</title>
+    <title>VFPE - Instagram Carousel Creator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
         
-        :root {
-            --bg: #000000;
-            --accent: #00d26a;
-            --card-bg: #111;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
-            font-family: 'Outfit', sans-serif; 
-            background: var(--bg); 
+            background: #111; 
             color: white; 
+            font-family: 'Outfit', sans-serif; 
             display: flex; 
             flex-direction: column; 
-            align-items: center;
-            padding-bottom: 50px;
+            align-items: center; 
+            padding: 50px 20px;
         }
 
-        .download-header {
-            position: sticky; top: 0; width: 100%; background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px); padding: 20px; z-index: 1000;
-            display: flex; justify-content: center; border-bottom: 1px solid #222;
+        .controls {
+            position: fixed;
+            top: 20px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: 1px solid #00d26a;
+            display: flex;
+            gap: 15px;
+            backdrop-filter: blur(10px);
         }
 
-        .btn-download-all {
-            background: var(--accent); color: black; border: none;
-            padding: 12px 25px; border-radius: 50px; font-weight: 800;
-            cursor: pointer; font-size: 1rem; box-shadow: 0 0 20px rgba(0, 210, 106, 0.3);
-            transition: transform 0.2s;
+        .btn-download {
+            background: #00d26a;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.9rem;
         }
-        .btn-download-all:active { transform: scale(0.95); }
 
-        .ig-feed { max-width: 500px; width: 100%; padding: 20px; }
-
+        /* Instagram Post Container (1080x1080) */
         .ig-post {
-            background: var(--card-bg); border-radius: 20px;
-            margin-bottom: 40px; overflow: hidden; border: 1px solid #222;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 800px;
+            height: 800px;
+            background: #000;
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 60px;
+            border: 1px solid #222;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
         }
 
-        .post-header { padding: 15px; display: flex; align-items: center; gap: 10px; }
-        .post-header img { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent); }
-        .post-header span { font-weight: 600; font-size: 0.9rem; }
-
-        .post-image { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; background: #000; }
-        
-        .post-content { padding: 20px; }
-        .post-content h2 { color: var(--accent); font-size: 1.4rem; margin-bottom: 8px; }
-        .post-content p { color: #aaa; font-size: 0.95rem; line-height: 1.4; }
-
-        .post-footer { padding: 15px; border-top: 1px solid #222; font-size: 0.8rem; color: #555; text-align: right; }
-
-        h1.main-title { margin: 40px 0; font-size: 2.5rem; text-align: center; color: var(--accent); }
-
-        @media (max-width: 600px) {
-            .ig-feed { padding: 10px; }
+        .ig-post::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 70% 20%, rgba(0, 210, 106, 0.15) 0%, transparent 50%);
+            pointer-events: none;
         }
+
+        .slide-header { z-index: 1; }
+        .slide-header h2 { font-size: 3.5rem; font-weight: 900; line-height: 1.1; margin-bottom: 15px; color: #00d26a; text-transform: uppercase; }
+        .slide-header p { font-size: 1.4rem; color: #aaa; font-weight: 400; }
+
+        .slide-body {
+            z-index: 1;
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .mockup {
+            width: 85%;
+            height: 90%;
+            background: #111;
+            border-radius: 30px;
+            border: 8px solid #222;
+            padding: 10px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+        }
+
+        .mockup img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+        }
+
+        .slide-footer {
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 2px solid #222;
+            padding-top: 30px;
+        }
+
+        .brand { display: flex; align-items: center; gap: 15px; }
+        .brand img { height: 40px; border-radius: 8px; }
+        .brand span { font-weight: 800; font-size: 1.2rem; }
+        .slide-num { color: #555; font-weight: 900; font-size: 1.5rem; }
+
+        /* Specific Layouts */
+        .slide-cover { justify-content: center; text-align: center; background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%); }
+        .slide-cover h1 { font-size: 5rem; font-weight: 900; color: #00d26a; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="download-header">
-        <button class="btn-download-all" onclick="downloadAllImages()">📥 Descargar todas las diapositivas</button>
+    <div class="controls">
+        <span style="display: flex; align-items: center; font-size: 0.9rem;">📸 Instagram Carousel Pack</span>
+        <button class="btn-download" onclick="downloadAll()">📥 DESCARGAR TODAS LAS DIAPOSITIVAS</button>
     </div>
 
-    <h1 class="main-title">VFPE Social Kit</h1>
-
-    <div class="ig-feed">
-        <!-- SLIDE 1 -->
-        <div class="ig-post">
-            <div class="post-header"><img src="assets/logo.jpg"> <span>Verify Plug Europe</span></div>
-            <img src="assets/presentacion/start-en-bot.jpg" class="post-image">
-            <div class="post-content">
-                <h2>01. Onboarding</h2>
-                <p>Nuestra puerta de entrada nativa en Telegram. Rápido, seguro y multilingüe.</p>
-            </div>
-            <div class="post-footer">Slide 1/7</div>
+    <!-- SLIDE 1: PORTADA -->
+    <div class="ig-post slide-cover" id="slide-1">
+        <div class="slide-header">
+            <img src="assets/logo.jpg" style="height: 120px; border-radius: 20px; margin-bottom: 30px;">
+            <h1>VFPE</h1>
+            <p>El Directorio Revolucionario de Clubes en Europa</p>
         </div>
-
-        <!-- SLIDE 2 -->
-        <div class="ig-post">
-            <div class="post-header"><img src="assets/logo.jpg"> <span>Verify Plug Europe</span></div>
-            <img src="assets/presentacion/pagina-principal-miniapp.jpg" class="post-image">
-            <div class="post-content">
-                <h2>02. Exploración</h2>
-                <p>Mapa interactivo con geolocalización en tiempo real para encontrar clubes cercanos.</p>
-            </div>
-            <div class="post-footer">Slide 2/7</div>
+        <div class="slide-footer" style="border:none;">
+            <p style="color: #00d26a; font-weight: 800;">DESLIZA PARA VER MÁS →</p>
         </div>
+    </div>
 
-        <!-- SLIDE 3 -->
-        <div class="ig-post">
-            <div class="post-header"><img src="assets/logo.jpg"> <span>Verify Plug Europe</span></div>
-            <img src="assets/presentacion/detalles-club.jpg" class="post-image">
-            <div class="post-content">
-                <h2>03. Confianza</h2>
-                <p>Fichas de clubes verificadas manualmente. Datos reales para usuarios reales.</p>
-            </div>
-            <div class="post-footer">Slide 3/7</div>
+    <!-- SLIDE 2: EL BOT -->
+    <div class="ig-post" id="slide-2">
+        <div class="slide-header">
+            <span class="slide-num">01</span>
+            <h2>ACCESO TOTAL</h2>
+            <p>Integrado 100% en Telegram. Sin descargas, sin registros pesados.</p>
         </div>
-
-        <!-- SLIDE 4 -->
-        <div class="ig-post">
-            <div class="post-header"><img src="assets/logo.jpg"> <span>Verify Plug Europe</span></div>
-            <img src="assets/presentacion/formulario-miniapp.jpg" class="post-image">
-            <div class="post-content">
-                <h2>04. Crecimiento</h2>
-                <p>Registro inteligente para nuevos clubes con validación de País y Ciudad.</p>
+        <div class="slide-body">
+            <div class="mockup">
+                <img src="assets/presentacion/start-en-bot.jpg">
             </div>
-            <div class="post-footer">Slide 4/7</div>
         </div>
-
-        <!-- SLIDE 5 -->
-        <div class="ig-post">
-            <div class="post-header"><img src="assets/logo.jpg"> <span>Verify Plug Europe</span></div>
-            <img src="assets/presentacion/club-promocionado-y-ajustes-manage-my-club-visibles.jpg" class="post-image">
-            <div class="post-content">
-                <h2>05. Gestión</h2>
-                <p>Estatus Premium y autogestión de perfiles para dueños de clubes.</p>
-            </div>
-            <div class="post-footer">Slide 5/7</div>
+        <div class="slide-footer">
+            <div class="brand"><img src="assets/logo.jpg"><span>@VerifyPlugEU_bot</span></div>
         </div>
+    </div>
 
-        <!-- SLIDE 6 -->
-        <div class="ig-post">
-            <div class="post-header"><img src="assets/logo.jpg"> <span>Verify Plug Europe</span></div>
-            <img src="assets/presentacion/admin-lista-de-club-y-club-promocionado.jpg" class="post-image">
-            <div class="post-content">
-                <h2>06. Control HQ</h2>
-                <p>Panel Administrativo completo para gestionar todo el ecosistema móvil.</p>
-            </div>
-            <div class="post-footer">Slide 6/7</div>
+    <!-- SLIDE 3: EL MAPA -->
+    <div class="ig-post" id="slide-3">
+        <div class="slide-header">
+            <span class="slide-num">02</span>
+            <h2>MAPA INTERACTIVO</h2>
+            <p>Encuentra tu club ideal con geolocalización en tiempo real.</p>
         </div>
-
-        <!-- SLIDE 7 -->
-        <div class="ig-post">
-            <div class="post-header"><img src="assets/logo.jpg"> <span>Verify Plug Europe</span></div>
-            <img src="assets/presentacion/aprobarrechazar-club-desde-admin-miniapp.jpg" class="post-image">
-            <div class="post-content">
-                <h2>07. Moderación</h2>
-                <p>Aprobación y rechazo instantáneo de solicitudes para una red de calidad.</p>
+        <div class="slide-body">
+            <div class="mockup" style="transform: perspective(1000px) rotateY(5deg) rotateX(5deg);">
+                <img src="assets/presentacion/pagina-principal-miniapp.jpg">
             </div>
-            <div class="post-footer">Slide 7/7</div>
+        </div>
+        <div class="slide-footer">
+            <div class="brand"><img src="assets/logo.jpg"><span>Explore Europe 🇪🇸 🇩🇪 🇳🇱</span></div>
+        </div>
+    </div>
+
+    <!-- SLIDE 4: VERIFICACIÓN -->
+    <div class="ig-post" id="slide-4">
+        <div class="slide-header">
+            <span class="slide-num">03</span>
+            <h2>SOLO VERIFICADOS</h2>
+            <p>Seguridad y confianza. Clubes reales revisados manualmente.</p>
+        </div>
+        <div class="slide-body">
+            <div class="mockup">
+                <img src="assets/presentacion/detalles-club.jpg">
+            </div>
+        </div>
+        <div class="slide-footer">
+            <div class="brand"><img src="assets/logo.jpg"><span>Safe. Real. Trusted.</span></div>
+        </div>
+    </div>
+
+    <!-- SLIDE 5: PREMIUM -->
+    <div class="ig-post" id="slide-5">
+        <div class="slide-header">
+            <span class="slide-num">04</span>
+            <h2>ESTATUS PREMIUM</h2>
+            <p>Visibilidad destacada para los mejores clubes del continente.</p>
+        </div>
+        <div class="slide-body">
+            <div class="mockup" style="transform: scale(1.1) rotate(2deg);">
+                <img src="assets/presentacion/club-promocionado-y-ajustes-manage-my-club-visibles.jpg">
+            </div>
+        </div>
+        <div class="slide-footer">
+            <div class="brand"><img src="assets/logo.jpg"><span>Grow your club</span></div>
+        </div>
+    </div>
+
+    <!-- SLIDE 6: ADMIN -->
+    <div class="ig-post" id="slide-6">
+        <div class="slide-header">
+            <span class="slide-num">05</span>
+            <h2>CONTROL HQ</h2>
+            <p>Gestión completa y analíticas en tiempo real para administradores.</p>
+        </div>
+        <div class="slide-body">
+            <div class="mockup">
+                <img src="assets/presentacion/admin-lista-de-club-y-club-promocionado.jpg">
+            </div>
+        </div>
+        <div class="slide-footer">
+            <div class="brand"><img src="assets/logo.jpg"><span>Power to Admins</span></div>
         </div>
     </div>
 
     <script>
-        function downloadAllImages() {
-            const images = [
-                'assets/presentacion/start-en-bot.jpg',
-                'assets/presentacion/pagina-principal-miniapp.jpg',
-                'assets/presentacion/detalles-club.jpg',
-                'assets/presentacion/formulario-miniapp.jpg',
-                'assets/presentacion/club-promocionado-y-ajustes-manage-my-club-visibles.jpg',
-                'assets/presentacion/admin-lista-de-club-y-club-promocionado.jpg',
-                'assets/presentacion/aprobarrechazar-club-desde-admin-miniapp.jpg'
-            ];
+        async function downloadAll() {
+            const btn = document.querySelector('.btn-download');
+            btn.textContent = '⏳ PROCESANDO...';
+            btn.disabled = true;
 
-            images.forEach((url, index) => {
-                setTimeout(() => {
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = `VFPE_Slide_${index + 1}.jpg`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }, index * 500); // Pequeño retraso para evitar bloqueo del navegador
-            });
+            const slides = document.querySelectorAll('.ig-post');
             
-            alert('Iniciando descarga de las 7 diapositivas...');
+            for (let i = 0; i < slides.length; i++) {
+                const canvas = await html2canvas(slides[i], {
+                    scale: 2, // High resolution for Instagram
+                    useCORS: true,
+                    backgroundColor: '#000000'
+                });
+                
+                const link = document.createElement('a');
+                link.download = `VFPE_IG_Slide_${i+1}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.click();
+                
+                // Small delay to prevent browser issues
+                await new Promise(r => setTimeout(r, 500));
+            }
+
+            btn.textContent = '✅ DESCARGA COMPLETADA';
+            btn.disabled = false;
+            setTimeout(() => btn.textContent = '📥 DESCARGAR TODAS LAS DIAPOSITIVAS', 3000);
         }
     </script>
-
 </body>
 </html>
