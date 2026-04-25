@@ -65,23 +65,18 @@ header {
 
 .custom-marker {
     background: var(--primary);
-    width: 35px !important;
-    height: 35px !important;
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
     border: 2px solid white;
-}
-
-.custom-marker span {
-    transform: rotate(45deg);
     color: black;
-    font-weight: 900;
-    font-size: 1rem;
-    display: block;
+    font-weight: 800;
+    font-size: 0.9rem;
+    transform: none !important; /* Force no rotation */
 }
 
 #search-input {
