@@ -124,4 +124,11 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`Server running at ${PORT}`));
+// Health check endpoint for Render
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.listen(PORT, () => {
+    console.log(`VFPE Server running at http://localhost:${PORT}`);
+});

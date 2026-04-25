@@ -65,7 +65,14 @@ document.addEventListener('DOMContentLoaded', () => {
         statusMessage.textContent = "Loading verified clubs...";
         try {
             const response = await fetch('/api/clubs');
-            allClubs = await response.json();
+            const data = await response.json();
+            
+            if (data.error || !Array.isArray(data)) {
+                statusMessage.textContent = `⚠️ ${data.error || "Failed to load clubs"}`;
+                return;
+            }
+
+            allClubs = data;
             clubCount.textContent = allClubs.length;
             
             if (allClubs.length === 0) {
