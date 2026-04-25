@@ -63,20 +63,40 @@ header {
     filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
 }
 
+/* --- FIXED PIN STYLES --- */
 .custom-marker {
     background: var(--primary);
-    width: 30px !important;
-    height: 30px !important;
+    width: 32px !important;
+    height: 32px !important;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     border: 2px solid white;
+    position: relative;
+}
+
+/* The tip of the pin */
+.custom-marker::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 10px solid white;
+}
+
+.custom-marker span {
     color: black;
     font-weight: 800;
-    font-size: 0.9rem;
-    transform: none !important; /* Force no rotation */
+    font-size: 0.95rem;
+    line-height: 1;
+    text-align: center;
 }
 
 #search-input {
@@ -144,7 +164,7 @@ select { padding: 10px; border-radius: 8px; background: #222; color: white; bord
     top: 0; left: 0;
     width: 100%; height: 100%;
     background: var(--bg-color);
-    z-index: 5000; /* Over everything */
+    z-index: 5000;
     padding: 20px;
     overflow-y: auto;
 }
