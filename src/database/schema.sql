@@ -17,6 +17,10 @@ CREATE TABLE IF NOT EXISTS clubs (
     verified_at TIMESTAMP
 );
 
+-- Migrations for existing tables
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS is_premium BOOLEAN DEFAULT FALSE;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS click_count INTEGER DEFAULT 0;
+
 -- FIX: Index on the most frequent query pattern (city + status lookups)
 CREATE INDEX IF NOT EXISTS idx_clubs_city_status ON clubs(city, status);
 
