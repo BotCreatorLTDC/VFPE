@@ -10,16 +10,23 @@ const PORT = process.env.PORT || 3000;
 // FIX: Restrict CORS to the configured webapp URL instead of wildcard
 const allowedOrigins = [
     process.env.WEBAPP_URL,
+    'https://vfpe.onrender.com', // Explicitly add the production URL
     'http://localhost:3000',
-    'http://localhost:5000'
-].filter(Boolean);
+    'http://localhost:5000',
+    'http://localhost:10000' // Common Render local port
+].filter(Boolean).map(url => url.replace(/\/$/, "")); // Remove trailing slashes
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (e.g. Telegram WebApp, mobile)
-        if (!origin || allowedOrigins.includes(origin)) {
+        // Allow requests with no origin (e.g. mobile apps, curl, same-origin in some browsers)
+        if (!origin) return callback(null, true);
+        
+        const originClean = origin.replace(/\/$/, "");
+        if (allowedOrigins.includes(originClean)) {
             return callback(null, true);
         }
+        
+        console.warn(`[CORS] Blocked request from origin: ${origin}`);
         callback(new Error('Not allowed by CORS'));
     },
     optionsSuccessStatus: 200
