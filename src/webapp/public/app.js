@@ -57,10 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const count = clubs.filter(c => c.city === city).length;
                 
                 const markerIcon = L.divIcon({
-                    html: `${count}`,
+                    html: `<span>${count}</span>`,
                     className: 'custom-marker',
-                    iconSize: [30, 30],
-                    iconAnchor: [15, 15]
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 32]
                 });
 
                 const marker = L.marker(coords, { icon: markerIcon }).addTo(map);

@@ -94,8 +94,11 @@ header {
 .custom-marker span {
     color: black;
     font-weight: 800;
-    font-size: 0.95rem;
-    line-height: 1;
+    font-size: 0.9rem;
+    display: block;
+    width: 100%;
+    height: 100%;
+    line-height: 28px; /* Slightly less than height to account for border */
     text-align: center;
 }
 
