@@ -18,16 +18,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let markers = [];
 
     const cityCoords = {
-        'Madrid': [40.4168, -3.7038],
-        'Barcelona': [41.3851, 2.1734],
-        'Valencia': [39.4699, -0.3763],
-        'Sevilla': [37.3891, -5.9845],
-        'Bilbao': [43.2630, -2.9350],
-        'Málaga': [36.7213, -4.4214],
-        'Berlin': [52.5200, 13.4050],
-        'Hamburg': [53.5511, 9.9937],
-        'Amsterdam': [52.3676, 4.9041],
-        'Rotterdam': [51.9225, 4.4792]
+        // España
+        'Madrid': [40.4168, -3.7038], 'Barcelona': [41.3851, 2.1734], 'Valencia': [39.4699, -0.3763],
+        'Sevilla': [37.3891, -5.9845], 'Zaragoza': [41.6488, -0.8891], 'Málaga': [36.7213, -4.4214],
+        'Murcia': [37.9922, -1.1307], 'Palma': [39.5696, 2.6502], 'Las Palmas': [28.1248, -15.4300],
+        'Bilbao': [43.2630, -2.9350], 'Alicante': [38.3452, -0.4810], 'Córdoba': [37.8882, -4.7794],
+        'Valladolid': [41.6523, -4.7245], 'Vigo': [42.2406, -8.7207], 'Gijón': [43.5357, -5.6615],
+        'Granada': [37.1773, -3.5986], 'Tarragona': [41.1189, 1.2445], 'San Sebastián': [43.3183, -1.9812],
+        'Santander': [43.4623, -3.8099], 'Ibiza': [38.9067, 1.4206], 'Marbella': [36.5100, -4.8800],
+        'Almería': [36.8340, -2.4637], 'Tenerife': [28.2916, -16.6291],
+        // Alemania
+        'Berlin': [52.5200, 13.4050], 'Hamburg': [53.5511, 9.9937], 'Munich': [48.1351, 11.5820],
+        'Cologne': [50.9375, 6.9603], 'Frankfurt': [50.1109, 8.6821], 'Stuttgart': [48.7758, 9.1829],
+        'Düsseldorf': [51.2277, 6.7735], 'Dortmund': [51.5136, 7.4653], 'Essen': [51.4556, 7.0116],
+        'Bremen': [53.0793, 8.8017], 'Leipzig': [51.3397, 12.3731], 'Dresden': [51.0504, 13.7373],
+        'Hanover': [52.3759, 9.7320], 'Nuremberg': [49.4521, 11.0767],
+        // Netherlands
+        'Amsterdam': [52.3676, 4.9041], 'Rotterdam': [51.9225, 4.4792], 'The Hague': [52.0705, 4.3007],
+        'Utrecht': [52.0907, 5.1214], 'Eindhoven': [51.4416, 5.4697], 'Tilburg': [51.5555, 5.0913],
+        'Groningen': [53.2192, 6.5667], 'Almere': [52.3702, 5.2141], 'Breda': [51.5895, 4.7734],
+        'Nijmegen': [51.8126, 5.8372], 'Haarlem': [52.3874, 4.6462], 'Enschede': [52.2215, 6.8937]
     };
 
     function initMap() {
@@ -248,9 +258,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const citySelect = document.getElementById('form-city');
 
     const CITIES_BY_COUNTRY = {
-        'ES': ['Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Bilbao', 'Málaga', 'Alicante', 'Ibiza', 'Tenerife'],
-        'DE': ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Frankfurt', 'Stuttgart'],
-        'NL': ['Amsterdam', 'Rotterdam', 'The Hague', 'Utrecht', 'Eindhoven']
+        'ES': ['Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Zaragoza', 'Málaga', 'Murcia', 'Palma', 'Las Palmas', 'Bilbao', 'Alicante', 'Córdoba', 'Valladolid', 'Vigo', 'Gijón', 'Granada', 'Tarragona', 'San Sebastián', 'Santander', 'Ibiza', 'Marbella', 'Almería', 'Tenerife'],
+        'DE': ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Frankfurt', 'Stuttgart', 'Düsseldorf', 'Dortmund', 'Essen', 'Bremen', 'Leipzig', 'Dresden', 'Hanover', 'Nuremberg'],
+        'NL': ['Amsterdam', 'Rotterdam', 'The Hague', 'Utrecht', 'Eindhoven', 'Tilburg', 'Groningen', 'Almere', 'Breda', 'Nijmegen', 'Haarlem', 'Enschede']
     };
 
     countrySelect.onchange = () => {
