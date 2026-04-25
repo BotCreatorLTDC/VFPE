@@ -239,6 +239,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    // Dynamic City Dropdown for Apply Form
+    const countrySelect = document.getElementById('form-country');
+    const citySelect = document.getElementById('form-city');
+
+    const CITIES_BY_COUNTRY = {
+        'ES': ['Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Bilbao', 'Málaga', 'Alicante', 'Ibiza', 'Tenerife'],
+        'DE': ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Frankfurt', 'Stuttgart'],
+        'NL': ['Amsterdam', 'Rotterdam', 'The Hague', 'Utrecht', 'Eindhoven']
+    };
+
+    countrySelect.onchange = () => {
+        const country = countrySelect.value;
+        const cities = CITIES_BY_COUNTRY[country] || [];
+        
+        citySelect.innerHTML = '<option value="" disabled selected>2. Select city</option>';
+        cities.forEach(city => {
+            const opt = document.createElement('option');
+            opt.value = city;
+            opt.textContent = city;
+            citySelect.appendChild(opt);
+        });
+        
+        citySelect.disabled = false;
+    };
+
     // Initialize
     initMap();
     fetchClubs();

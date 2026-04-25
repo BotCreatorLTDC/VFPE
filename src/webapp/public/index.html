@@ -85,15 +85,20 @@
             <h2>Apply for Verification</h2>
             <form id="apply-form">
                 <input type="text" name="name" placeholder="Your club's name" required>
-                <input type="text" name="city" placeholder="e.g. Madrid, Barcelona..." required>
-                <select name="country" required>
-                    <option value="" disabled selected>Select country</option>
+                
+                <select name="country" id="form-country" required>
+                    <option value="" disabled selected>1. Select country</option>
                     <option value="ES">Spain</option>
                     <option value="DE">Germany</option>
                     <option value="NL">Netherlands</option>
                 </select>
-                <input type="text" name="telegram_username" placeholder="@yourclub" required>
-                <input type="text" name="instagram" placeholder="@yourclub (optional)">
+
+                <select name="city" id="form-city" required disabled>
+                    <option value="" disabled selected>2. Select city (choose country first)</option>
+                </select>
+
+                <input type="text" name="telegram_username" placeholder="Telegram @username" required>
+                <input type="text" name="instagram" placeholder="Instagram @username (optional)">
                 <textarea name="description" placeholder="Brief description of your club (max 200 chars)" maxlength="200"></textarea>
                 <p class="disclaimer">⚠️ VFPE is a directory platform. We do not sell, distribute, or facilitate the acquisition of any substance. All clubs listed are legal cannabis social clubs operating under Spanish or applicable European law.</p>
                 <button type="submit">Submit Verification Request</button>
