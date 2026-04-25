@@ -299,14 +299,31 @@ bot.callbackQuery(/^reject_(\d+)$/, async (ctx) => {
 
 bot.command("admin", async (ctx) => {
     if (!isAdmin(ctx)) return;
+
     const res = await query("SELECT id, name, city FROM clubs WHERE status = 'pending' LIMIT 5");
     const pending = res.rows;
-    if (pending.length === 0) return ctx.reply("✅ No hay solicitudes pendientes.");
+
+    const kb = new InlineKeyboard()
+        .webApp("🖥 Web Admin Panel", `${process.env.WEBAPP_URL || 'https://vfpe.onrender.com'}/admin.html`)
+        .row();
+
+    if (pending.length === 0) {
+        return ctx.reply("✅ No hay solicitudes pendientes.\n\nPuedes gestionar el directorio completo en el panel web:", { 
+            parse_mode: "Markdown", 
+            reply_markup: kb 
+        });
+    }
+
+    await ctx.reply(`📊 *Panel de Administración*\n\nHay ${pending.length} solicitudes pendientes. Puedes gestionarlas aquí abajo o en el panel web:`, {
+        parse_mode: "Markdown",
+        reply_markup: kb
+    });
+
     for (const club of pending) {
-        const kb = new InlineKeyboard()
+        const itemKb = new InlineKeyboard()
             .text("✅ Aprobar", `approve_${club.id}`)
             .text("❌ Rechazar", `reject_${club.id}`);
-        await ctx.reply(`🏷 *${club.name}*\n📍 ${club.city}`, { parse_mode: "Markdown", reply_markup: kb });
+        await ctx.reply(`🏷 *${club.name}*\n📍 ${club.city}`, { parse_mode: "Markdown", reply_markup: itemKb });
     }
 });
 
