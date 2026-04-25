@@ -264,6 +264,69 @@ document.addEventListener('DOMContentLoaded', () => {
         citySelect.disabled = false;
     };
 
+    // Self-Management for Club Owners
+    const tg = window.Telegram?.WebApp;
+    const username = tg?.initDataUnsafe?.user?.username;
+
+    if (username) {
+        checkOwnerStatus(username);
+    }
+
+    async function checkOwnerStatus(uname) {
+        try {
+            const response = await fetch(`/api/my-club?username=${uname}`);
+            if (response.ok) {
+                const club = await response.json();
+                showOwnerTools(club);
+            }
+        } catch (e) {}
+    }
+
+    function showOwnerTools(club) {
+        const tools = document.getElementById('owner-tools');
+        const openBtn = document.getElementById('open-edit-btn');
+        const modal = document.getElementById('edit-modal');
+        const closeBtn = document.getElementById('close-edit');
+        const form = document.getElementById('edit-form');
+
+        tools.style.display = 'block';
+        
+        openBtn.onclick = () => {
+            document.getElementById('edit-id').value = club.id;
+            document.getElementById('edit-name-display').value = club.name;
+            document.getElementById('edit-instagram').value = club.instagram || '';
+            document.getElementById('edit-description').value = club.description || '';
+            modal.style.display = 'block';
+        };
+
+        closeBtn.onclick = () => modal.style.display = 'none';
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const data = {
+                id: formData.get('id'),
+                username: username,
+                instagram: formData.get('instagram'),
+                description: formData.get('description')
+            };
+
+            const res = await fetch('/api/my-club/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                alert('Club updated successfully!');
+                modal.style.display = 'none';
+                fetchClubs(); // Refresh main list
+            } else {
+                alert('Failed to update club.');
+            }
+        };
+    }
+
     // Initialize
     initMap();
     fetchClubs();

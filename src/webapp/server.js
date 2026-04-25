@@ -81,6 +81,45 @@ app.post('/api/verify', async (req, res) => {
     }
 });
 
+// --- CLUB OWNER SELF-MANAGEMENT ---
+
+// GET my club data based on TG username
+app.get('/api/my-club', async (req, res) => {
+    const username = req.query.username; // Should be verified via initData in production
+    if (!username) return res.status(400).json({ error: "No username provided" });
+
+    const tgUser = username.startsWith('@') ? username : `@${username}`;
+
+    try {
+        const result = await query("SELECT * FROM clubs WHERE telegram_username = $1 AND status = 'verified'", [tgUser]);
+        if (result.rows.length === 0) return res.status(404).json({ error: "No verified club found for this user" });
+        res.json(result.rows[0]);
+    } catch (err) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+// UPDATE my club data
+app.post('/api/my-club/update', async (req, res) => {
+    const { id, username, instagram, description } = req.body;
+    
+    // Security: Check if the username matches the club's owner
+    const tgUser = username.startsWith('@') ? username : `@${username}`;
+    
+    try {
+        const check = await query("SELECT id FROM clubs WHERE id = $1 AND telegram_username = $2", [id, tgUser]);
+        if (check.rows.length === 0) return res.status(403).json({ error: "Unauthorized" });
+
+        await query(
+            "UPDATE clubs SET instagram = $1, description = $2 WHERE id = $3",
+            [instagram || null, description || null, id]
+        );
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: "Update failed" });
+    }
+});
+
 // --- ADMIN API ---
 
 app.get('/api/admin/clubs', adminAuth, async (req, res) => {
