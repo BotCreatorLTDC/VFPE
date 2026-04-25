@@ -53,22 +53,28 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 60px;
+            padding: 30px; /* Reduced padding */
             border: 1px solid #222;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
         }
 
         .ig-post::before {
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 70% 20%, rgba(0, 210, 106, 0.15) 0%, transparent 50%);
+            background: radial-gradient(circle at 70% 10%, rgba(0, 210, 106, 0.1) 0%, transparent 40%);
             pointer-events: none;
         }
 
-        .slide-header { z-index: 1; }
-        .slide-header h2 { font-size: 3.5rem; font-weight: 900; line-height: 1.1; margin-bottom: 15px; color: #00d26a; text-transform: uppercase; }
-        .slide-header p { font-size: 1.4rem; color: #aaa; font-weight: 400; }
+        .slide-header { 
+            z-index: 1; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .slide-header .titles h2 { font-size: 1.8rem; font-weight: 900; color: #00d26a; margin: 0; text-transform: uppercase; }
+        .slide-header .titles p { font-size: 0.9rem; color: #888; margin: 0; }
+        .slide-num { font-size: 2rem; font-weight: 900; color: #222; }
 
         .slide-body {
             z-index: 1;
@@ -76,26 +82,25 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px 0;
+            overflow: hidden;
+            padding: 10px 0;
         }
 
         .mockup {
-            width: 85%;
-            height: 90%;
-            background: #111;
-            border-radius: 30px;
-            border: 8px solid #222;
-            padding: 10px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-            transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+            height: 100%; /* Take all available space */
+            aspect-ratio: 9 / 19; /* Mobile ratio */
+            background: #000;
+            border-radius: 20px;
+            border: 4px solid #333;
+            padding: 5px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
         }
 
         .mockup img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Muestra la imagen completa sin recortar */
-            border-radius: 10px;
-            background: #050505;
+            object-fit: contain;
+            border-radius: 15px;
         }
 
         .slide-footer {
@@ -103,45 +108,44 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-top: 2px solid #222;
-            padding-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #1a1a1a;
         }
 
-        .brand { display: flex; align-items: center; gap: 15px; }
-        .brand img { height: 40px; border-radius: 8px; }
-        .brand span { font-weight: 800; font-size: 1.2rem; }
-        .slide-num { color: #555; font-weight: 900; font-size: 1.5rem; }
+        .brand { display: flex; align-items: center; gap: 10px; }
+        .brand img { height: 25px; border-radius: 5px; }
+        .brand span { font-weight: 700; font-size: 0.8rem; color: #aaa; }
 
-        /* Specific Layouts */
-        .slide-cover { justify-content: center; text-align: center; background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%); }
-        .slide-cover h1 { font-size: 5rem; font-weight: 900; color: #00d26a; margin-bottom: 20px; }
+        /* Cover Slide remains special */
+        .slide-cover { justify-content: center; text-align: center; }
+        .slide-cover h1 { font-size: 5rem; color: #00d26a; font-weight: 900; }
     </style>
 </head>
 <body>
 
     <div class="controls">
-        <span style="display: flex; align-items: center; font-size: 0.9rem;">📸 Instagram Carousel Pack</span>
+        <span style="display: flex; align-items: center; font-size: 0.9rem;">📸 Full-Height IG Carousel</span>
         <button class="btn-download" onclick="downloadAll()">📥 DESCARGAR TODAS LAS DIAPOSITIVAS</button>
     </div>
 
     <!-- SLIDE 1: PORTADA -->
     <div class="ig-post slide-cover" id="slide-1">
-        <div class="slide-header">
-            <img src="assets/logo.jpg" style="height: 120px; border-radius: 20px; margin-bottom: 30px;">
-            <h1>VFPE</h1>
-            <p>El Directorio Revolucionario de Clubes en Europa</p>
+        <div class="slide-header" style="justify-content:center;">
+            <img src="assets/logo.jpg" style="height: 150px; border-radius: 25px; margin-bottom: 20px;">
         </div>
-        <div class="slide-footer" style="border:none;">
-            <p style="color: #00d26a; font-weight: 800;">DESLIZA PARA VER MÁS →</p>
-        </div>
+        <h1>VFPE</h1>
+        <p style="font-size: 1.5rem; color: #888;">The Mobile-First Ecosystem</p>
+        <p style="margin-top: 40px; color: #00d26a; font-weight: 800;">CARRUSEL DE PRODUCTO →</p>
     </div>
 
     <!-- SLIDE 2: EL BOT -->
     <div class="ig-post" id="slide-2">
         <div class="slide-header">
+            <div class="titles">
+                <h2>Acceso Directo</h2>
+                <p>Integración nativa con Telegram</p>
+            </div>
             <span class="slide-num">01</span>
-            <h2>ACCESO TOTAL</h2>
-            <p>Integrado 100% en Telegram. Sin descargas, sin registros pesados.</p>
         </div>
         <div class="slide-body">
             <div class="mockup">
@@ -156,26 +160,30 @@
     <!-- SLIDE 3: EL MAPA -->
     <div class="ig-post" id="slide-3">
         <div class="slide-header">
+            <div class="titles">
+                <h2>Mapa & Geo</h2>
+                <p>Encuentra tu club ideal en segundos</p>
+            </div>
             <span class="slide-num">02</span>
-            <h2>MAPA INTERACTIVO</h2>
-            <p>Encuentra tu club ideal con geolocalización en tiempo real.</p>
         </div>
         <div class="slide-body">
-            <div class="mockup" style="transform: perspective(1000px) rotateY(5deg) rotateX(5deg);">
+            <div class="mockup">
                 <img src="assets/presentacion/pagina-principal-miniapp.jpg">
             </div>
         </div>
         <div class="slide-footer">
-            <div class="brand"><img src="assets/logo.jpg"><span>Explore Europe 🇪🇸 🇩🇪 🇳🇱</span></div>
+            <div class="brand"><img src="assets/logo.jpg"><span>Explore Europe</span></div>
         </div>
     </div>
 
-    <!-- SLIDE 4: VERIFICACIÓN -->
+    <!-- SLIDE 4: DETALLES -->
     <div class="ig-post" id="slide-4">
         <div class="slide-header">
+            <div class="titles">
+                <h2>Fichas Verificadas</h2>
+                <p>Información real y segura</p>
+            </div>
             <span class="slide-num">03</span>
-            <h2>SOLO VERIFICADOS</h2>
-            <p>Seguridad y confianza. Clubes reales revisados manualmente.</p>
         </div>
         <div class="slide-body">
             <div class="mockup">
@@ -190,12 +198,14 @@
     <!-- SLIDE 5: PREMIUM -->
     <div class="ig-post" id="slide-5">
         <div class="slide-header">
+            <div class="titles">
+                <h2>Estatus y Gestión</h2>
+                <p>Premium & Self-Management</p>
+            </div>
             <span class="slide-num">04</span>
-            <h2>ESTATUS PREMIUM</h2>
-            <p>Visibilidad destacada para los mejores clubes del continente.</p>
         </div>
         <div class="slide-body">
-            <div class="mockup" style="transform: scale(1.1) rotate(2deg);">
+            <div class="mockup">
                 <img src="assets/presentacion/club-promocionado-y-ajustes-manage-my-club-visibles.jpg">
             </div>
         </div>
@@ -207,9 +217,11 @@
     <!-- SLIDE 6: ADMIN -->
     <div class="ig-post" id="slide-6">
         <div class="slide-header">
+            <div class="titles">
+                <h2>Control HQ</h2>
+                <p>Administración y Analíticas</p>
+            </div>
             <span class="slide-num">05</span>
-            <h2>CONTROL HQ</h2>
-            <p>Gestión completa y analíticas en tiempo real para administradores.</p>
         </div>
         <div class="slide-body">
             <div class="mockup">
@@ -224,25 +236,23 @@
     <script>
         async function downloadAll() {
             const btn = document.querySelector('.btn-download');
-            btn.textContent = '⏳ PROCESANDO...';
+            btn.textContent = '⏳ GENERANDO IMÁGENES...';
             btn.disabled = true;
 
             const slides = document.querySelectorAll('.ig-post');
             
             for (let i = 0; i < slides.length; i++) {
                 const canvas = await html2canvas(slides[i], {
-                    scale: 2, // High resolution for Instagram
+                    scale: 2,
                     useCORS: true,
                     backgroundColor: '#000000'
                 });
                 
                 const link = document.createElement('a');
-                link.download = `VFPE_IG_Slide_${i+1}.jpg`;
+                link.download = `VFPE_Slide_${i+1}.jpg`;
                 link.href = canvas.toDataURL('image/jpeg', 0.9);
                 link.click();
-                
-                // Small delay to prevent browser issues
-                await new Promise(r => setTimeout(r, 500));
+                await new Promise(r => setTimeout(r, 600));
             }
 
             btn.textContent = '✅ DESCARGA COMPLETADA';
