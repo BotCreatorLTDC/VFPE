@@ -388,15 +388,14 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let eventInput = document.getElementById('edit-event-message');
             if (!eventInput) {
-                const formGroups = form.querySelectorAll('.form-group');
-                const lastGroup = formGroups[formGroups.length - 1];
+                const submitBtn = form.querySelector('button[type="submit"]');
                 const eventGroup = document.createElement('div');
-                eventGroup.className = 'form-group';
+                eventGroup.style.marginBottom = '15px';
                 eventGroup.innerHTML = `
-                    <label>${isEnglish ? '24h Event / Announcement (PRO+)' : 'Anuncio 24h (Solo PRO+)'}</label>
+                    <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">${isEnglish ? '24h Event / Announcement (PRO+)' : 'Anuncio 24h (Solo PRO+)'}</label>
                     <input type="text" id="edit-event-message" name="event_message" placeholder="Ej: Hoy DJ en vivo a las 22:00" maxlength="50" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #333; background: #222; color: white;">
                 `;
-                lastGroup.parentNode.insertBefore(eventGroup, lastGroup.nextSibling);
+                form.insertBefore(eventGroup, submitBtn);
                 eventInput = document.getElementById('edit-event-message');
             }
             
