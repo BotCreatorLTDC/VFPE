@@ -113,8 +113,24 @@ header {
     margin-bottom: 15px;
 }
 
-.filters { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
+.filters { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; flex-wrap: wrap; }
 select { padding: 10px; border-radius: 8px; background: #222; color: white; border: 1px solid #444; }
+
+#saved-filter-btn {
+    padding: 10px 15px;
+    border-radius: 8px;
+    background: #111;
+    color: #fff;
+    border: 1px solid #444;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+#saved-filter-btn:hover {
+    border-color: var(--primary);
+    background: #222;
+}
 
 #status-message {
     text-align: center;

@@ -257,11 +257,10 @@ bot.callbackQuery("confirm_verify", async (ctx) => {
             if (!adminId) continue;
             try {
                 const kb = new InlineKeyboard()
-                    .text("✅ Aprobar", `approve_${club.id}`)
-                    .text("❌ Rechazar", `reject_${club.id}`);
+                    .webApp("🖥 Abrir Panel Admin", `${process.env.WEBAPP_URL || 'https://vfpe.onrender.com'}/admin.html`);
                 await bot.api.sendMessage(
                     adminId,
-                    `📬 *Nueva solicitud de verificación:*\n\n🏷 ${club.name}\n📍 ${club.city}\n💬 ${club.username}`,
+                    `📬 *Nueva solicitud de verificación:*\n\n🏷 ${club.name}\n📍 ${club.city}\n💬 ${club.username}\n\nRevisa esta solicitud en el Panel de Administración.`,
                     { parse_mode: "Markdown", reply_markup: kb }
                 );
             } catch (e) { /* Admin might not have started the bot */ }
@@ -301,31 +300,24 @@ bot.callbackQuery(/^reject_(\d+)$/, async (ctx) => {
 bot.command("admin", async (ctx) => {
     if (!isAdmin(ctx)) return;
 
-    const res = await query("SELECT id, name, city FROM clubs WHERE status = 'pending' LIMIT 5");
-    const pending = res.rows;
+    const res = await query("SELECT COUNT(*) FROM clubs WHERE status = 'pending'");
+    const pendingCount = parseInt(res.rows[0].count);
 
     const kb = new InlineKeyboard()
         .webApp("🖥 Web Admin Panel", `${process.env.WEBAPP_URL || 'https://vfpe.onrender.com'}/admin.html`)
         .row();
 
-    if (pending.length === 0) {
+    if (pendingCount === 0) {
         return ctx.reply("✅ No hay solicitudes pendientes.\n\nPuedes gestionar el directorio completo en el panel web:", { 
             parse_mode: "Markdown", 
             reply_markup: kb 
         });
     }
 
-    await ctx.reply(`📊 *Panel de Administración*\n\nHay ${pending.length} solicitudes pendientes. Puedes gestionarlas aquí abajo o en el panel web:`, {
+    await ctx.reply(`📊 *Panel de Administración*\n\nHay *${pendingCount}* solicitudes pendientes.\n\nAccede al Panel Web para gestionar (Aceptar, Enviar Billetera, Publicar):`, {
         parse_mode: "Markdown",
         reply_markup: kb
     });
-
-    for (const club of pending) {
-        const itemKb = new InlineKeyboard()
-            .text("✅ Aprobar", `approve_${club.id}`)
-            .text("❌ Rechazar", `reject_${club.id}`);
-        await ctx.reply(`🏷 *${club.name}*\n📍 ${club.city}`, { parse_mode: "Markdown", reply_markup: itemKb });
-    }
 });
 
 if (require.main === module) {
