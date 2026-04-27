@@ -20,6 +20,12 @@ CREATE TABLE IF NOT EXISTS clubs (
 -- Migrations for existing tables
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS is_premium BOOLEAN DEFAULT FALSE;
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS click_count INTEGER DEFAULT 0;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS tg_user_id BIGINT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS selected_plan TEXT;
+
+-- Drop and recreate the status constraint to include 'accepted'
+ALTER TABLE clubs DROP CONSTRAINT IF EXISTS clubs_status_check;
+ALTER TABLE clubs ADD CONSTRAINT clubs_status_check CHECK (status IN ('pending', 'accepted', 'verified', 'rejected'));
 
 -- FIX: Index on the most frequent query pattern (city + status lookups)
 CREATE INDEX IF NOT EXISTS idx_clubs_city_status ON clubs(city, status);

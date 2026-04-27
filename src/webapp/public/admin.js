@@ -91,9 +91,34 @@ function renderView() {
         const card = document.createElement('div');
         card.className = `club-card ${club.is_premium ? 'premium' : ''}`;
         
+        let planBadge = '';
+        if (club.selected_plan) {
+            const planColor = club.selected_plan === 'Advanced' ? '#FFD700' : (club.selected_plan === 'PRO' ? '#00d26a' : '#fff');
+            planBadge = `<span style="font-size:0.8rem; font-weight:bold; color:${planColor}; border:1px solid ${planColor}; padding:2px 6px; border-radius:10px; margin-left:10px;">${club.selected_plan}</span>`;
+        }
+
+        let actionButtons = '';
+        if (club.status === 'pending') {
+            actionButtons = `
+                <button class="btn-m btn-approve" onclick="handleAction(${club.id}, 'accept')" style="width:100%; margin-bottom:5px;">Aceptar y Enviar Billetera 📥</button>
+                <button class="btn-m btn-reject" onclick="handleAction(${club.id}, 'reject')">Reject</button>
+            `;
+        } else if (club.status === 'accepted') {
+            actionButtons = `
+                <button class="btn-m btn-approve" onclick="handleAction(${club.id}, 'publish')" style="width:100%; margin-bottom:5px; background:#FFD700; color:#000;">Confirmar Pago y Publicar 🚀</button>
+                <button class="btn-m btn-reject" onclick="handleAction(${club.id}, 'reject')">Reject</button>
+            `;
+        } else if (club.status === 'verified') {
+            actionButtons = `
+                <button class="btn-m btn-promote" onclick="handleAction(${club.id}, 'promote')">
+                    ${club.is_premium ? '💎 UNPROMOTE' : '⭐ PROMOTE'}
+                </button>
+            `;
+        }
+
         card.innerHTML = `
             <div class="card-header">
-                <h3>${club.name}</h3>
+                <h3>${club.name} ${planBadge}</h3>
                 <span class="loc">📍 ${club.city}, ${club.country}</span>
             </div>
             <div class="card-meta">
@@ -101,16 +126,11 @@ function renderView() {
                 <span>🖱 ${club.click_count || 0} clicks</span>
             </div>
             <div class="card-actions">
-                ${club.status === 'pending' ? `
-                    <button class="btn-m btn-approve" onclick="handleAction(${club.id}, 'approve')">Approve</button>
-                    <button class="btn-m btn-reject" onclick="handleAction(${club.id}, 'reject')">Reject</button>
-                ` : `
-                    <button class="btn-m btn-promote" onclick="handleAction(${club.id}, 'promote')">
-                        ${club.is_premium ? '💎 UNPROMOTE' : '⭐ PROMOTE'}
-                    </button>
-                `}
-                <button class="btn-m btn-edit" onclick="openEditModal(${club.id})">✏️ Edit</button>
-                <button class="btn-m btn-delete" onclick="handleAction(${club.id}, 'delete')">Delete</button>
+                ${actionButtons}
+                <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                    <button class="btn-m btn-edit" onclick="openEditModal(${club.id})">✏️ Edit</button>
+                    <button class="btn-m btn-delete" onclick="handleAction(${club.id}, 'delete')">Delete</button>
+                </div>
             </div>
         `;
         clubsList.appendChild(card);

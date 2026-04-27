@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const axios = require('axios'); // For Telegram Bot API
 const { query } = require('../shared/db');
 
 const app = express();
@@ -64,7 +65,7 @@ app.post('/api/clubs/click/:id', async (req, res) => {
 });
 
 app.post('/api/verify', async (req, res) => {
-    const { name, city, country, telegram_username, instagram, description } = req.body;
+    const { name, city, country, telegram_username, instagram, description, tg_user_id } = req.body;
     if (!name || !city || !country || !telegram_username) return res.status(400).json({ error: "Missing fields" });
     
     const COUNTRY_CODE_MAP = { 'Spain': 'ES', 'España': 'ES', 'Germany': 'DE', 'Netherlands': 'NL' };
@@ -72,12 +73,31 @@ app.post('/api/verify', async (req, res) => {
 
     try {
         await query(
-            "INSERT INTO clubs (name, city, country, telegram_username, instagram, description, status) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-            [name, city, normalizedCountry, telegram_username, instagram || null, description || null, 'pending']
+            "INSERT INTO clubs (name, city, country, telegram_username, instagram, description, status, tg_user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+            [name, city, normalizedCountry, telegram_username, instagram || null, description || null, 'pending', tg_user_id || null]
         );
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: "Failed" });
+    }
+});
+
+// NEW: Endpoint to save the selected plan from pricing.html
+app.post('/api/select-plan', async (req, res) => {
+    const { username, plan } = req.body;
+    if (!username || !plan) return res.status(400).json({ error: "Missing parameters" });
+
+    const tgUser = username.startsWith('@') ? username : `@${username}`;
+
+    try {
+        await query(
+            "UPDATE clubs SET selected_plan = $1 WHERE telegram_username = $2 AND status = 'pending'",
+            [plan, tgUser]
+        );
+        res.json({ success: true });
+    } catch (err) {
+        console.error("Error saving plan:", err);
+        res.status(500).json({ error: "Failed to save plan" });
     }
 });
 
@@ -153,13 +173,38 @@ app.get('/api/admin/analytics', adminAuth, async (req, res) => {
 app.post('/api/admin/action', adminAuth, async (req, res) => {
     const { id, action } = req.body;
     try {
-        if (action === 'approve') await query("UPDATE clubs SET status = 'verified', verified_at = CURRENT_TIMESTAMP WHERE id = $1", [id]);
+        if (action === 'accept') {
+            // STEP 1: Accept the application (not published yet) and send Wallet to User
+            const clubRes = await query("UPDATE clubs SET status = 'accepted' WHERE id = $1 RETURNING *", [id]);
+            const club = clubRes.rows[0];
+
+            // Send Telegram Message
+            if (club && club.tg_user_id && process.env.TELEGRAM_BOT_TOKEN) {
+                const planStr = club.selected_plan ? `Plan ${club.selected_plan}` : "Plan Básico";
+                const priceMap = { 'Basic': '50€', 'PRO': '80€', 'Advanced': '100€' };
+                const priceStr = priceMap[club.selected_plan] || '50€';
+                
+                const message = `¡Enhorabuena! Tu solicitud para el club *${club.name}* ha sido pre-aprobada para el *${planStr}*.\n\nPara proceder a la publicación oficial en el directorio, por favor realiza el pago de *${priceStr}* a la siguiente billetera de criptomonedas (USDT TRC20):\n\n\`[TU_BILLETERA_AQUI]\`\n\nUna vez confirmado el pago, tu club será publicado de inmediato.`;
+                
+                await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    chat_id: club.tg_user_id,
+                    text: message,
+                    parse_mode: 'Markdown'
+                }).catch(err => console.error("Error sending TG message:", err.response?.data || err.message));
+            }
+        } 
+        else if (action === 'publish') {
+            // STEP 2: Publish the application (verified)
+            await query("UPDATE clubs SET status = 'verified', verified_at = CURRENT_TIMESTAMP WHERE id = $1", [id]);
+        }
+        else if (action === 'approve') await query("UPDATE clubs SET status = 'verified', verified_at = CURRENT_TIMESTAMP WHERE id = $1", [id]); // Legacy compatibility
         else if (action === 'reject') await query("UPDATE clubs SET status = 'rejected' WHERE id = $1", [id]);
         else if (action === 'delete') await query("DELETE FROM clubs WHERE id = $1", [id]);
         else if (action === 'promote') await query("UPDATE clubs SET is_premium = NOT is_premium WHERE id = $1", [id]); // Toggle premium
         else return res.status(400).json({ error: "Invalid action" });
         res.json({ success: true });
     } catch (err) {
+        console.error("Action error:", err);
         res.status(500).json({ error: "Failed" });
     }
 });

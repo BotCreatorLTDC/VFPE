@@ -206,6 +206,10 @@ document.addEventListener('DOMContentLoaded', () => {
             data.telegram_username = '@' + data.telegram_username;
         }
 
+        // Capture the user's numeric ID for bot messaging
+        const tg = window.Telegram?.WebApp;
+        data.tg_user_id = tg?.initDataUnsafe?.user?.id || null;
+
         try {
             const response = await fetch('/api/verify', {
                 method: 'POST',

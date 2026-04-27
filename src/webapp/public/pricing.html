@@ -279,13 +279,34 @@
             }
         });
 
-        function selectPlan(planName) {
+        async function selectPlan(planName) {
             const tg = window.Telegram?.WebApp;
-            // Send data back to the bot or API to notify admins about the plan selection
-            alert(`Has seleccionado el plan ${planName}. Nos pondremos en contacto contigo para activarlo.`);
-            if (tg) {
-                // Optionally close the WebApp after selection
-                tg.close();
+            const actualUser = tg?.initDataUnsafe?.user?.username;
+
+            if (!actualUser) {
+                alert("Error: No se pudo identificar tu usuario de Telegram.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/select-plan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: actualUser, plan: planName })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(`✅ Has seleccionado el plan ${planName}.\n\nRevisaremos tu club y te contactaremos por Telegram muy pronto para finalizar la activación.`);
+                    if (tg) {
+                        tg.close();
+                    }
+                } else {
+                    alert("❌ Hubo un error al guardar tu selección. Inténtalo de nuevo.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("❌ Error de conexión al guardar el plan.");
             }
         }
     </script>
