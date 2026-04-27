@@ -187,14 +187,14 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
             const club = clubRes.rows[0];
 
             // Send Telegram Message
-            if (club && club.tg_user_id && process.env.TELEGRAM_BOT_TOKEN) {
+            if (club && club.tg_user_id && process.env.MAIN_BOT_TOKEN) {
                 const planStr = club.selected_plan ? `Plan ${club.selected_plan}` : "Plan Básico";
                 const priceMap = { 'Basic': '50€', 'PRO': '80€', 'Advanced': '100€' };
                 const priceStr = priceMap[club.selected_plan] || '50€';
                 
                 const message = `¡Enhorabuena! Tu solicitud para el club *${club.name}* ha sido pre-aprobada para el *${planStr}*.\n\nPara proceder a la publicación oficial en el directorio, por favor realiza el pago de *${priceStr}* a la siguiente billetera de criptomonedas (USDT TRC20):\n\n\`[TU_BILLETERA_AQUI]\`\n\nUna vez confirmado el pago, tu club será publicado de inmediato.`;
                 
-                await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                await axios.post(`https://api.telegram.org/bot${process.env.MAIN_BOT_TOKEN}/sendMessage`, {
                     chat_id: club.tg_user_id,
                     text: message,
                     parse_mode: 'Markdown'
@@ -210,7 +210,7 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
             const club = clubRes.rows[0];
 
             // Official Channel Broadcast (if Advanced or PRO)
-            if (club && (club.selected_plan === 'Advanced' || club.selected_plan === 'PRO') && process.env.CHANNEL_ID && process.env.TELEGRAM_BOT_TOKEN) {
+            if (club && (club.selected_plan === 'Advanced' || club.selected_plan === 'PRO') && process.env.CHANNEL_ID && process.env.MAIN_BOT_TOKEN) {
                 const isAdv = club.selected_plan === 'Advanced';
                 const channelMsg = `🔥 *¡Nuevo Club ${isAdv ? 'Premium ' : ''}Verificado en ${club.city}!*\n\n` +
                                    `${isAdv ? '🏆' : '✅'} *${club.name}*\n` +
@@ -218,7 +218,7 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
                                    `💬 Contacto: ${club.telegram_username}\n\n` +
                                    `🔗 _¡Abre la Mini App de VFPE para ver más detalles y localizar este club en el mapa!_`;
                 
-                await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                await axios.post(`https://api.telegram.org/bot${process.env.MAIN_BOT_TOKEN}/sendMessage`, {
                     chat_id: process.env.CHANNEL_ID,
                     text: channelMsg,
                     parse_mode: 'Markdown'
