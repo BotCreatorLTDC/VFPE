@@ -37,6 +37,36 @@ cron.schedule('0 */12 * * *', async () => {
     }
 });
 
+// Every day at 12:00 PM: Subscription Reminder Bot (3 days before expiry)
+cron.schedule('0 12 * * *', async () => {
+    try {
+        const expiringRes = await query(`
+            SELECT name, tg_user_id, selected_plan 
+            FROM clubs 
+            WHERE status = 'verified' 
+            AND subscription_expires_at BETWEEN CURRENT_TIMESTAMP + interval '3 days' AND CURRENT_TIMESTAMP + interval '4 days'
+        `);
+        
+        for (const club of expiringRes.rows) {
+            if (!club.tg_user_id) continue;
+            const msg = `⚠️ *Aviso de Suscripción VFPE*\n\n` +
+                `Hola, tu plan *${club.selected_plan || 'PRO'}* para el club *${club.name}* caduca en exactamente 3 días.\n\n` +
+                `Por favor, realiza la renovación para no perder tu insignia y visibilidad premium en el mapa.\n` +
+                `Contacta con el soporte para más detalles.`;
+            
+            try {
+                // Sending message directly with axios or bot API depending on bot instance
+                await bot.api.sendMessage(club.tg_user_id, msg, { parse_mode: "Markdown" });
+            } catch (err) {
+                console.error(`Error notifying club ${club.name}:`, err.message);
+            }
+        }
+        console.log(`Sent subscription reminders to ${expiringRes.rows.length} clubs`);
+    } catch (err) {
+        console.error("Scheduler error (Sub Reminder):", err.message);
+    }
+});
+
 // Every 24 hours at midnight: post community rules
 cron.schedule('0 0 * * *', async () => {
     const rules = `📋 *VFPE Community Rules*\n\n` +

@@ -160,6 +160,18 @@ select { padding: 10px; border-radius: 8px; background: #222; color: white; bord
 .club-card h2 { font-size: 1.2rem; margin-bottom: 5px; }
 .club-card .location { font-size: 0.85rem; color: var(--text-dim); }
 
+.event-banner {
+    background: rgba(255, 204, 0, 0.1);
+    color: var(--premium);
+    border: 1px solid var(--premium);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.2);
+}
+
 /* Detail Screen Overlay */
 .screen-overlay {
     display: none;

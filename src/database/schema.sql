@@ -22,6 +22,9 @@ ALTER TABLE clubs ADD COLUMN IF NOT EXISTS is_premium BOOLEAN DEFAULT FALSE;
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS click_count INTEGER DEFAULT 0;
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS tg_user_id BIGINT;
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS selected_plan TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS event_message TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS event_expires_at TIMESTAMP;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS subscription_expires_at TIMESTAMP;
 
 -- Drop and recreate the status constraint to include 'accepted'
 ALTER TABLE clubs DROP CONSTRAINT IF EXISTS clubs_status_check;

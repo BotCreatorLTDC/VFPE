@@ -121,7 +121,7 @@ app.get('/api/my-club', async (req, res) => {
 
 // UPDATE my club data
 app.post('/api/my-club/update', async (req, res) => {
-    const { id, username, instagram, description } = req.body;
+    const { id, username, instagram, description, event_message } = req.body;
     
     // Security: Check if the username matches the club's owner
     const tgUser = username.startsWith('@') ? username : `@${username}`;
@@ -130,10 +130,18 @@ app.post('/api/my-club/update', async (req, res) => {
         const check = await query("SELECT id FROM clubs WHERE id = $1 AND telegram_username = $2", [id, tgUser]);
         if (check.rows.length === 0) return res.status(403).json({ error: "Unauthorized" });
 
-        await query(
-            "UPDATE clubs SET instagram = $1, description = $2 WHERE id = $3",
-            [instagram || null, description || null, id]
-        );
+        if (event_message && event_message.trim() !== '') {
+            await query(
+                "UPDATE clubs SET instagram = $1, description = $2, event_message = $3, event_expires_at = CURRENT_TIMESTAMP + interval '24 hours' WHERE id = $4",
+                [instagram || null, description || null, event_message.substring(0, 50), id]
+            );
+        } else {
+            await query(
+                "UPDATE clubs SET instagram = $1, description = $2, event_message = NULL, event_expires_at = NULL WHERE id = $3",
+                [instagram || null, description || null, id]
+            );
+        }
+        
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: "Update failed" });
@@ -194,8 +202,28 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
             }
         } 
         else if (action === 'publish') {
-            // STEP 2: Publish the application (verified)
-            await query("UPDATE clubs SET status = 'verified', verified_at = CURRENT_TIMESTAMP WHERE id = $1", [id]);
+            // STEP 2: Publish the application (verified) and grant 30 days subscription
+            const clubRes = await query(
+                "UPDATE clubs SET status = 'verified', verified_at = CURRENT_TIMESTAMP, subscription_expires_at = CURRENT_TIMESTAMP + interval '30 days' WHERE id = $1 RETURNING *", 
+                [id]
+            );
+            const club = clubRes.rows[0];
+
+            // Official Channel Broadcast (if Advanced or PRO)
+            if (club && (club.selected_plan === 'Advanced' || club.selected_plan === 'PRO') && process.env.CHANNEL_ID && process.env.TELEGRAM_BOT_TOKEN) {
+                const isAdv = club.selected_plan === 'Advanced';
+                const channelMsg = `🔥 *¡Nuevo Club ${isAdv ? 'Premium ' : ''}Verificado en ${club.city}!*\n\n` +
+                                   `${isAdv ? '🏆' : '✅'} *${club.name}*\n` +
+                                   `📍 Ubicación: ${club.city}, ${club.country}\n` +
+                                   `💬 Contacto: ${club.telegram_username}\n\n` +
+                                   `🔗 _¡Abre la Mini App de VFPE para ver más detalles y localizar este club en el mapa!_`;
+                
+                await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    chat_id: process.env.CHANNEL_ID,
+                    text: channelMsg,
+                    parse_mode: 'Markdown'
+                }).catch(err => console.error("Error broadcast channel:", err.message));
+            }
         }
         else if (action === 'approve') await query("UPDATE clubs SET status = 'verified', verified_at = CURRENT_TIMESTAMP WHERE id = $1", [id]); // Legacy compatibility
         else if (action === 'reject') await query("UPDATE clubs SET status = 'rejected' WHERE id = $1", [id]);

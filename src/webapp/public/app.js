@@ -13,7 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeDetailBtn = document.getElementById('close-detail');
     const applyForm = document.getElementById('apply-form');
 
+    const tg = window.Telegram?.WebApp;
+    const userLang = tg?.initDataUnsafe?.user?.language_code || 'es';
+    const isEnglish = userLang === 'en' || userLang === 'de' || userLang === 'nl'; // Fallback to EN for non-ES
+    
     let allClubs = [];
+    let savedClubs = JSON.parse(localStorage.getItem('vfpe_saved_clubs')) || [];
+    let showOnlySaved = false;
     let map;
     let markers = [];
 
@@ -115,19 +121,50 @@ document.addEventListener('DOMContentLoaded', () => {
         const sorted = [...clubs].sort((a, b) => (b.is_premium ? 1 : 0) - (a.is_premium ? 1 : 0));
 
         sorted.forEach(club => {
+            const isSaved = savedClubs.includes(club.id);
             const card = document.createElement('div');
             card.className = `club-card ${club.is_premium ? 'premium' : ''}`;
+            
+            let eventHtml = '';
+            if (club.event_message && new Date(club.event_expires_at) > new Date()) {
+                eventHtml = `<div class="event-banner">⚡ ${club.event_message}</div>`;
+            }
+
             card.innerHTML = `
-                <span class="badge">${club.is_premium ? '⭐ PREMIUM' : 'VERIFIED'}</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span class="badge">${club.is_premium ? '⭐ PREMIUM' : 'VERIFIED'}</span>
+                    <button class="save-btn" data-id="${club.id}" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">
+                        ${isSaved ? '❤️' : '🤍'}
+                    </button>
+                </div>
+                ${eventHtml}
                 <h2>${club.name}</h2>
                 <p class="location">📍 ${club.city}, ${club.country}</p>
             `;
+            
+            // Event delegation for the save button
+            card.querySelector('.save-btn').onclick = (e) => {
+                e.stopPropagation();
+                toggleSaveClub(club.id);
+            };
+
             card.onclick = () => {
                 logClick(club.id);
                 showDetail(club);
             };
             clubList.appendChild(card);
         });
+    }
+
+    function toggleSaveClub(id) {
+        if (savedClubs.includes(id)) {
+            savedClubs = savedClubs.filter(cid => cid !== id);
+        } else {
+            savedClubs.push(id);
+        }
+        localStorage.setItem('vfpe_saved_clubs', JSON.stringify(savedClubs));
+        filterClubs(); // Re-render to update heart icons
+        if (tg) tg.HapticFeedback.impactOccurred('light');
     }
 
     async function logClick(id) {
@@ -152,6 +189,25 @@ document.addEventListener('DOMContentLoaded', () => {
             igLink.style.display = "none";
         }
 
+        // Deep Link Share Button
+        let shareBtn = document.getElementById('detail-share-btn');
+        if (!shareBtn) {
+            shareBtn = document.createElement('button');
+            shareBtn.id = 'detail-share-btn';
+            shareBtn.className = 'action-btn';
+            shareBtn.style.marginTop = '10px';
+            shareBtn.style.background = '#222';
+            document.querySelector('.detail-actions').appendChild(shareBtn);
+        }
+        shareBtn.innerHTML = `🔗 ${isEnglish ? 'Share Club' : 'Compartir Club'}`;
+        shareBtn.onclick = () => {
+            const shareUrl = `https://t.me/VerifyPlugEU_bot?startapp=club_${club.id}`;
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                shareBtn.innerHTML = `✅ ${isEnglish ? 'Copied!' : '¡Copiado!'}`;
+                setTimeout(() => shareBtn.innerHTML = `🔗 ${isEnglish ? 'Share Club' : 'Compartir Club'}`, 2000);
+            });
+        };
+
         detailScreen.style.display = "block";
         document.body.style.overflow = "hidden"; // Prevent scroll
     }
@@ -162,7 +218,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Filter logic
-    // FIX: country filter now uses ISO codes ('ES', 'DE', 'NL') matching what's stored in DB
     function filterClubs() {
         const searchTerm = searchInput.value.toLowerCase();
         const country = countryFilter.value; // already 'all' | 'ES' | 'DE' | 'NL'
@@ -170,10 +225,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const filtered = allClubs.filter(club => {
             const matchesSearch = club.name.toLowerCase().includes(searchTerm) || 
                                  club.city.toLowerCase().includes(searchTerm);
-            // Normalize both sides to uppercase for safe comparison
             const matchesCountry = country === 'all' || 
                                    (club.country || '').toUpperCase() === country.toUpperCase();
-            return matchesSearch && matchesCountry;
+            const matchesSaved = !showOnlySaved || savedClubs.includes(club.id);
+            return matchesSearch && matchesCountry && matchesSaved;
         });
         
         renderClubs(filtered);
@@ -252,9 +307,26 @@ document.addEventListener('DOMContentLoaded', () => {
             L.circle([latitude, longitude], { radius: 200, color: '#00d26a' }).addTo(map);
             nearMeBtn.innerHTML = '📍';
         }, (err) => {
-            alert('Could not get location');
+            alert(isEnglish ? 'Could not get location' : 'No se pudo obtener la ubicación');
             nearMeBtn.innerHTML = '📍';
         });
+    };
+
+    // Favorites "⭐ Guardados" filter button logic
+    const filtersContainer = document.querySelector('.filters');
+    const savedFilterBtn = document.createElement('button');
+    savedFilterBtn.id = 'saved-filter-btn';
+    savedFilterBtn.className = 'country-select'; // Reuse style
+    savedFilterBtn.style.marginLeft = '10px';
+    savedFilterBtn.style.cursor = 'pointer';
+    savedFilterBtn.innerHTML = isEnglish ? '⭐ Saved' : '⭐ Guardados';
+    filtersContainer.appendChild(savedFilterBtn);
+
+    savedFilterBtn.onclick = () => {
+        showOnlySaved = !showOnlySaved;
+        savedFilterBtn.style.background = showOnlySaved ? '#00d26a' : '#111';
+        savedFilterBtn.style.color = showOnlySaved ? '#000' : '#fff';
+        filterClubs();
     };
 
     // Dynamic City Dropdown for Apply Form
@@ -314,6 +386,28 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit-name-display').value = club.name;
             document.getElementById('edit-instagram').value = club.instagram || '';
             document.getElementById('edit-description').value = club.description || '';
+            
+            let eventInput = document.getElementById('edit-event-message');
+            if (!eventInput) {
+                const formGroups = form.querySelectorAll('.form-group');
+                const lastGroup = formGroups[formGroups.length - 1];
+                const eventGroup = document.createElement('div');
+                eventGroup.className = 'form-group';
+                eventGroup.innerHTML = `
+                    <label>${isEnglish ? '24h Event / Announcement (PRO+)' : 'Anuncio 24h (Solo PRO+)'}</label>
+                    <input type="text" id="edit-event-message" name="event_message" placeholder="Ej: Hoy DJ en vivo a las 22:00" maxlength="50" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #333; background: #222; color: white;">
+                `;
+                lastGroup.parentNode.insertBefore(eventGroup, lastGroup.nextSibling);
+                eventInput = document.getElementById('edit-event-message');
+            }
+            
+            // Only show the event message if it hasn't expired
+            if (club.event_message && new Date(club.event_expires_at) > new Date()) {
+                eventInput.value = club.event_message;
+            } else {
+                eventInput.value = '';
+            }
+
             modal.style.display = 'block';
         };
 
@@ -326,7 +420,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 id: formData.get('id'),
                 username: username,
                 instagram: formData.get('instagram'),
-                description: formData.get('description')
+                description: formData.get('description'),
+                event_message: formData.get('event_message')
             };
 
             const res = await fetch('/api/my-club/update', {
@@ -349,10 +444,29 @@ document.addEventListener('DOMContentLoaded', () => {
     initMap();
     fetchClubs();
 
-    // Telegram WebApp integration
-    if (window.Telegram && window.Telegram.WebApp) {
-        const tg = window.Telegram.WebApp;
+    // Telegram WebApp integration and Deep Link Handling
+    if (tg) {
         tg.expand();
         tg.ready();
+        
+        // Auto-translate initial static text if English
+        if (isEnglish) {
+            searchInput.placeholder = "Search club or city...";
+            openApplyBtn.textContent = "Apply for Verification";
+            // More static translations can be added here
+        }
+
+        // Handle Deep Link (startapp=club_123)
+        const startParam = tg.initDataUnsafe?.start_param;
+        if (startParam && startParam.startsWith('club_')) {
+            const clubId = parseInt(startParam.split('_')[1]);
+            // Wait a moment for clubs to load, then open detail
+            setTimeout(() => {
+                const targetClub = allClubs.find(c => c.id === clubId);
+                if (targetClub) {
+                    showDetail(targetClub);
+                }
+            }, 1000);
+        }
     }
 });
