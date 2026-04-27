@@ -194,10 +194,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!shareBtn) {
             shareBtn = document.createElement('button');
             shareBtn.id = 'detail-share-btn';
-            shareBtn.className = 'action-btn';
+            shareBtn.className = 'cta-secondary'; // Matched UI style
             shareBtn.style.marginTop = '10px';
-            shareBtn.style.background = '#222';
-            document.querySelector('.detail-actions').appendChild(shareBtn);
+            shareBtn.style.border = 'none'; // Overriding default button border
+            shareBtn.style.cursor = 'pointer';
+            document.querySelector('.detail-ctas').appendChild(shareBtn);
         }
         shareBtn.innerHTML = `🔗 ${isEnglish ? 'Share Club' : 'Compartir Club'}`;
         shareBtn.onclick = () => {
