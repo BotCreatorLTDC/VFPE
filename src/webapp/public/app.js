@@ -214,9 +214,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const result = await response.json();
             if (result.success) {
-                alert("✅ Request received! We'll review your club within 24-48 hours.");
-                applyModal.style.display = "none";
-                applyForm.reset();
+                // Redirect to the unique pricing page, passing the username (without the @)
+                const uname = data.telegram_username.replace('@', '');
+                window.location.href = `/pricing.html?u=${uname}`;
             } else {
                 alert('❌ Error: ' + (result.error || 'Unknown error'));
             }

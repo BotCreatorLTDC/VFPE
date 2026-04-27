@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VFPE - Planes de Promoción</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #fff;
+            padding: 20px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #auth-error {
+            display: none;
+            text-align: center;
+            margin-top: 50px;
+            color: #ff4d4d;
+        }
+
+        #pricing-content {
+            display: none; /* Hidden until authorized */
+        }
+
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .pricing-header h1 {
+            color: #00d26a;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .pricing-header p {
+            color: #aaa;
+            font-size: 1rem;
+        }
+
+        .plan-card {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .plan-card.pro {
+            border-color: #00d26a;
+            box-shadow: 0 0 20px rgba(0, 210, 106, 0.1);
+        }
+
+        .plan-card.advanced {
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.15);
+            background: linear-gradient(145deg, #111 0%, #1a1500 100%);
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: #00d26a;
+            color: #000;
+            font-weight: 800;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .advanced .plan-badge {
+            background: #FFD700;
+        }
+
+        .plan-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .plan-price span {
+            font-size: 1rem;
+            color: #888;
+            font-weight: 400;
+        }
+
+        .plan-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 25px;
+        }
+
+        .plan-features li {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            color: #ddd;
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            color: #00d26a;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .advanced .plan-features li::before {
+            color: #FFD700;
+        }
+
+        .select-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            background: #222;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .pro .select-btn {
+            background: #00d26a;
+            color: #000;
+        }
+
+        .advanced .select-btn {
+            background: #FFD700;
+            color: #000;
+        }
+
+        .extras-section {
+            margin-top: 40px;
+            background: #0a0a0a;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px dashed #333;
+        }
+
+        .extras-title {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .extra-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .extra-item:last-child {
+            border-bottom: none;
+        }
+
+        .extra-info h4 {
+            margin: 0 0 5px 0;
+            color: #fff;
+        }
+
+        .extra-info p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .extra-price {
+            color: #00d26a;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="auth-error">
+        <h2>Acceso Denegado 🔒</h2>
+        <p>Esta página es privada y única para el usuario que solicitó la verificación. Por favor, accede desde la Mini App de Telegram.</p>
+    </div>
+
+    <div id="pricing-content">
+        <div class="pricing-header">
+            <h1>¡Solicitud Recibida!</h1>
+            <p>Selecciona un plan para impulsar tu club mientras revisamos tu perfil.</p>
+        </div>
+
+        <!-- BASIC PLAN -->
+        <div class="plan-card">
+            <div class="plan-title">Basic</div>
+            <div class="plan-price">50€<span>/mes</span></div>
+            <ul class="plan-features">
+                <li>Listado estándar en el directorio</li>
+                <li>Info esencial (Nombre, País, Ciudad)</li>
+                <li>Link directo a Telegram / Instagram</li>
+            </ul>
+            <button class="select-btn" onclick="selectPlan('Basic')">Seleccionar Basic</button>
+        </div>
+
+        <!-- PRO PLAN -->
+        <div class="plan-card pro">
+            <div class="plan-badge">RECOMENDADO</div>
+            <div class="plan-title">PRO</div>
+            <div class="plan-price">80€<span>/mes</span></div>
+            <ul class="plan-features">
+                <li>Listado estándar en el directorio</li>
+                <li>Historia diaria en Instagram</li>
+                <li>Analíticas básicas de visitas</li>
+            </ul>
+            <button class="select-btn" onclick="selectPlan('PRO')">Seleccionar PRO</button>
+        </div>
+
+        <!-- ADVANCED PLAN -->
+        <div class="plan-card advanced">
+            <div class="plan-badge">MÁXIMO IMPACTO</div>
+            <div class="plan-title">Advanced</div>
+            <div class="plan-price">100€<span>/mes</span></div>
+            <ul class="plan-features">
+                <li>Borde dorado premium en el mapa</li>
+                <li>Listado fijado arriba en búsquedas</li>
+                <li>Etiqueta exclusiva ⭐ PREMIUM</li>
+            </ul>
+            <button class="select-btn" onclick="selectPlan('Advanced')">Seleccionar Advanced</button>
+        </div>
+
+        <!-- EXTRAS -->
+        <div class="extras-section">
+            <h3 class="extras-title">+ Extras y Add-ons</h3>
+            <div class="extra-item">
+                <div class="extra-info">
+                    <h4>Diseño de Logo</h4>
+                    <p>Creación de identidad visual para tu club</p>
+                </div>
+                <div class="extra-price">Consultar</div>
+            </div>
+            <div class="extra-item">
+                <div class="extra-info">
+                    <h4>Perfil de Marca</h4>
+                    <p>Asesoramiento y branding completo</p>
+                </div>
+                <div class="extra-price">Consultar</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tg = window.Telegram?.WebApp;
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetUser = urlParams.get('u');
+            
+            // Get actual user from Telegram WebApp
+            const actualUser = tg?.initDataUnsafe?.user?.username;
+
+            // Security Check
+            // We compare actualUser (no @) with targetUser (no @)
+            if (actualUser && targetUser && actualUser.toLowerCase() === targetUser.toLowerCase()) {
+                document.getElementById('pricing-content').style.display = 'block';
+                tg.expand(); // Ensure full screen in Telegram
+            } else {
+                // For local development testing, you can bypass this by commenting it out, 
+                // but in production it ensures only the specific user can see it.
+                document.getElementById('auth-error').style.display = 'block';
+            }
+        });
+
+        function selectPlan(planName) {
+            const tg = window.Telegram?.WebApp;
+            // Send data back to the bot or API to notify admins about the plan selection
+            alert(`Has seleccionado el plan ${planName}. Nos pondremos en contacto contigo para activarlo.`);
+            if (tg) {
+                // Optionally close the WebApp after selection
+                tg.close();
+            }
+        }
+    </script>
+</body>
+</html>
