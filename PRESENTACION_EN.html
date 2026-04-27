@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFPE - Presentation 2024</title>
+    <link rel="stylesheet" href="src/webapp/public/style.css">
+    <style>
+        body { background: #050505; color: white; scroll-behavior: smooth; }
+        .hero-section { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%); }
+        .hero-section img { height: 120px; margin-bottom: 20px; }
+        .hero-section h1 { font-size: 4rem; color: #00d26a; margin-bottom: 10px; }
+        
+        .slide { padding: 80px 20px; max-width: 1000px; margin: 0 auto; border-bottom: 1px solid #222; }
+        .slide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+        .slide-text h2 { font-size: 2.5rem; color: #00d26a; margin-bottom: 20px; }
+        .slide-text p { font-size: 1.1rem; color: #aaa; line-height: 1.8; }
+        
+        .mockup-container { position: relative; background: #111; border-radius: 30px; padding: 15px; border: 8px solid #222; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .mockup-container img { width: 100%; border-radius: 15px; display: block; }
+        
+        .feature-tag { display: inline-block; background: rgba(0, 210, 106, 0.1); color: #00d26a; padding: 5px 15px; border-radius: 50px; font-weight: 700; font-size: 0.8rem; margin-bottom: 15px; }
+        
+        @media (max-width: 768px) {
+            .slide-grid { grid-template-columns: 1fr; text-align: center; }
+            .hero-section h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="hero-section">
+        <img src="assets/logo.jpg" alt="Logo">
+        <h1>VFPE Ecosystem</h1>
+        <p>The Future of Verified Club Directories in Europe</p>
+        <div style="margin-top: 50px;">
+            <a href="#onboarding" style="color: #00d26a; text-decoration: none; font-weight: 700;">Start Tour ↓</a>
+        </div>
+    </section>
+
+    <!-- SLIDE 1: ONBOARDING -->
+    <section class="slide" id="onboarding">
+        <div class="slide-grid">
+            <div class="slide-text">
+                <span class="feature-tag">BOT INTEGRATION</span>
+                <h2>Instant Access</h2>
+                <p>Our gateway is a smart Telegram Bot. Users can launch the directory, choose their language, and receive notifications without leaving the industry's most used messaging app.</p>
+            </div>
+            <div class="mockup-container">
+                <img src="assets/presentacion/start-en-bot.jpg" alt="Bot Welcome">
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 2: EXPLORATION -->
+    <section class="slide">
+        <div class="slide-grid">
+            <div class="mockup-container">
+                <img src="assets/presentacion/pagina-principal-miniapp.jpg" alt="Main Map">
+            </div>
+            <div class="slide-text">
+                <span class="feature-tag">MAP & GEO</span>
+                <h2>Limitless Exploration</h2>
+                <p>An interactive map with geolocation showing clubs in real-time. Users can discover nearby spots and browse through cities in Spain, Germany, and the Netherlands with advanced filters.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 3: TRUST -->
+    <section class="slide">
+        <div class="slide-grid">
+            <div class="slide-text">
+                <span class="feature-tag">VERIFIED ONLY</span>
+                <h2>Total Trust</h2>
+                <p>Every club features a detailed profile. We manually verify each contact to ensure users arrive at a real, legal, and safe location.</p>
+            </div>
+            <div class="mockup-container">
+                <img src="assets/presentacion/detalles-club.jpg" alt="Club Details">
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 4: GROWTH -->
+    <section class="slide">
+        <div class="slide-grid">
+            <div class="mockup-container">
+                <img src="assets/presentacion/formulario-miniapp.jpg" alt="Apply Form">
+            </div>
+            <div class="slide-text">
+                <span class="feature-tag">CLUB ACQUISITION</span>
+                <h2>Organic Growth</h2>
+                <p>Clubs can request to be listed directly from the Mini App. A smart Country → City selection system ensures data is clean and ready for review.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 5: MONETIZATION & MANAGEMENT -->
+    <section class="slide">
+        <div class="slide-grid">
+            <div class="slide-text">
+                <span class="feature-tag">PREMIUM & SELF-MANAGEMENT</span>
+                <h2>Status & Autonomy</h2>
+                <p>Featured clubs are highlighted with golden borders for maximum visibility. Furthermore, owners can manage their own data in real-time using the "Manage My Club" button.</p>
+            </div>
+            <div class="mockup-container">
+                <img src="assets/presentacion/club-promocionado-y-ajustes-manage-my-club-visibles.jpg" alt="Premium View">
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 6: MANAGE FORM -->
+    <section class="slide">
+        <div class="slide-grid">
+            <div class="mockup-container">
+                <img src="assets/presentacion/formulario-manage-mt-club.jpg" alt="Manage Form">
+            </div>
+            <div class="slide-text">
+                <span class="feature-tag">REAL-TIME EDITING</span>
+                <h2>Instant Updates</h2>
+                <p>The exclusive owner form allows modifying the description, social media, and contact info. Changes are reflected instantly across the ecosystem.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 7: ADMINISTRATION -->
+    <section class="slide">
+        <div class="slide-grid">
+            <div class="mockup-container">
+                <img src="assets/presentacion/admin-lista-de-club-y-club-promocionado.jpg" alt="Admin HQ">
+            </div>
+            <div class="slide-text">
+                <span class="feature-tag">ADMIN CONTROL</span>
+                <h2>Absolute Control</h2>
+                <p>A mobile-first Admin HQ Panel allows moderators to approve requests, promote clubs to Premium, or view click statistics to measure platform success.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer style="padding: 100px 20px; text-align: center; opacity: 0.5;">
+        <p>VFPE — Presentation 2024 — Safe. Real. Trusted.</p>
+    </footer>
+
+</body>
+</html>
