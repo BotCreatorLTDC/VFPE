@@ -262,7 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Capture the user's numeric ID for bot messaging
-        const tg = window.Telegram?.WebApp;
         data.tg_user_id = tg?.initDataUnsafe?.user?.id || null;
 
         try {
@@ -355,7 +354,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Self-Management for Club Owners
-    const tg = window.Telegram?.WebApp;
     const username = tg?.initDataUnsafe?.user?.username;
 
     if (username) {
