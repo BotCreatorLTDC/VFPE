@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                  club.city.toLowerCase().includes(searchTerm);
             const matchesCountry = country === 'all' || 
                                    (club.country || '').toUpperCase() === country.toUpperCase();
-            const matchesSaved = !showOnlySaved || savedClubs.includes(club.id);
+            const matchesSaved = !showOnlySaved || savedClubs.includes(Number(club.id));
             return matchesSearch && matchesCountry && matchesSaved;
         });
         

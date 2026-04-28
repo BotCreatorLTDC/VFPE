@@ -97,10 +97,19 @@ async function verifyClubConversation(conversation, ctx) {
         .text("🇪🇸 España", "conv_country_ES")
         .text("🇩🇪 Alemania", "conv_country_DE")
         .text("🇳🇱 Países Bajos", "conv_country_NL");
-    await ctx.reply("\ud83c� *¿En qué país está?*", { parse_mode: "Markdown", reply_markup: countryKb });
-    const { callbackQuery: countryQuery } = await conversation.waitFor("callback_query");
-    const countryCode = countryQuery.data.replace("conv_country_", "");
-    await countryQuery.answer();
+    await ctx.reply("🌍 *¿En qué país está tu plug?*", { parse_mode: "Markdown", reply_markup: countryKb });
+    // FIX: Loop until a valid conv_country_* callback is received
+    let countryCode;
+    while (true) {
+        const { callbackQuery: countryQuery } = await conversation.waitFor("callback_query");
+        await countryQuery.answer();
+        if (countryQuery.data.startsWith("conv_country_")) {
+            countryCode = countryQuery.data.replace("conv_country_", "");
+            break;
+        }
+        // Ignore stray callbacks (e.g. old buttons) and re-prompt
+        await ctx.reply("⚠️ Por favor, selecciona un país de los botones de arriba.", { reply_markup: countryKb });
+    }
 
     // FIX: Validate @username format — re-ask until valid
     await ctx.reply(t(ctx, 'verify_tg'), { parse_mode: "Markdown" });
