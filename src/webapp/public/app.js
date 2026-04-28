@@ -389,23 +389,32 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit-description').value = club.description || '';
             
             let eventInput = document.getElementById('edit-event-message');
-            if (!eventInput) {
-                const submitBtn = form.querySelector('button[type="submit"]');
-                const eventGroup = document.createElement('div');
-                eventGroup.style.marginBottom = '15px';
-                eventGroup.innerHTML = `
-                    <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">${isEnglish ? '24h Event / Announcement (PRO+)' : 'Anuncio 24h (Solo PRO+)'}</label>
-                    <input type="text" id="edit-event-message" name="event_message" placeholder="Ej: Hoy DJ en vivo a las 22:00" maxlength="50" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #333; background: #222; color: white;">
-                `;
-                form.insertBefore(eventGroup, submitBtn);
-                eventInput = document.getElementById('edit-event-message');
-            }
-            
-            // Only show the event message if it hasn't expired
-            if (club.event_message && new Date(club.event_expires_at) > new Date()) {
-                eventInput.value = club.event_message;
+            const eventFieldId = 'event-group-wrapper';
+            let eventGroup = document.getElementById(eventFieldId);
+
+            // FIX: Only show the announcement option if the user has Advanced plan
+            if (club.selected_plan === 'Advanced') {
+                if (!eventGroup) {
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    eventGroup = document.createElement('div');
+                    eventGroup.id = eventFieldId;
+                    eventGroup.style.marginBottom = '15px';
+                    eventGroup.innerHTML = `
+                        <label style="font-size: 0.7rem; color: #FFD700; display: block; margin-bottom: 5px;">${isEnglish ? '24h Announcement (Advanced ⚡)' : 'Anuncio 24h (Solo Advanced ⚡)'}</label>
+                        <input type="text" id="edit-event-message" name="event_message" placeholder="Ej: ¡Nuevo stock disponible! 🔥" maxlength="50" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #FFD700; background: #1a1500; color: white;">
+                    `;
+                    form.insertBefore(eventGroup, submitBtn);
+                    eventInput = document.getElementById('edit-event-message');
+                }
+                
+                if (club.event_message && new Date(club.event_expires_at) > new Date()) {
+                    eventInput.value = club.event_message;
+                } else {
+                    eventInput.value = '';
+                }
             } else {
-                eventInput.value = '';
+                // If not Advanced, make sure the field is GONE
+                if (eventGroup) eventGroup.remove();
             }
 
             modal.style.display = 'block';

@@ -127,10 +127,16 @@ app.post('/api/my-club/update', async (req, res) => {
     const tgUser = username.startsWith('@') ? username : `@${username}`;
     
     try {
-        const check = await query("SELECT id FROM clubs WHERE id = $1 AND telegram_username = $2", [id, tgUser]);
+        const check = await query("SELECT id, selected_plan FROM clubs WHERE id = $1 AND telegram_username = $2", [id, tgUser]);
         if (check.rows.length === 0) return res.status(403).json({ error: "Unauthorized" });
 
+        const club = check.rows[0];
+        
+        // SECURITY: Only allow announcements for Advanced plan
         if (event_message && event_message.trim() !== '') {
+            if (club.selected_plan !== 'Advanced') {
+                return res.status(403).json({ error: "Feature reserved for Advanced plans" });
+            }
             await query(
                 "UPDATE clubs SET instagram = $1, description = $2, event_message = $3, event_expires_at = CURRENT_TIMESTAMP + interval '24 hours' WHERE id = $4",
                 [instagram || null, description || null, event_message.substring(0, 50), id]
