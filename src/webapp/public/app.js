@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const detailScreen = document.getElementById('detail-screen');
     
     const openApplyBtn = document.getElementById('open-apply-modal');
-    const closeApplyBtn = document.querySelector('.close');
+    const closeApplyBtn = document.querySelector('#apply-modal .close');
     const closeDetailBtn = document.getElementById('close-detail');
     const applyForm = document.getElementById('apply-form');
 
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             
             if (data.error || !Array.isArray(data)) {
-                statusMessage.textContent = `⚠️ ${data.error || "Failed to load clubs"}`;
+                statusMessage.textContent = `⚠️ ${data.error || "Failed to load plugs"}`;
                 return;
             }
 
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const sorted = [...clubs].sort((a, b) => (b.is_premium ? 1 : 0) - (a.is_premium ? 1 : 0));
 
         sorted.forEach(club => {
-            const isSaved = savedClubs.includes(club.id);
+            const isSaved = savedClubs.includes(Number(club.id));
             const card = document.createElement('div');
             card.className = `club-card ${club.is_premium ? 'premium' : ''}`;
             
@@ -157,10 +157,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleSaveClub(id) {
-        if (savedClubs.includes(id)) {
-            savedClubs = savedClubs.filter(cid => cid !== id);
+        if (savedClubs.includes(Number(id))) {
+            savedClubs = savedClubs.filter(cid => Number(cid) !== Number(id));
         } else {
-            savedClubs.push(id);
+            savedClubs.push(Number(id));
         }
         localStorage.setItem('vfpe_saved_clubs', JSON.stringify(savedClubs));
         filterClubs(); // Re-render to update heart icons
@@ -233,6 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         renderClubs(filtered);
+        updateMapMarkers(filtered); // FIX: update map when filtering
     }
 
     searchInput.addEventListener('input', filterClubs);

@@ -262,29 +262,28 @@
         document.addEventListener('DOMContentLoaded', () => {
             const tg = window.Telegram?.WebApp;
             const urlParams = new URLSearchParams(window.location.search);
-            const targetUser = urlParams.get('u');
-            
-            // Get actual user from Telegram WebApp
-            const actualUser = tg?.initDataUnsafe?.user?.username;
+            const targetUser = urlParams.get('u'); // club's telegram username (no @)
 
-            // Security Check
-            // We compare actualUser (no @) with targetUser (no @)
-            if (actualUser && targetUser && actualUser.toLowerCase() === targetUser.toLowerCase()) {
+            // FIX: Show pricing if we have a valid targetUser from the URL.
+            // We no longer block based on Telegram username mismatch, since many
+            // users don't have a public @username, and the link itself is private.
+            if (targetUser) {
                 document.getElementById('pricing-content').style.display = 'block';
-                tg.expand(); // Ensure full screen in Telegram
+                if (tg) tg.expand();
             } else {
-                // For local development testing, you can bypass this by commenting it out, 
-                // but in production it ensures only the specific user can see it.
                 document.getElementById('auth-error').style.display = 'block';
             }
         });
 
         async function selectPlan(planName) {
             const tg = window.Telegram?.WebApp;
-            const actualUser = tg?.initDataUnsafe?.user?.username;
+            const urlParams = new URLSearchParams(window.location.search);
+            // FIX: Use targetUser from URL (club's telegram) NOT the user's personal Telegram.
+            // This ensures the UPDATE query finds the correct row in the DB.
+            const targetUser = urlParams.get('u');
 
-            if (!actualUser) {
-                alert("Error: No se pudo identificar tu usuario de Telegram.");
+            if (!targetUser) {
+                alert("Error: No se pudo identificar el plug. Por favor, vuelve a enviar el formulario.");
                 return;
             }
 
@@ -292,7 +291,7 @@
                 const response = await fetch('/api/select-plan', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: actualUser, plan: planName })
+                    body: JSON.stringify({ username: targetUser, plan: planName })
                 });
 
                 const result = await response.json();

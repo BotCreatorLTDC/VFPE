@@ -211,6 +211,10 @@ async function handleAction(id, action) {
         if (response.ok) {
             fetchData();
             tg.HapticFeedback.notificationOccurred('success');
+        } else {
+            const err = await response.json().catch(() => ({ error: 'Unknown error' }));
+            alert(`❌ Acción fallida: ${err.error || response.status}`);
+            tg.HapticFeedback.notificationOccurred('error');
         }
     } catch (e) {
         alert('Action failed');

@@ -26,8 +26,8 @@ if (WEBAPP_URL) {
 
 // Every 12 hours: bot reminder in community group
 cron.schedule('0 */12 * * *', async () => {
-    const msg = `🔍 *¿Buscas un club verificado?*\n\n` +
-        `Usa @VerifyPlugEU_bot — encuentra clubes de cannabis social verificados en Madrid, Barcelona, y toda Europa.\n\n` +
+    const msg = `🔍 *¿Buscas un plug verificado?*\n\n` +
+        `Usa @VerifyPlugEU_bot — encuentra plugs verificados en Madrid, Barcelona, y toda Europa.\n\n` +
         `✅ Contactos verificados únicamente. Sin scams.`;
     try {
         await bot.api.sendMessage(COMMUNITY_GROUP_ID, msg, { parse_mode: "Markdown" });
@@ -96,7 +96,7 @@ cron.schedule('0 10 * * 1', async () => {
             const list = lastWeekClubs.map(c => `• ${c.name} (${c.city})`).join('\n');
             const summary = `📊 *VFPE Weekly*\n\n` +
                 `Esta semana en Verify Plug Europe:\n\n` +
-                `✅ ${lastWeekClubs.length} clubes verificados\n` +
+                `✅ ${lastWeekClubs.length} plugs verificados\n` +
                 `${list}\n\n` +
                 `🔍 Directorio completo:\n` +
                 `→ @VPFE_bot\n\n` +

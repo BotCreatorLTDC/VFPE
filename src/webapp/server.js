@@ -212,7 +212,7 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
             // Official Channel Broadcast (if Advanced or PRO)
             if (club && (club.selected_plan === 'Advanced' || club.selected_plan === 'PRO') && process.env.CHANNEL_ID && process.env.MAIN_BOT_TOKEN) {
                 const isAdv = club.selected_plan === 'Advanced';
-                const channelMsg = `🔥 *¡Nuevo Club ${isAdv ? 'Premium ' : ''}Verificado en ${club.city}!*\n\n` +
+                const channelMsg = `🔥 *¡Nuevo Plug ${isAdv ? 'Premium ' : ''}Verificado en ${club.city}!*\n\n` +
                                    `${isAdv ? '🏆' : '✅'} *${club.name}*\n` +
                                    `📍 Ubicación: ${club.city}, ${club.country}\n` +
                                    `💬 Contacto: ${club.telegram_username}\n\n` +

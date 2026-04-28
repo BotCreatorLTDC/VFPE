@@ -92,6 +92,16 @@ async function verifyClubConversation(conversation, ctx) {
     await ctx.reply(t(ctx, 'verify_city'), { parse_mode: "Markdown" });
     const { message: cityMsg } = await conversation.wait();
 
+    // FIX: Ask for country so it's not hardcoded to 'ES'
+    const countryKb = new InlineKeyboard()
+        .text("🇪🇸 España", "conv_country_ES")
+        .text("🇩🇪 Alemania", "conv_country_DE")
+        .text("🇳🇱 Países Bajos", "conv_country_NL");
+    await ctx.reply("\ud83c� *¿En qué país está?*", { parse_mode: "Markdown", reply_markup: countryKb });
+    const { callbackQuery: countryQuery } = await conversation.waitFor("callback_query");
+    const countryCode = countryQuery.data.replace("conv_country_", "");
+    await countryQuery.answer();
+
     // FIX: Validate @username format — re-ask until valid
     await ctx.reply(t(ctx, 'verify_tg'), { parse_mode: "Markdown" });
     let userMsg;
@@ -109,7 +119,7 @@ async function verifyClubConversation(conversation, ctx) {
     const instagram = instaMsg.text.toLowerCase() === 'skip' ? null : instaMsg.text;
 
     const summary = `${t(ctx, 'verify_confirm')}\n\n` +
-        `🏷 ${nameMsg.text}\n📍 ${cityMsg.text}\n💬 ${userMsg.text}\n📸 ${instagram || 'None'}`;
+        `🏷 ${nameMsg.text}\n📍 ${cityMsg.text}, ${countryCode}\n💬 ${userMsg.text}\n📸 ${instagram || 'None'}`;
 
     const keyboard = new InlineKeyboard()
         .text(t(ctx, 'confirm_btn'), "confirm_verify")
@@ -117,7 +127,7 @@ async function verifyClubConversation(conversation, ctx) {
         .text(t(ctx, 'cancel_btn'), "back_main");
 
     await ctx.reply(summary, { parse_mode: "Markdown", reply_markup: keyboard });
-    ctx.session.pendingClub = { name: nameMsg.text, city: cityMsg.text, username: userMsg.text, instagram };
+    ctx.session.pendingClub = { name: nameMsg.text, city: cityMsg.text, country: countryCode, username: userMsg.text, instagram };
 }
 
 bot.use(createConversation(verifyClubConversation));
@@ -188,8 +198,9 @@ bot.callbackQuery(/^country_(.+)$/, async (ctx) => {
     });
     cities.row().text(t(ctx, 'back'), "menu_find");
 
-    const cityLabel = { ES: '🇪🇸 *España', DE: '🇩🇪 *Alemania', NL: '🇳🇱 *Países Bajos' }[countryCode] || '🌍';
-    await ctx.editMessageText(`${cityLabel} — Selecciona tu ciudad:*`, { parse_mode: "Markdown", reply_markup: cities });
+    // FIX: Markdown corrected — asterisks properly wrapping the full string
+    const cityLabel = { ES: 'España 🇪🇸', DE: 'Alemania 🇩🇪', NL: 'Países Bajos 🇳🇱' }[countryCode] || '🌍';
+    await ctx.editMessageText(`*${cityLabel} — Selecciona tu ciudad:*`, { parse_mode: "Markdown", reply_markup: cities });
     await ctx.answerCallbackQuery();
 });
 
@@ -245,12 +256,14 @@ bot.callbackQuery("back_main", async (ctx) => {
 bot.callbackQuery("confirm_verify", async (ctx) => {
     const club = ctx.session.pendingClub;
     if (club) {
-        // FIX: Use ISO country code 'ES' instead of 'Spain'
+        // FIX: Now uses club.country from conversation instead of hardcoded 'ES'
         await query(
             "INSERT INTO clubs (name, city, country, telegram_username, instagram, status) VALUES ($1, $2, $3, $4, $5, $6)",
-            [club.name, club.city, 'ES', club.username, club.instagram, 'pending']
+            [club.name, club.city, club.country || 'ES', club.username, club.instagram, 'pending']
         );
         await ctx.editMessageText(t(ctx, 'req_submitted'), { parse_mode: "Markdown" });
+        // Clear pending data from session
+        ctx.session.pendingClub = null;
 
         // Notify admins of new pending request
         for (const adminId of ADMIN_IDS) {
@@ -278,7 +291,7 @@ bot.callbackQuery(/^approve_(\d+)$/, async (ctx) => {
     if (club) {
         await query("UPDATE clubs SET status = 'verified', verified_at = CURRENT_TIMESTAMP WHERE id = $1", [clubId]);
         await ctx.editMessageText(`✅ *${club.name}* verificado!`, { parse_mode: "Markdown" });
-        const channelMsg = `🆕 *NUEVO CLUB VERIFICADO*\n\n✅ *${club.name}*\n📍 ${club.city}\n💬 ${club.telegram_username}\n\n#VFPE #${club.city}`;
+        const channelMsg = `🆕 *NUEVO PLUG VERIFICADO*\n\n✅ *${club.name}*\n📍 ${club.city}\n💬 ${club.telegram_username}\n\n#VFPE #${club.city}`;
         try { await bot.api.sendMessage(process.env.CHANNEL_ID, channelMsg, { parse_mode: "Markdown" }); } catch (e) {}
     }
     await ctx.answerCallbackQuery();

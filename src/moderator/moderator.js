@@ -191,7 +191,7 @@ moderatorBot.on("chat_member", async (ctx) => {
     const member = ctx.chatMember.new_chat_member;
     if (member?.status === "member") {
         await ctx.reply(
-            `👋 Bienvenido a VFPE, ${member.user.first_name}!\nUsa @VerifyPlugEU_bot para encontrar clubes verificados.`,
+            `👋 Bienvenido a VFPE, ${member.user.first_name}!\nUsa @VerifyPlugEU_bot para encontrar plugs verificados. 🔌`,
             { parse_mode: "Markdown" }
         );
     }
