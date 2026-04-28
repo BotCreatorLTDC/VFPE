@@ -80,9 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Fetch clubs from API
+    // Fetch plugs from API
     async function fetchClubs() {
-        statusMessage.textContent = "Loading verified clubs...";
+        statusMessage.textContent = "Loading verified plugs...";
         try {
             const response = await fetch('/api/clubs');
             const data = await response.json();
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             clubCount.textContent = allClubs.length;
             
             if (allClubs.length === 0) {
-                statusMessage.textContent = "No clubs found in this location yet. Expanding soon.";
+                statusMessage.textContent = "No plugs found in this location yet. Expanding soon.";
             } else {
                 statusMessage.textContent = "";
                 renderClubs(allClubs);
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showDetail(club) {
         document.getElementById('detail-name').textContent = club.name;
         document.getElementById('detail-location').textContent = `📍 ${club.city}, ${club.country}`;
-        document.getElementById('detail-description').textContent = club.description || 'Verified cannabis social club operating under local law.';
+        document.getElementById('detail-description').textContent = club.description || 'Verified plug operating under local guidelines.';
         
         const tgLink = document.getElementById('detail-tg-link');
         tgLink.href = `https://t.me/${club.telegram_username.replace('@', '')}`;
@@ -200,12 +200,12 @@ document.addEventListener('DOMContentLoaded', () => {
             shareBtn.style.cursor = 'pointer';
             document.querySelector('.detail-ctas').appendChild(shareBtn);
         }
-        shareBtn.innerHTML = `🔗 ${isEnglish ? 'Share Club' : 'Compartir Club'}`;
+        shareBtn.innerHTML = `🔗 ${isEnglish ? 'Share Plug' : 'Compartir Plug'}`;
         shareBtn.onclick = () => {
             const shareUrl = `https://t.me/VerifyPlugEU_bot?startapp=club_${club.id}`;
             navigator.clipboard.writeText(shareUrl).then(() => {
                 shareBtn.innerHTML = `✅ ${isEnglish ? 'Copied!' : '¡Copiado!'}`;
-                setTimeout(() => shareBtn.innerHTML = `🔗 ${isEnglish ? 'Share Club' : 'Compartir Club'}`, 2000);
+                setTimeout(() => shareBtn.innerHTML = `🔗 ${isEnglish ? 'Share Plug' : 'Compartir Plug'}`, 2000);
             });
         };
 
@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const nearMeBtn = document.createElement('button');
     nearMeBtn.id = 'near-me-btn';
     nearMeBtn.innerHTML = '📍';
-    nearMeBtn.title = 'Clubs near me';
+    nearMeBtn.title = 'Plugs near me';
     document.getElementById('map-container').appendChild(nearMeBtn);
 
     nearMeBtn.onclick = () => {
@@ -354,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
         citySelect.disabled = false;
     };
 
-    // Self-Management for Club Owners
+    // Self-Management for Plug Owners
     const username = tg?.initDataUnsafe?.user?.username;
 
     if (username) {
@@ -429,11 +429,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (res.ok) {
-                alert('Club updated successfully!');
+                alert('Plug updated successfully!');
                 modal.style.display = 'none';
                 fetchClubs(); // Refresh main list
             } else {
-                alert('Failed to update club.');
+                alert('Failed to update plug.');
             }
         };
     }
@@ -449,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Auto-translate initial static text if English
         if (isEnglish) {
-            searchInput.placeholder = "Search club or city...";
+            searchInput.placeholder = "Search plug or city...";
             openApplyBtn.textContent = "Apply for Verification";
             // More static translations can be added here
         }

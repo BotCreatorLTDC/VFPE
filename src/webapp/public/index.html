@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VFPE - Europe's Verified Club Directory</title>
+    <title>VFPE - Europe's Verified Plug Directory 🔌</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -15,10 +15,10 @@
         <header>
             <div class="logo">
                 <img src="/assets/logo.jpg" alt="VFPE Logo" class="brand-logo">
-                <p>Europe's Verified Club Directory</p>
+                <p>Europe's Verified Plug Directory 🔌</p>
             </div>
             <div class="stats">
-                <span id="club-count">...</span> Verified Clubs 🇪🇸 🇩🇪 🇳🇱
+                <span id="club-count">...</span> Verified Plugs 🇪🇸 🇩🇪 🇳🇱
             </div>
         </header>
 
@@ -28,7 +28,7 @@
             </div>
 
             <section id="search-section">
-                <input type="text" id="search-input" placeholder="Search by city or club name...">
+                <input type="text" id="search-input" placeholder="Search by city or plug name...">
                 <div class="filters">
                     <select id="country-filter">
                         <option value="all">All Countries</option>
@@ -50,7 +50,7 @@
             </section>
 
             <section id="apply-section">
-                <h3>Is your club not listed?</h3>
+                <h3>Is your plug not listed?</h3>
                 <button id="open-apply-modal">Apply for Verification →</button>
             </section>
         </main>
@@ -73,7 +73,7 @@
             </div>
             <div class="verification-info">
                 <h4>About VFPE verification</h4>
-                <p>This club has been manually verified by our team. We ensure the contact is real and the club is operating legally under local laws.</p>
+                <p>This plug has been manually verified by our team. We ensure the contact is real and the operation is safe and reliable.</p>
             </div>
         </div>
     </div>
@@ -84,7 +84,7 @@
             <span class="close">&times;</span>
             <h2>Apply for Verification</h2>
             <form id="apply-form">
-                <input type="text" name="name" placeholder="Your club's name" required>
+                <input type="text" name="name" placeholder="Your plug's name" required>
                 
                 <select name="country" id="form-country" required>
                     <option value="" disabled selected>1. Select country</option>
@@ -99,28 +99,28 @@
 
                 <input type="text" name="telegram_username" placeholder="Telegram @username" required>
                 <input type="text" name="instagram" placeholder="Instagram @username (optional)">
-                <textarea name="description" placeholder="Brief description of your club (max 200 chars)" maxlength="200"></textarea>
-                <p class="disclaimer">⚠️ VFPE is a directory platform. We do not sell, distribute, or facilitate the acquisition of any substance. All clubs listed are legal cannabis social clubs operating under Spanish or applicable European law.</p>
+                <textarea name="description" placeholder="Brief description of your plug (max 200 chars)" maxlength="200"></textarea>
+                <p class="disclaimer">⚠️ VFPE is a directory platform. We do not sell, distribute, or facilitate the acquisition of any substance. All plugs listed are verified entities operating under local laws.</p>
                 <button type="submit">Submit Verification Request</button>
             </form>
         </div>
     </div>
 
-    <!-- Edit Club Modal -->
+    <!-- Edit Plug Modal -->
     <div id="edit-modal" class="modal">
         <div class="modal-content">
             <span class="close" id="close-edit">&times;</span>
-            <h2>Manage My Club</h2>
-            <p style="font-size: 0.8rem; color: #8e8e93; margin-bottom: 1.5rem;">Update your club's visible information.</p>
+            <h2>Manage My Plug</h2>
+            <p style="font-size: 0.8rem; color: #8e8e93; margin-bottom: 1.5rem;">Update your plug's visible information.</p>
             <form id="edit-form">
                 <input type="hidden" name="id" id="edit-id">
-                <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">Club Name (Read-only)</label>
+                <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">Plug Name (Read-only)</label>
                 <input type="text" id="edit-name-display" disabled style="opacity: 0.6;">
                 
                 <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">Instagram @username</label>
-                <input type="text" name="instagram" id="edit-instagram" placeholder="@yourclub">
+                <input type="text" name="instagram" id="edit-instagram" placeholder="@yourplug">
                 
-                <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">Club Description</label>
+                <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">Plug Description</label>
                 <textarea name="description" id="edit-description" placeholder="Update description..." maxlength="200"></textarea>
                 
                 <button type="submit">Save Changes</button>
@@ -129,7 +129,7 @@
     </div>
 
     <div id="owner-tools" style="display: none;">
-        <button id="open-edit-btn">⚙️ Manage My Club</button>
+        <button id="open-edit-btn">⚙️ Manage My Plug</button>
     </div>
 
     <footer>

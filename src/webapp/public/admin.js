@@ -188,7 +188,7 @@ function renderAnalytics(data) {
     const citiesList = document.getElementById('top-cities-list');
     const clubsListAn = document.getElementById('top-clubs-list');
 
-    citiesList.innerHTML = data.topCities.map(c => `<li><span class="n">${c.city}</span> <span class="v">${c.count} clubs</span></li>`).join('');
+    citiesList.innerHTML = data.topCities.map(c => `<li><span class="n">${c.city}</span> <span class="v">${c.count} plugs</span></li>`).join('');
     clubsListAn.innerHTML = data.topClubs.map(c => `<li><span class="n">${c.name}</span> <span class="v">${c.click_count} clicks</span></li>`).join('');
 }
 

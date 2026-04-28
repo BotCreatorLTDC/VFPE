@@ -18,9 +18,9 @@ Es el núcleo del sistema y el punto de entrada para los usuarios.
 
 ### Qué probar:
 *   **Comando `/start`:** Verifica que muestra el menú principal con botones interactivos.
-*   **Buscador de Clubes:** Pulsa en "🗺 Find a Club" -> España -> Madrid. Deberías ver la lista de clubes verificados.
-*   **Ficha de Detalle:** Pulsa en "ℹ️ Info" dentro de una tarjeta para ver la descripción ampliada.
-*   **Registro de Clubes:** Pulsa en "✅ Get Verified" y completa el formulario conversacional.
+*   **Buscador de Plugs:** Pulsa en \"🗺 Find a Plug\" -> España -> Madrid. Deberías ver la lista de plugs verificados.
+*   **Ficha de Detalle:** Pulsa en \"ℹ️ Info\" dentro de una tarjeta para ver la descripción ampliada.
+*   **Registro de Plugs:** Pulsa en \"✅ Get Verified\" y completa el formulario conversacional.
 *   **Panel de Administración (Solo Admins):** Escribe `/admin` para aprobar o rechazar solicitudes pendientes.
 
 ---
@@ -47,7 +47,7 @@ Gestiona la seguridad y el orden del grupo automáticamente.
 ---
 
 ## 4. Canal de Publicaciones (@verifyplugchannel)
-*   **Publicación Automática:** Cada vez que un admin aprueba un club desde el Bot Principal (`/admin`), se genera automáticamente un post en este canal.
+*   **Publicación Automática:** Cada vez que un admin aprueba un plug desde el Bot Principal (`/admin`), se genera automáticamente un post en este canal.
 
 ---
 
