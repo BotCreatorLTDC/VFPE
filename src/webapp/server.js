@@ -244,16 +244,25 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
 
 // FULL UPDATE for Admins
 app.post('/api/admin/update', adminAuth, async (req, res) => {
-    const { id, name, city, country, telegram_username, instagram, description } = req.body;
+    const { id, name, city, country, telegram_username, instagram, description, event_message } = req.body;
     
     try {
-        await query(
-            "UPDATE clubs SET name = $1, city = $2, country = $3, telegram_username = $4, instagram = $5, description = $6 WHERE id = $7",
-            [name, city, country, telegram_username, instagram || null, description || null, id]
-        );
+        // If event_message is new/changed, we set expiry to 24h from now
+        // If it's cleared, we clear the expiry
+        let queryStr = "UPDATE clubs SET name = $1, city = $2, country = $3, telegram_username = $4, instagram = $5, description = $6 WHERE id = $7";
+        let params = [name, city, country, telegram_username, instagram || null, description || null, id];
+
+        if (event_message !== undefined) {
+            const expiry = event_message ? "CURRENT_TIMESTAMP + interval '24 hours'" : "NULL";
+            queryStr = `UPDATE clubs SET name = $1, city = $2, country = $3, telegram_username = $4, instagram = $5, description = $6, event_message = $8, event_expires_at = ${expiry} WHERE id = $7`;
+            params.push(event_message || null);
+        }
+
+        await query(queryStr, params);
         res.json({ success: true });
     } catch (err) {
-        res.status(500).json({ error: "Admin update failed" });
+        console.error("Update error:", err);
+        res.status(500).json({ error: "Failed" });
     }
 });
 

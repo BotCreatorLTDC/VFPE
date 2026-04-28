@@ -154,6 +154,17 @@ function openEditModal(id) {
     document.getElementById('edit-tg').value = club.telegram_username;
     document.getElementById('edit-ig').value = club.instagram || '';
     document.getElementById('edit-desc').value = club.description || '';
+    
+    // FIX: Show event field only for Advanced plan
+    const eventGroup = document.getElementById('event-group');
+    if (club.selected_plan === 'Advanced') {
+        eventGroup.style.display = 'block';
+        document.getElementById('edit-event').value = club.event_message || '';
+    } else {
+        eventGroup.style.display = 'none';
+        document.getElementById('edit-event').value = '';
+    }
+    
     document.getElementById('edit-modal').style.display = 'flex';
 }
 
@@ -170,7 +181,8 @@ document.getElementById('edit-form').onsubmit = async (e) => {
         country: document.getElementById('edit-country').value,
         telegram_username: document.getElementById('edit-tg').value,
         instagram: document.getElementById('edit-ig').value,
-        description: document.getElementById('edit-desc').value
+        description: document.getElementById('edit-desc').value,
+        event_message: document.getElementById('edit-event').value // Capture event
     };
 
     const res = await fetch('/api/admin/update', {

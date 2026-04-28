@@ -126,7 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = `club-card ${club.is_premium ? 'premium' : ''}`;
             
             let eventHtml = '';
-            if (club.event_message && new Date(club.event_expires_at) > new Date()) {
+            // FIX: Only show events for Advanced plan
+            if (club.selected_plan === 'Advanced' && club.event_message && new Date(club.event_expires_at) > new Date()) {
                 eventHtml = `<div class="event-banner">⚡ ${club.event_message}</div>`;
             }
 
