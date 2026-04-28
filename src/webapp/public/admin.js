@@ -118,12 +118,19 @@ function renderView() {
 
         card.innerHTML = `
             <div class="card-header">
-                <h3>${club.name} ${planBadge}</h3>
+                <h3><span style="color:#888; font-size:0.9rem;">#${club.id}</span> ${club.name} ${planBadge}</h3>
                 <span class="loc">📍 ${club.city}, ${club.country}</span>
             </div>
-            <div class="card-meta">
+            <div class="card-meta" style="display:flex; flex-direction:column; gap:5px;">
                 <span>💬 ${club.telegram_username}</span>
-                <span>🖱 ${club.click_count || 0} clicks</span>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>🖱 ${club.click_count || 0} clicks</span>
+                    ${club.status === 'verified' ? `
+                        <button onclick="copyDeepLink(${club.id})" style="background:#444; border:none; color:#fff; padding:2px 8px; border-radius:5px; font-size:0.7rem; cursor:pointer;">
+                            🔗 Copiar Enlace
+                        </button>
+                    ` : ''}
+                </div>
             </div>
             <div class="card-actions">
                 ${actionButtons}
@@ -221,6 +228,16 @@ async function handleAction(id, action) {
     } finally {
         tg.MainButton.hide();
     }
+}
+
+function copyDeepLink(id) {
+    const shareUrl = `https://t.me/VerifyPlugEU_bot?startapp=club_${id}`;
+    navigator.clipboard.writeText(shareUrl).then(() => {
+        tg.HapticFeedback.notificationOccurred('success');
+        alert('Enlace copiado al portapapeles');
+    }).catch(err => {
+        console.error('Error copying link:', err);
+    });
 }
 
 tabItems.forEach(item => {

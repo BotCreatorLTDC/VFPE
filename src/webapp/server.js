@@ -203,9 +203,14 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
         } 
         else if (action === 'publish') {
             // STEP 2: Publish the application (verified) and grant 30 days subscription
+            // FIX: If plan is Advanced, automatically set is_premium = true
+            const checkRes = await query("SELECT selected_plan FROM clubs WHERE id = $1", [id]);
+            const currentPlan = checkRes.rows[0]?.selected_plan;
+            const setPremium = (currentPlan === 'Advanced');
+
             const clubRes = await query(
-                "UPDATE clubs SET status = 'verified', verified_at = CURRENT_TIMESTAMP, subscription_expires_at = CURRENT_TIMESTAMP + interval '30 days' WHERE id = $1 RETURNING *", 
-                [id]
+                "UPDATE clubs SET status = 'verified', verified_at = CURRENT_TIMESTAMP, subscription_expires_at = CURRENT_TIMESTAMP + interval '30 days', is_premium = $2 WHERE id = $1 RETURNING *", 
+                [id, setPremium]
             );
             const club = clubRes.rows[0];
 
