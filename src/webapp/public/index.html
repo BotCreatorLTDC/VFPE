@@ -10,7 +10,8 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <!-- Main Screen -->
+
+    <!-- ══ MAIN SCREEN ══ -->
     <div id="main-screen">
         <header>
             <div class="logo">
@@ -18,7 +19,7 @@
                 <p>Europe's Verified Plug Directory 🔌</p>
             </div>
             <div class="stats">
-                <span id="club-count">...</span> Verified Plugs 🇪🇸 🇩🇪 🇳🇱
+                <span id="club-count">...</span> Verified 🇪🇸🇩🇪🇳🇱
             </div>
         </header>
 
@@ -37,12 +38,18 @@
                         <option value="NL">Netherlands</option>
                     </select>
                 </div>
+                <div class="tag-filters" id="tag-filters">
+                    <button class="tag-filter-btn active" data-tag="all">🌐 All</button>
+                    <button class="tag-filter-btn" data-tag="delivery">🚚 Delivery</button>
+                    <button class="tag-filter-btn" data-tag="meetup">🤝 Meetup</button>
+                    <button class="tag-filter-btn" data-tag="postal">📬 Postal</button>
+                </div>
             </section>
 
             <div id="status-message"></div>
 
             <section id="club-list" class="grid">
-                <!-- Club cards will be injected here -->
+                <!-- Cards injected here -->
             </section>
 
             <section id="apply-section">
@@ -52,57 +59,97 @@
         </main>
     </div>
 
-    <!-- Detail Screen -->
+    <!-- ══ REDESIGNED DETAIL SCREEN ══ -->
     <div id="detail-screen" class="screen-overlay">
-        <div class="detail-header">
-            <button id="close-detail">← Back to Directory</button>
+        <!-- Hero -->
+        <div class="detail-hero" id="detail-hero">
+            <button id="close-detail" class="back-btn">← Back</button>
+            <div class="detail-hero-content">
+                <div id="detail-badges" class="detail-badges"></div>
+                <h2 id="detail-name"></h2>
+                <p id="detail-location" class="detail-hero-location"></p>
+            </div>
         </div>
-        <div class="detail-content">
-            <div class="verified-badge-large">✅ VERIFIED</div>
-            <h2 id="detail-name"></h2>
-            <p id="detail-location" class="location-large"></p>
-            <hr>
-            <p id="detail-description"></p>
+
+        <div class="detail-body">
+            <!-- Stats Bar -->
+            <div class="detail-stats-bar">
+                <button class="stat-like-btn" id="detail-like-btn">
+                    <span id="detail-like-icon">🤍</span>
+                    <span id="detail-likes-count">0</span>
+                </button>
+                <div class="stat-item">
+                    <span class="stat-stars" id="detail-stars-display">☆☆☆☆☆</span>
+                    <span id="detail-rating-val">—</span>
+                </div>
+                <div class="stat-item">
+                    <span>💬</span>
+                    <span id="detail-reviews-count">0 reviews</span>
+                </div>
+            </div>
+
+            <!-- Service Tags Row -->
+            <div id="detail-tags-row" class="detail-tags-row"></div>
+
+            <!-- 24h Event Banner -->
+            <div id="detail-event-banner" class="event-banner" style="display:none;"></div>
+
+            <!-- CTAs -->
             <div class="detail-ctas">
                 <a id="detail-tg-link" href="#" class="cta-primary">💬 Contact on Telegram</a>
-                <a id="detail-ig-link" href="#" class="cta-secondary">📸 Instagram</a>
+                <a id="detail-ig-link" href="#" class="cta-secondary" style="display:none;">📸 Instagram</a>
+                <button id="detail-share-btn" class="cta-secondary">🔗 Share Plug</button>
             </div>
+
+            <!-- About -->
+            <div class="detail-about-section">
+                <h4>About this Plug</h4>
+                <p id="detail-description"></p>
+            </div>
+
+            <!-- Verification box -->
             <div class="verification-info">
-                <h4>About VFPE verification</h4>
-                <p>This plug has been manually verified by our team. We ensure the contact is real and the operation is safe and reliable.</p>
+                <h4>✅ VFPE Verified</h4>
+                <p>Manually verified by our team. Real, safe, and reliable contact.</p>
+            </div>
+
+            <!-- Reviews -->
+            <div class="detail-reviews-section">
+                <div class="reviews-header">
+                    <h4 id="detail-reviews-title">Reviews</h4>
+                    <button id="write-review-btn" class="write-review-btn">✍️ Write Review</button>
+                </div>
+                <div id="reviews-list" class="reviews-list"></div>
             </div>
         </div>
     </div>
 
-    <!-- Apply Modal -->
+    <!-- ══ APPLY MODAL ══ -->
     <div id="apply-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>Apply for Verification</h2>
             <form id="apply-form">
                 <input type="text" name="name" placeholder="Your plug's name" required>
-                
                 <select name="country" id="form-country" required>
                     <option value="" disabled selected>1. Select country</option>
                     <option value="ES">Spain</option>
                     <option value="DE">Germany</option>
                     <option value="NL">Netherlands</option>
                 </select>
-
                 <select name="city" id="form-city" required disabled>
                     <option value="" disabled selected>2. Select city (choose country first)</option>
                 </select>
-
                 <input type="text" name="telegram_username" placeholder="Telegram @username" required>
                 <input type="text" name="instagram" placeholder="Instagram @username (optional)">
-                <textarea name="description" placeholder="Brief description of your plug (max 200 chars)" maxlength="200"></textarea>
-                <p class="disclaimer">⚠️ VFPE is a directory platform. We do not sell, distribute, or facilitate the acquisition of any substance. All plugs listed are verified entities operating under local laws.</p>
+                <textarea name="description" placeholder="Brief description (max 200 chars)" maxlength="200"></textarea>
+                <p class="disclaimer">⚠️ VFPE is a directory platform. We do not sell, distribute, or facilitate the acquisition of any substance. All plugs operate under local laws.</p>
                 <button type="submit">Submit Verification Request</button>
             </form>
         </div>
     </div>
 
-    <!-- Edit Plug Modal -->
+    <!-- ══ OWNER EDIT MODAL ══ -->
     <div id="edit-modal" class="modal">
         <div class="modal-content">
             <span class="close" id="close-edit">&times;</span>
@@ -112,15 +159,32 @@
                 <input type="hidden" name="id" id="edit-id">
                 <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">Plug Name (Read-only)</label>
                 <input type="text" id="edit-name-display" disabled style="opacity: 0.6;">
-                
                 <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">Instagram @username</label>
                 <input type="text" name="instagram" id="edit-instagram" placeholder="@yourplug">
-                
                 <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">Plug Description</label>
                 <textarea name="description" id="edit-description" placeholder="Update description..." maxlength="200"></textarea>
-                
                 <button type="submit">Save Changes</button>
             </form>
+        </div>
+    </div>
+
+    <!-- ══ REVIEW MODAL ══ -->
+    <div id="review-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-review">&times;</span>
+            <h2>✍️ Write a Review</h2>
+            <p style="color:#888; font-size:0.85rem; margin-bottom:1.2rem; line-height:1.5;">Your @handle is used for authenticity. Only handle + rating are public.</p>
+            <div class="star-picker" id="star-picker">
+                <span class="star" data-val="1">★</span>
+                <span class="star" data-val="2">★</span>
+                <span class="star" data-val="3">★</span>
+                <span class="star" data-val="4">★</span>
+                <span class="star" data-val="5">★</span>
+            </div>
+            <p id="star-label" style="text-align:center; color:#888; font-size:0.8rem; margin: 8px 0 1rem;">Tap to rate</p>
+            <input type="text" id="review-handle" placeholder="Your Telegram @handle">
+            <textarea id="review-text" placeholder="Share your experience... (optional)" maxlength="300" style="height:90px; resize:none;"></textarea>
+            <button id="submit-review-btn" class="btn-review-submit">Submit Review</button>
         </div>
     </div>
 
@@ -129,7 +193,7 @@
     </div>
 
     <footer>
-        <p>v1.1 — VFPE — Safe. Real. Trusted.</p>
+        <p>v2.0 — VFPE — Safe. Real. Trusted.</p>
     </footer>
 
     <script src="app.js"></script>

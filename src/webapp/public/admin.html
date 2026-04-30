@@ -102,6 +102,26 @@
                 </div>
 
                 <div class="input-group">
+                    <label>🖼 Photo URL (imagen del club)</label>
+                    <input type="text" id="edit-photo" placeholder="https://... (enlace a imagen)">
+                </div>
+
+                <div class="input-group" style="border: 1px solid #333; padding: 10px; border-radius: 10px;">
+                    <label>🏷 Service Tags</label>
+                    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:8px;">
+                        <label style="display:flex;align-items:center;gap:6px;font-size:0.9rem;">
+                            <input type="checkbox" id="tag-delivery" value="delivery"> 🚚 Delivery
+                        </label>
+                        <label style="display:flex;align-items:center;gap:6px;font-size:0.9rem;">
+                            <input type="checkbox" id="tag-meetup" value="meetup"> 🤝 Meetup
+                        </label>
+                        <label style="display:flex;align-items:center;gap:6px;font-size:0.9rem;">
+                            <input type="checkbox" id="tag-postal" value="postal"> 📬 Postal
+                        </label>
+                    </div>
+                </div>
+
+                <div class="input-group">
                     <label>Description (max 200 chars)</label>
                     <textarea id="edit-desc" maxlength="200"></textarea>
                 </div>

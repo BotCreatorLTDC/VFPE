@@ -25,6 +25,30 @@ ALTER TABLE clubs ADD COLUMN IF NOT EXISTS selected_plan TEXT;
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS event_message TEXT;
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS event_expires_at TIMESTAMP;
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS subscription_expires_at TIMESTAMP;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS photo_url TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS service_tags TEXT[] DEFAULT '{}';
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS likes_count INTEGER DEFAULT 0;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS rating_avg NUMERIC(3,1) DEFAULT 0;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS reviews_count INTEGER DEFAULT 0;
+
+-- Table for user reviews of clubs
+CREATE TABLE IF NOT EXISTS reviews (
+    id SERIAL PRIMARY KEY,
+    club_id INTEGER REFERENCES clubs(id) ON DELETE CASCADE,
+    rating INTEGER CHECK (rating BETWEEN 1 AND 5),
+    review_text TEXT,
+    reviewer_handle TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_reviews_club_id ON reviews(club_id);
+
+-- Table for server-side likes (replaces localStorage)
+CREATE TABLE IF NOT EXISTS club_likes (
+    club_id INTEGER REFERENCES clubs(id) ON DELETE CASCADE,
+    user_fingerprint TEXT NOT NULL, -- tg_user_id or UUID fallback
+    PRIMARY KEY (club_id, user_fingerprint)
+);
 
 -- Drop and recreate the status constraint to include 'accepted'
 ALTER TABLE clubs DROP CONSTRAINT IF EXISTS clubs_status_check;

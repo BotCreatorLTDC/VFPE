@@ -64,6 +64,72 @@ app.post('/api/clubs/click/:id', async (req, res) => {
     }
 });
 
+// GET reviews for a club
+app.get('/api/clubs/:id/reviews', async (req, res) => {
+    try {
+        const result = await query(
+            "SELECT * FROM reviews WHERE club_id = $1 ORDER BY created_at DESC LIMIT 20",
+            [req.params.id]
+        );
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to fetch reviews" });
+    }
+});
+
+// POST a review for a club
+app.post('/api/clubs/:id/review', async (req, res) => {
+    const { rating, review_text, reviewer_handle } = req.body;
+    const clubId = req.params.id;
+    if (!rating || !reviewer_handle) return res.status(400).json({ error: "Missing fields" });
+
+    try {
+        await query(
+            "INSERT INTO reviews (club_id, rating, review_text, reviewer_handle) VALUES ($1, $2, $3, $4)",
+            [clubId, rating, review_text || null, reviewer_handle]
+        );
+        // Recalculate avg rating and count on the club
+        await query(
+            "UPDATE clubs SET rating_avg = (SELECT ROUND(AVG(rating)::numeric, 1) FROM reviews WHERE club_id = $1), reviews_count = (SELECT COUNT(*) FROM reviews WHERE club_id = $1) WHERE id = $1",
+            [clubId]
+        );
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Review error:', err);
+        res.status(500).json({ error: "Failed to submit review" });
+    }
+});
+
+// POST toggle like for a club (server-side persistence)
+app.post('/api/clubs/:id/like', async (req, res) => {
+    const { fingerprint } = req.body; // tg_user_id or localStorage UUID
+    const clubId = req.params.id;
+    if (!fingerprint) return res.status(400).json({ error: "Missing fingerprint" });
+
+    try {
+        // Check if already liked
+        const existing = await query(
+            "SELECT 1 FROM club_likes WHERE club_id = $1 AND user_fingerprint = $2",
+            [clubId, fingerprint]
+        );
+
+        if (existing.rows.length > 0) {
+            // Unlike
+            await query("DELETE FROM club_likes WHERE club_id = $1 AND user_fingerprint = $2", [clubId, fingerprint]);
+            await query("UPDATE clubs SET likes_count = GREATEST(0, likes_count - 1) WHERE id = $1", [clubId]);
+            res.json({ liked: false });
+        } else {
+            // Like
+            await query("INSERT INTO club_likes (club_id, user_fingerprint) VALUES ($1, $2)", [clubId, fingerprint]);
+            await query("UPDATE clubs SET likes_count = likes_count + 1 WHERE id = $1", [clubId]);
+            res.json({ liked: true });
+        }
+    } catch (err) {
+        console.error('Like error:', err);
+        res.status(500).json({ error: "Failed to toggle like" });
+    }
+});
+
 app.post('/api/verify', async (req, res) => {
     const { name, city, country, telegram_username, instagram, description, tg_user_id } = req.body;
     if (!name || !city || !country || !telegram_username) return res.status(400).json({ error: "Missing fields" });
@@ -250,21 +316,24 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
 
 // FULL UPDATE for Admins
 app.post('/api/admin/update', adminAuth, async (req, res) => {
-    const { id, name, city, country, telegram_username, instagram, description, event_message } = req.body;
+    const { id, name, city, country, telegram_username, instagram, description, event_message, photo_url, service_tags } = req.body;
     
     try {
-        // If event_message is new/changed, we set expiry to 24h from now
-        // If it's cleared, we clear the expiry
-        let queryStr = "UPDATE clubs SET name = $1, city = $2, country = $3, telegram_username = $4, instagram = $5, description = $6 WHERE id = $7";
-        let params = [name, city, country, telegram_username, instagram || null, description || null, id];
+        const expiry = event_message ? "CURRENT_TIMESTAMP + interval '24 hours'" : "NULL";
+        const tagsArray = Array.isArray(service_tags) ? service_tags : [];
 
-        if (event_message !== undefined) {
-            const expiry = event_message ? "CURRENT_TIMESTAMP + interval '24 hours'" : "NULL";
-            queryStr = `UPDATE clubs SET name = $1, city = $2, country = $3, telegram_username = $4, instagram = $5, description = $6, event_message = $8, event_expires_at = ${expiry} WHERE id = $7`;
-            params.push(event_message || null);
-        }
+        const queryStr = `UPDATE clubs 
+            SET name = $1, city = $2, country = $3, telegram_username = $4, 
+                instagram = $5, description = $6, 
+                event_message = $8, event_expires_at = ${expiry},
+                photo_url = $9, service_tags = $10
+            WHERE id = $7`;
 
-        await query(queryStr, params);
+        await query(queryStr, [
+            name, city, country, telegram_username,
+            instagram || null, description || null, id,
+            event_message || null, photo_url || null, tagsArray
+        ]);
         res.json({ success: true });
     } catch (err) {
         console.error("Update error:", err);

@@ -1,51 +1,86 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const clubList = document.getElementById('club-list');
-    const searchInput = document.getElementById('search-input');
-    const countryFilter = document.getElementById('country-filter');
-    const clubCount = document.getElementById('club-count');
-    const statusMessage = document.getElementById('status-message');
-    
-    const applyModal = document.getElementById('apply-modal');
-    const detailScreen = document.getElementById('detail-screen');
-    
-    const openApplyBtn = document.getElementById('open-apply-modal');
-    const closeApplyBtn = document.querySelector('#apply-modal .close');
-    const closeDetailBtn = document.getElementById('close-detail');
-    const applyForm = document.getElementById('apply-form');
+    // ─── DOM REFS ────────────────────────────────────────────────────────────
+    const clubList        = document.getElementById('club-list');
+    const searchInput     = document.getElementById('search-input');
+    const countryFilter   = document.getElementById('country-filter');
+    const clubCount       = document.getElementById('club-count');
+    const statusMessage   = document.getElementById('status-message');
+    const applyModal      = document.getElementById('apply-modal');
+    const detailScreen    = document.getElementById('detail-screen');
+    const openApplyBtn    = document.getElementById('open-apply-modal');
+    const closeApplyBtn   = document.querySelector('#apply-modal .close');
+    const closeDetailBtn  = document.getElementById('close-detail');
+    const applyForm       = document.getElementById('apply-form');
+    const reviewModal     = document.getElementById('review-modal');
+    const closeReviewBtn  = document.getElementById('close-review');
 
-    const tg = window.Telegram?.WebApp;
-    const userLang = tg?.initDataUnsafe?.user?.language_code || 'es';
-    const isEnglish = userLang === 'en' || userLang === 'de' || userLang === 'nl'; // Fallback to EN for non-ES
-    
-    let allClubs = [];
-    let savedClubs = JSON.parse(localStorage.getItem('vfpe_saved_clubs')) || [];
-    let showOnlySaved = false;
+    // ─── TELEGRAM ────────────────────────────────────────────────────────────
+    const tg         = window.Telegram?.WebApp;
+    const userLang   = tg?.initDataUnsafe?.user?.language_code || 'es';
+    const isEnglish  = (userLang !== 'es');
+    const tgUserId   = tg?.initDataUnsafe?.user?.id;
+    const tgUsername = tg?.initDataUnsafe?.user?.username;
+
+    // User fingerprint: TG user ID (string) or persistent UUID fallback
+    let userFingerprint = tgUserId
+        ? String(tgUserId)
+        : localStorage.getItem('vfpe_fp') || (() => {
+            const fp = crypto.randomUUID();
+            localStorage.setItem('vfpe_fp', fp);
+            return fp;
+        })();
+
+    // ─── STATE ───────────────────────────────────────────────────────────────
+    let allClubs    = [];
+    let likedClubs  = new Set(JSON.parse(localStorage.getItem('vfpe_liked_clubs') || '[]'));
+    let activeTag   = 'all';
+    let currentClub = null;
+    let selectedRating = 0;
     let map;
     let markers = [];
 
+    // ─── CITY COORDS (kept from v1) ──────────────────────────────────────────
     const cityCoords = {
-        // España
         'Madrid': [40.4168, -3.7038], 'Barcelona': [41.3851, 2.1734], 'Valencia': [39.4699, -0.3763],
         'Sevilla': [37.3891, -5.9845], 'Zaragoza': [41.6488, -0.8891], 'Málaga': [36.7213, -4.4214],
         'Murcia': [37.9922, -1.1307], 'Palma': [39.5696, 2.6502], 'Las Palmas': [28.1248, -15.4300],
         'Bilbao': [43.2630, -2.9350], 'Alicante': [38.3452, -0.4810], 'Córdoba': [37.8882, -4.7794],
         'Valladolid': [41.6523, -4.7245], 'Vigo': [42.2406, -8.7207], 'Gijón': [43.5357, -5.6615],
         'Granada': [37.1773, -3.5986], 'Tarragona': [41.1189, 1.2445], 'San Sebastián': [43.3183, -1.9812],
-        'Santander': [43.4623, -3.8099], 'Ibiza': [38.9067, 1.4206], 'Marbella': [36.5100, -4.8800],
-        'Almería': [36.8340, -2.4637], 'Tenerife': [28.2916, -16.6291],
-        // Alemania
+        'Ibiza': [38.9067, 1.4206], 'Marbella': [36.5100, -4.8800], 'Tenerife': [28.2916, -16.6291],
         'Berlin': [52.5200, 13.4050], 'Hamburg': [53.5511, 9.9937], 'Munich': [48.1351, 11.5820],
-        'Cologne': [50.9375, 6.9603], 'Frankfurt': [50.1109, 8.6821], 'Stuttgart': [48.7758, 9.1829],
-        'Düsseldorf': [51.2277, 6.7735], 'Dortmund': [51.5136, 7.4653], 'Essen': [51.4556, 7.0116],
-        'Bremen': [53.0793, 8.8017], 'Leipzig': [51.3397, 12.3731], 'Dresden': [51.0504, 13.7373],
-        'Hanover': [52.3759, 9.7320], 'Nuremberg': [49.4521, 11.0767],
-        // Netherlands
+        'Cologne': [50.9375, 6.9603], 'Frankfurt': [50.1109, 8.6821],
         'Amsterdam': [52.3676, 4.9041], 'Rotterdam': [51.9225, 4.4792], 'The Hague': [52.0705, 4.3007],
-        'Utrecht': [52.0907, 5.1214], 'Eindhoven': [51.4416, 5.4697], 'Tilburg': [51.5555, 5.0913],
-        'Groningen': [53.2192, 6.5667], 'Almere': [52.3702, 5.2141], 'Breda': [51.5895, 4.7734],
-        'Nijmegen': [51.8126, 5.8372], 'Haarlem': [52.3874, 4.6462], 'Enschede': [52.2215, 6.8937]
+        'Utrecht': [52.0907, 5.1214], 'Eindhoven': [51.4416, 5.4697]
     };
 
+    // ─── HELPERS ─────────────────────────────────────────────────────────────
+    function getColorIndex(name) {
+        let sum = 0;
+        for (const c of name) sum += c.charCodeAt(0);
+        return sum % 5;
+    }
+
+    function getTagEmoji(tag) {
+        return { delivery: '🚚', meetup: '🤝', postal: '📬' }[tag] || '🏷';
+    }
+
+    function renderStars(rating, total = 5) {
+        const filled = Math.round(rating);
+        return '★'.repeat(filled) + '☆'.repeat(total - filled);
+    }
+
+    function getTimeAgo(dateStr) {
+        const diff = Date.now() - new Date(dateStr);
+        const d = Math.floor(diff / 86400000);
+        if (d === 0) return 'Today';
+        if (d === 1) return 'Yesterday';
+        if (d < 7)  return `${d}d ago`;
+        if (d < 30) return `${Math.floor(d / 7)}w ago`;
+        return `${Math.floor(d / 30)}mo ago`;
+    }
+
+    // ─── MAP ─────────────────────────────────────────────────────────────────
     function initMap() {
         if (map) return;
         map = L.map('map', { zoomControl: false }).setView([40.4168, -3.7038], 5);
@@ -56,426 +91,468 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!map) return;
         markers.forEach(m => map.removeLayer(m));
         markers = [];
-        const citiesWithClubs = [...new Set(clubs.map(c => c.city))];
-        citiesWithClubs.forEach(city => {
+        const cities = [...new Set(clubs.map(c => c.city))];
+        cities.forEach(city => {
             const coords = cityCoords[city];
-            if (coords) {
-                const count = clubs.filter(c => c.city === city).length;
-                
-                const markerIcon = L.divIcon({
-                    html: `<span>${count}</span>`,
-                    className: 'custom-marker',
-                    iconSize: [32, 32],
-                    iconAnchor: [16, 32]
-                });
-
-                const marker = L.marker(coords, { icon: markerIcon }).addTo(map);
-                marker.on('click', () => {
-                    searchInput.value = city;
-                    filterClubs();
-                    map.setView(coords, 10);
-                });
-                markers.push(marker);
-            }
-        });
-    }
-
-    // Fetch plugs from API
-    async function fetchClubs() {
-        statusMessage.textContent = "Loading verified plugs...";
-        try {
-            const response = await fetch('/api/clubs');
-            const data = await response.json();
-            
-            if (data.error || !Array.isArray(data)) {
-                statusMessage.textContent = `⚠️ ${data.error || "Failed to load plugs"}`;
-                return;
-            }
-
-            allClubs = data;
-            clubCount.textContent = allClubs.length;
-            
-            if (allClubs.length === 0) {
-                statusMessage.textContent = "No plugs found in this location yet. Expanding soon.";
-            } else {
-                statusMessage.textContent = "";
-                renderClubs(allClubs);
-                updateMapMarkers(allClubs);
-            }
-        } catch (err) {
-            statusMessage.textContent = "Connection error. Please try again.";
-            console.error("Error fetching clubs:", err);
-        }
-    }
-
-    function renderClubs(clubs) {
-        clubList.innerHTML = '';
-        if (clubs.length === 0) {
-            statusMessage.textContent = `No results for "${searchInput.value}". Try a different city.`;
-            return;
-        } else {
-            statusMessage.textContent = "";
-        }
-
-        // Sort: Premium first
-        const sorted = [...clubs].sort((a, b) => (b.is_premium ? 1 : 0) - (a.is_premium ? 1 : 0));
-
-        sorted.forEach(club => {
-            const isSaved = savedClubs.includes(Number(club.id));
-            const card = document.createElement('div');
-            card.className = `club-card ${club.is_premium ? 'premium' : ''}`;
-            
-            let eventHtml = '';
-            // FIX: Only show events for Advanced plan
-            if (club.selected_plan === 'Advanced' && club.event_message && new Date(club.event_expires_at) > new Date()) {
-                eventHtml = `<div class="event-banner">⚡ ${club.event_message}</div>`;
-            }
-
-            card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span class="badge">${club.is_premium ? '⭐ PREMIUM' : 'VERIFIED'}</span>
-                    <button class="save-btn" data-id="${club.id}" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">
-                        ${isSaved ? '❤️' : '🤍'}
-                    </button>
-                </div>
-                ${eventHtml}
-                <h2>${club.name}</h2>
-                <p class="location">📍 ${club.city}, ${club.country}</p>
-            `;
-            
-            // Event delegation for the save button
-            card.querySelector('.save-btn').onclick = (e) => {
-                e.stopPropagation();
-                toggleSaveClub(club.id);
-            };
-
-            card.onclick = () => {
-                logClick(club.id);
-                showDetail(club);
-            };
-            clubList.appendChild(card);
-        });
-    }
-
-    function toggleSaveClub(id) {
-        if (savedClubs.includes(Number(id))) {
-            savedClubs = savedClubs.filter(cid => Number(cid) !== Number(id));
-        } else {
-            savedClubs.push(Number(id));
-        }
-        localStorage.setItem('vfpe_saved_clubs', JSON.stringify(savedClubs));
-        filterClubs(); // Re-render to update heart icons
-        if (tg) tg.HapticFeedback.impactOccurred('light');
-    }
-
-    async function logClick(id) {
-        try {
-            fetch(`/api/clubs/click/${id}`, { method: 'POST' });
-        } catch (e) {}
-    }
-
-    function showDetail(club) {
-        document.getElementById('detail-name').textContent = club.name;
-        document.getElementById('detail-location').textContent = `📍 ${club.city}, ${club.country}`;
-        document.getElementById('detail-description').textContent = club.description || 'Verified plug operating under local guidelines.';
-        
-        const tgLink = document.getElementById('detail-tg-link');
-        tgLink.href = `https://t.me/${club.telegram_username.replace('@', '')}`;
-        
-        const igLink = document.getElementById('detail-ig-link');
-        if (club.instagram) {
-            igLink.href = `https://instagram.com/${club.instagram.replace('@', '')}`;
-            igLink.style.display = "block";
-        } else {
-            igLink.style.display = "none";
-        }
-
-        // Deep Link Share Button
-        let shareBtn = document.getElementById('detail-share-btn');
-        if (!shareBtn) {
-            shareBtn = document.createElement('button');
-            shareBtn.id = 'detail-share-btn';
-            shareBtn.className = 'cta-secondary'; // Matched UI style
-            shareBtn.style.marginTop = '10px';
-            shareBtn.style.border = 'none'; // Overriding default button border
-            shareBtn.style.cursor = 'pointer';
-            document.querySelector('.detail-ctas').appendChild(shareBtn);
-        }
-        shareBtn.innerHTML = `🔗 ${isEnglish ? 'Share Plug' : 'Compartir Plug'}`;
-        shareBtn.onclick = () => {
-            const shareUrl = `https://t.me/VerifyPlugEU_bot?startapp=club_${club.id}`;
-            navigator.clipboard.writeText(shareUrl).then(() => {
-                shareBtn.innerHTML = `✅ ${isEnglish ? 'Copied!' : '¡Copiado!'}`;
-                setTimeout(() => shareBtn.innerHTML = `🔗 ${isEnglish ? 'Share Plug' : 'Compartir Plug'}`, 2000);
+            if (!coords) return;
+            const count = clubs.filter(c => c.city === city).length;
+            const icon = L.divIcon({
+                html: `<span>${count}</span>`,
+                className: 'custom-marker',
+                iconSize: [32, 32], iconAnchor: [16, 32]
             });
-        };
-
-        detailScreen.style.display = "block";
-        document.body.style.overflow = "hidden"; // Prevent scroll
-    }
-
-    function hideDetail() {
-        detailScreen.style.display = "none";
-        document.body.style.overflow = "auto";
-    }
-
-    // Filter logic
-    function filterClubs() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const country = countryFilter.value; // already 'all' | 'ES' | 'DE' | 'NL'
-        
-        const filtered = allClubs.filter(club => {
-            const matchesSearch = club.name.toLowerCase().includes(searchTerm) || 
-                                 club.city.toLowerCase().includes(searchTerm);
-            const matchesCountry = country === 'all' || 
-                                   (club.country || '').toUpperCase() === country.toUpperCase();
-            const matchesSaved = !showOnlySaved || savedClubs.includes(Number(club.id));
-            return matchesSearch && matchesCountry && matchesSaved;
+            const m = L.marker(coords, { icon }).addTo(map);
+            m.on('click', () => { searchInput.value = city; filterClubs(); map.setView(coords, 10); });
+            markers.push(m);
         });
-        
-        renderClubs(filtered);
-        updateMapMarkers(filtered); // FIX: update map when filtering
     }
 
-    searchInput.addEventListener('input', filterClubs);
-    countryFilter.addEventListener('change', filterClubs);
-
-    // Navigation
-    openApplyBtn.onclick = () => applyModal.style.display = "block";
-    closeApplyBtn.onclick = () => applyModal.style.display = "none";
-    closeDetailBtn.onclick = hideDetail;
-
-    window.onclick = (event) => {
-        if (event.target == applyModal) applyModal.style.display = "none";
-    }
-
-    // Form submission
-    applyForm.onsubmit = async (e) => {
-        e.preventDefault();
-        const submitBtn = applyForm.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending...';
-
-        const formData = new FormData(applyForm);
-        const data = Object.fromEntries(formData.entries());
-
-        // FIX: Validate @username format on client side too
-        if (!data.telegram_username.startsWith('@')) {
-            data.telegram_username = '@' + data.telegram_username;
-        }
-
-        // Capture the user's numeric ID for bot messaging
-        data.tg_user_id = tg?.initDataUnsafe?.user?.id || null;
-
-        try {
-            const response = await fetch('/api/verify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            const result = await response.json();
-            if (result.success) {
-                // Redirect to the unique pricing page, passing the username (without the @)
-                const uname = data.telegram_username.replace('@', '');
-                window.location.href = `/pricing.html?u=${uname}`;
-            } else {
-                alert('❌ Error: ' + (result.error || 'Unknown error'));
-            }
-        } catch (err) {
-            alert("❌ Connection error. Please try again.");
-            console.error('Submit error:', err);
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit Verification Request';
-        }
-    };
-
-    // Geolocation "Near Me"
+    // ─── NEAR ME BUTTON ──────────────────────────────────────────────────────
     const nearMeBtn = document.createElement('button');
     nearMeBtn.id = 'near-me-btn';
     nearMeBtn.innerHTML = '📍';
     nearMeBtn.title = 'Plugs near me';
     document.getElementById('map-container').appendChild(nearMeBtn);
-
     nearMeBtn.onclick = () => {
         if (!navigator.geolocation) return alert('Geolocation not supported');
-        
         nearMeBtn.innerHTML = '⌛';
-        navigator.geolocation.getCurrentPosition((pos) => {
-            const { latitude, longitude } = pos.coords;
-            map.setView([latitude, longitude], 12);
-            
-            // Add user marker
-            L.circle([latitude, longitude], { radius: 200, color: '#00d26a' }).addTo(map);
+        navigator.geolocation.getCurrentPosition(pos => {
+            map.setView([pos.coords.latitude, pos.coords.longitude], 12);
+            L.circle([pos.coords.latitude, pos.coords.longitude], { radius: 200, color: '#00d26a' }).addTo(map);
             nearMeBtn.innerHTML = '📍';
-        }, (err) => {
-            alert(isEnglish ? 'Could not get location' : 'No se pudo obtener la ubicación');
-            nearMeBtn.innerHTML = '📍';
+        }, () => { nearMeBtn.innerHTML = '📍'; });
+    };
+
+    // ─── FETCH ───────────────────────────────────────────────────────────────
+    async function fetchClubs() {
+        statusMessage.textContent = 'Loading verified plugs...';
+        try {
+            const data = await fetch('/api/clubs').then(r => r.json());
+            if (!Array.isArray(data)) { statusMessage.textContent = '⚠️ Failed to load plugs'; return; }
+            allClubs = data;
+            clubCount.textContent = allClubs.length;
+            statusMessage.textContent = '';
+            filterClubs();
+        } catch (e) {
+            statusMessage.textContent = 'Connection error. Please try again.';
+        }
+    }
+
+    // ─── FILTER ──────────────────────────────────────────────────────────────
+    function filterClubs() {
+        const search  = searchInput.value.toLowerCase();
+        const country = countryFilter.value;
+
+        const filtered = allClubs.filter(c => {
+            const matchSearch  = c.name.toLowerCase().includes(search) || c.city.toLowerCase().includes(search);
+            const matchCountry = country === 'all' || (c.country || '').toUpperCase() === country.toUpperCase();
+            const matchTag     = activeTag === 'all' || (c.service_tags || []).includes(activeTag);
+            return matchSearch && matchCountry && matchTag;
         });
+
+        renderClubs(filtered);
+        updateMapMarkers(filtered);
+    }
+
+    searchInput.addEventListener('input', filterClubs);
+    countryFilter.addEventListener('change', filterClubs);
+
+    // Service tag filters
+    document.querySelectorAll('.tag-filter-btn').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.tag-filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeTag = btn.dataset.tag;
+            filterClubs();
+        };
+    });
+
+    // ─── RENDER CARDS ────────────────────────────────────────────────────────
+    function renderClubs(clubs) {
+        clubList.innerHTML = '';
+        if (clubs.length === 0) {
+            statusMessage.textContent = search => `No results. Try a different filter.`;
+            return;
+        }
+        statusMessage.textContent = '';
+
+        const sorted = [...clubs].sort((a, b) => (b.is_premium ? 1 : 0) - (a.is_premium ? 1 : 0));
+
+        sorted.forEach(club => {
+            const isLiked = likedClubs.has(Number(club.id));
+            const tags    = Array.isArray(club.service_tags) ? club.service_tags : [];
+            const idx     = getColorIndex(club.name);
+
+            const photoStyle = club.photo_url
+                ? `background-image: url('${club.photo_url}');`
+                : '';
+            const photoClass = club.photo_url ? '' : `club-gradient-${idx}`;
+
+            const eventHtml = (club.selected_plan === 'Advanced' && club.event_message && new Date(club.event_expires_at) > new Date())
+                ? `<div class="event-banner">⚡ ${club.event_message}</div>`
+                : '';
+
+            const ratingHtml = (club.rating_avg > 0)
+                ? `<span class="card-rating">⭐ ${club.rating_avg}</span>`
+                : '';
+
+            const tagsHtml = tags.map(t => `<span class="tag-chip">${getTagEmoji(t)} ${t}</span>`).join('');
+
+            const card = document.createElement('div');
+            card.className = `club-card ${club.is_premium ? 'premium' : ''}`;
+            card.innerHTML = `
+                <div class="card-photo ${photoClass}" style="${photoStyle}">
+                    <div class="card-photo-overlay">
+                        <span class="badge ${club.is_premium ? 'premium-badge' : ''}">${club.is_premium ? '⭐ PREMIUM' : '✅ VERIFIED'}</span>
+                        <button class="card-like-btn ${isLiked ? 'liked' : ''}" data-id="${club.id}">
+                            ${isLiked ? '❤️' : '🤍'} ${club.likes_count || 0}
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    ${eventHtml}
+                    <h2>${club.name}</h2>
+                    <p class="location">📍 ${club.city}, ${club.country}</p>
+                    <div class="card-meta-row">
+                        ${ratingHtml}
+                        <div class="card-tags">${tagsHtml}</div>
+                    </div>
+                </div>
+            `;
+
+            // Like button — stop propagation so it doesn't open detail
+            card.querySelector('.card-like-btn').onclick = e => {
+                e.stopPropagation();
+                toggleLike(club.id);
+            };
+
+            card.onclick = () => { logClick(club.id); showDetail(club); };
+            clubList.appendChild(card);
+        });
+    }
+
+    // ─── LIKES ───────────────────────────────────────────────────────────────
+    async function toggleLike(clubId) {
+        const id      = Number(clubId);
+        const isLiked = likedClubs.has(id);
+
+        // Optimistic update
+        const club = allClubs.find(c => Number(c.id) === id);
+        if (isLiked) {
+            likedClubs.delete(id);
+            if (club) club.likes_count = Math.max(0, (club.likes_count || 0) - 1);
+        } else {
+            likedClubs.add(id);
+            if (club) club.likes_count = (club.likes_count || 0) + 1;
+        }
+        localStorage.setItem('vfpe_liked_clubs', JSON.stringify([...likedClubs]));
+
+        // Update current detail if open
+        if (currentClub && Number(currentClub.id) === id) updateDetailLike();
+
+        filterClubs(); // Re-render cards
+        if (tg) tg.HapticFeedback.impactOccurred('light');
+
+        // Persist to server (fire-and-forget)
+        fetch(`/api/clubs/${clubId}/like`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fingerprint: userFingerprint })
+        }).catch(() => {});
+    }
+
+    function updateDetailLike() {
+        if (!currentClub) return;
+        const isLiked = likedClubs.has(Number(currentClub.id));
+        const btn     = document.getElementById('detail-like-btn');
+        const icon    = document.getElementById('detail-like-icon');
+        const count   = document.getElementById('detail-likes-count');
+        if (btn)   btn.classList.toggle('liked', isLiked);
+        if (icon)  icon.textContent = isLiked ? '❤️' : '🤍';
+        if (count) count.textContent = currentClub.likes_count || 0;
+    }
+
+    async function logClick(id) {
+        fetch(`/api/clubs/click/${id}`, { method: 'POST' }).catch(() => {});
+    }
+
+    // ─── SHOW DETAIL ─────────────────────────────────────────────────────────
+    function showDetail(club) {
+        currentClub = club;
+        const tags    = Array.isArray(club.service_tags) ? club.service_tags : [];
+        const isLiked = likedClubs.has(Number(club.id));
+
+        // Hero background
+        const hero  = document.getElementById('detail-hero');
+        const idx   = getColorIndex(club.name);
+        if (club.photo_url) {
+            hero.style.backgroundImage = `url('${club.photo_url}')`;
+            hero.className = 'detail-hero';
+        } else {
+            hero.style.backgroundImage = '';
+            hero.className = `detail-hero club-gradient-${idx}`;
+        }
+
+        // Badges
+        const badgesEl = document.getElementById('detail-badges');
+        badgesEl.innerHTML = `<span class="detail-badge verified">✅ VERIFIED</span>` +
+            (club.is_premium ? `<span class="detail-badge premium">⭐ PREMIUM</span>` : '');
+
+        // Name & location
+        document.getElementById('detail-name').textContent     = club.name;
+        document.getElementById('detail-location').textContent = `📍 ${club.city}, ${club.country}`;
+
+        // Stats bar
+        document.getElementById('detail-like-btn').classList.toggle('liked', isLiked);
+        document.getElementById('detail-like-icon').textContent  = isLiked ? '❤️' : '🤍';
+        document.getElementById('detail-likes-count').textContent = club.likes_count || 0;
+        document.getElementById('detail-stars-display').textContent = renderStars(club.rating_avg || 0);
+        document.getElementById('detail-rating-val').textContent = club.rating_avg > 0 ? club.rating_avg : '—';
+        document.getElementById('detail-reviews-count').textContent = `${club.reviews_count || 0} reviews`;
+
+        // Service tags
+        const tagsRow = document.getElementById('detail-tags-row');
+        tagsRow.innerHTML = tags.map(t => `<span class="detail-tag-chip">${getTagEmoji(t)} ${t}</span>`).join('');
+
+        // Event banner
+        const eventBanner = document.getElementById('detail-event-banner');
+        if (club.selected_plan === 'Advanced' && club.event_message && new Date(club.event_expires_at) > new Date()) {
+            eventBanner.textContent = `⚡ ${club.event_message}`;
+            eventBanner.style.display = 'block';
+        } else {
+            eventBanner.style.display = 'none';
+        }
+
+        // CTA links
+        document.getElementById('detail-tg-link').href = `https://t.me/${club.telegram_username.replace('@', '')}`;
+        const igLink = document.getElementById('detail-ig-link');
+        if (club.instagram) {
+            igLink.href = `https://instagram.com/${club.instagram.replace('@', '')}`;
+            igLink.style.display = 'block';
+        } else {
+            igLink.style.display = 'none';
+        }
+
+        // Share button
+        document.getElementById('detail-share-btn').onclick = () => {
+            const url = `https://t.me/VerifyPlugEU_bot?startapp=club_${club.id}`;
+            navigator.clipboard.writeText(url).then(() => {
+                const btn = document.getElementById('detail-share-btn');
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => { btn.textContent = '🔗 Share Plug'; }, 2000);
+            });
+        };
+
+        // Description
+        document.getElementById('detail-description').textContent =
+            club.description || 'Verified plug operating under local guidelines.';
+
+        // Show screen
+        detailScreen.style.display = 'flex';
+        detailScreen.style.flexDirection = 'column';
+        detailScreen.scrollTop = 0;
+        document.body.style.overflow = 'hidden';
+
+        // Load reviews async
+        loadReviews(club.id);
+
+        // Like button in detail
+        document.getElementById('detail-like-btn').onclick = () => toggleLike(club.id);
+    }
+
+    function hideDetail() {
+        detailScreen.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        currentClub = null;
+    }
+
+    // ─── REVIEWS ─────────────────────────────────────────────────────────────
+    async function loadReviews(clubId) {
+        const list = document.getElementById('reviews-list');
+        list.innerHTML = `<p style="color:#555; font-size:0.85rem; text-align:center; padding:10px;">Loading reviews...</p>`;
+        try {
+            const reviews = await fetch(`/api/clubs/${clubId}/reviews`).then(r => r.json());
+            if (!reviews.length) {
+                list.innerHTML = `<div class="no-reviews-msg">No reviews yet. Be the first!</div>`;
+                return;
+            }
+            list.innerHTML = reviews.map(r => `
+                <div class="review-card">
+                    <div class="review-header">
+                        <span class="review-handle">@${r.reviewer_handle.replace('@', '')}</span>
+                        <span class="review-stars">${renderStars(r.rating)}</span>
+                        <span class="review-date">${getTimeAgo(r.created_at)}</span>
+                    </div>
+                    ${r.review_text ? `<p class="review-text">${r.review_text}</p>` : ''}
+                </div>
+            `).join('');
+        } catch (e) {
+            list.innerHTML = `<div class="no-reviews-msg">Could not load reviews.</div>`;
+        }
+    }
+
+    // ─── REVIEW MODAL ────────────────────────────────────────────────────────
+    document.getElementById('write-review-btn').onclick = () => {
+        if (!currentClub) return;
+        // Pre-fill handle from TG
+        const handleInput = document.getElementById('review-handle');
+        handleInput.value = tgUsername ? `@${tgUsername}` : '';
+        handleInput.readOnly = !!tgUsername;
+        selectedRating = 0;
+        document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+        document.getElementById('star-label').textContent = 'Tap to rate';
+        document.getElementById('review-text').value = '';
+        reviewModal.style.display = 'block';
     };
 
-    // Favorites "⭐ Guardados" filter button logic
-    const filtersContainer = document.querySelector('.filters');
-    const savedFilterBtn = document.createElement('button');
-    savedFilterBtn.id = 'saved-filter-btn';
-    savedFilterBtn.className = 'country-select'; // Reuse style
-    savedFilterBtn.style.marginLeft = '10px';
-    savedFilterBtn.style.cursor = 'pointer';
-    savedFilterBtn.innerHTML = isEnglish ? '⭐ Saved' : '⭐ Guardados';
-    filtersContainer.appendChild(savedFilterBtn);
+    closeReviewBtn.onclick = () => { reviewModal.style.display = 'none'; };
 
-    savedFilterBtn.onclick = () => {
-        showOnlySaved = !showOnlySaved;
-        savedFilterBtn.style.background = showOnlySaved ? '#00d26a' : '#111';
-        savedFilterBtn.style.color = showOnlySaved ? '#000' : '#fff';
-        filterClubs();
+    // Star picker logic
+    const starLabels = ['', 'Poor 😕', 'Fair 😐', 'Good 👍', 'Very Good 😊', 'Excellent 🤩'];
+    document.querySelectorAll('.star').forEach(star => {
+        star.onclick = () => {
+            selectedRating = parseInt(star.dataset.val);
+            document.querySelectorAll('.star').forEach(s => {
+                s.classList.toggle('active', parseInt(s.dataset.val) <= selectedRating);
+            });
+            document.getElementById('star-label').textContent = starLabels[selectedRating];
+        };
+    });
+
+    document.getElementById('submit-review-btn').onclick = async () => {
+        if (!currentClub) return;
+        if (selectedRating === 0) { alert('Please select a rating!'); return; }
+
+        const handle = document.getElementById('review-handle').value.trim();
+        const text   = document.getElementById('review-text').value.trim();
+
+        if (!handle) { alert('Please enter your Telegram @handle'); return; }
+
+        const btn = document.getElementById('submit-review-btn');
+        btn.disabled = true;
+        btn.textContent = 'Submitting...';
+
+        try {
+            const res = await fetch(`/api/clubs/${currentClub.id}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rating: selectedRating, review_text: text, reviewer_handle: handle })
+            });
+            const result = await res.json();
+            if (result.success) {
+                reviewModal.style.display = 'none';
+                // Update local club state
+                currentClub.reviews_count = (currentClub.reviews_count || 0) + 1;
+                document.getElementById('detail-reviews-count').textContent = `${currentClub.reviews_count} reviews`;
+                loadReviews(currentClub.id);
+                if (tg) tg.HapticFeedback.notificationOccurred('success');
+            } else {
+                alert('❌ Failed to submit review.');
+            }
+        } catch (e) {
+            alert('❌ Connection error.');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Submit Review';
+        }
     };
 
-    // Dynamic City Dropdown for Apply Form
+    // ─── APPLY MODAL ─────────────────────────────────────────────────────────
+    openApplyBtn.onclick  = () => { applyModal.style.display  = 'block'; };
+    closeApplyBtn.onclick = () => { applyModal.style.display  = 'none';  };
+    closeDetailBtn.onclick = hideDetail;
+
+    window.onclick = e => {
+        if (e.target === applyModal)  applyModal.style.display  = 'none';
+        if (e.target === reviewModal) reviewModal.style.display = 'none';
+    };
+
+    // Dynamic city dropdown in apply form
     const countrySelect = document.getElementById('form-country');
-    const citySelect = document.getElementById('form-city');
-
+    const citySelect    = document.getElementById('form-city');
     const CITIES_BY_COUNTRY = {
-        'ES': ['Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Zaragoza', 'Málaga', 'Murcia', 'Palma', 'Las Palmas', 'Bilbao', 'Alicante', 'Córdoba', 'Valladolid', 'Vigo', 'Gijón', 'Granada', 'Tarragona', 'San Sebastián', 'Santander', 'Ibiza', 'Marbella', 'Almería', 'Tenerife'],
-        'DE': ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Frankfurt', 'Stuttgart', 'Düsseldorf', 'Dortmund', 'Essen', 'Bremen', 'Leipzig', 'Dresden', 'Hanover', 'Nuremberg'],
-        'NL': ['Amsterdam', 'Rotterdam', 'The Hague', 'Utrecht', 'Eindhoven', 'Tilburg', 'Groningen', 'Almere', 'Breda', 'Nijmegen', 'Haarlem', 'Enschede']
+        'ES': ['Madrid','Barcelona','Valencia','Sevilla','Zaragoza','Málaga','Murcia','Palma','Las Palmas','Bilbao','Alicante','Córdoba','Valladolid','Vigo','Granada','San Sebastián','Ibiza','Marbella','Tenerife'],
+        'DE': ['Berlin','Hamburg','Munich','Cologne','Frankfurt','Stuttgart','Düsseldorf','Bremen','Leipzig','Dresden'],
+        'NL': ['Amsterdam','Rotterdam','The Hague','Utrecht','Eindhoven','Tilburg','Groningen','Haarlem']
     };
-
     countrySelect.onchange = () => {
-        const country = countrySelect.value;
-        const cities = CITIES_BY_COUNTRY[country] || [];
-        
+        const cities = CITIES_BY_COUNTRY[countrySelect.value] || [];
         citySelect.innerHTML = '<option value="" disabled selected>2. Select city</option>';
-        cities.forEach(city => {
-            const opt = document.createElement('option');
-            opt.value = city;
-            opt.textContent = city;
-            citySelect.appendChild(opt);
-        });
-        
+        cities.forEach(c => { const o = document.createElement('option'); o.value = o.textContent = c; citySelect.appendChild(o); });
         citySelect.disabled = false;
     };
 
-    // Self-Management for Plug Owners
-    const username = tg?.initDataUnsafe?.user?.username;
+    applyForm.onsubmit = async e => {
+        e.preventDefault();
+        const btn = applyForm.querySelector('button[type="submit"]');
+        btn.disabled = true; btn.textContent = 'Sending...';
+        const data = Object.fromEntries(new FormData(applyForm).entries());
+        if (!data.telegram_username.startsWith('@')) data.telegram_username = '@' + data.telegram_username;
+        data.tg_user_id = tgUserId || null;
+        try {
+            const res = await fetch('/api/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            const result = await res.json();
+            if (result.success) {
+                window.location.href = `/pricing.html?u=${data.telegram_username.replace('@', '')}`;
+            } else {
+                alert('❌ Error: ' + (result.error || 'Unknown'));
+            }
+        } catch { alert('❌ Connection error.'); }
+        finally { btn.disabled = false; btn.textContent = 'Submit Verification Request'; }
+    };
 
-    if (username) {
-        checkOwnerStatus(username);
-    }
+    // ─── OWNER SELF-MANAGEMENT (unchanged) ───────────────────────────────────
+    if (tgUsername) checkOwnerStatus(tgUsername);
 
     async function checkOwnerStatus(uname) {
         try {
-            const response = await fetch(`/api/my-club?username=${uname}`);
-            if (response.ok) {
-                const club = await response.json();
-                showOwnerTools(club);
-            }
-        } catch (e) {}
+            const res = await fetch(`/api/my-club?username=${uname}`);
+            if (res.ok) showOwnerTools(await res.json());
+        } catch {}
     }
 
     function showOwnerTools(club) {
         const tools = document.getElementById('owner-tools');
-        const openBtn = document.getElementById('open-edit-btn');
-        const modal = document.getElementById('edit-modal');
-        const closeBtn = document.getElementById('close-edit');
-        const form = document.getElementById('edit-form');
-
         tools.style.display = 'block';
-        
-        openBtn.onclick = () => {
-            document.getElementById('edit-id').value = club.id;
-            document.getElementById('edit-name-display').value = club.name;
-            document.getElementById('edit-instagram').value = club.instagram || '';
-            document.getElementById('edit-description').value = club.description || '';
-            
-            let eventInput = document.getElementById('edit-event-message');
-            const eventFieldId = 'event-group-wrapper';
-            let eventGroup = document.getElementById(eventFieldId);
-
-            // FIX: Only show the announcement option if the user has Advanced plan
-            if (club.selected_plan === 'Advanced') {
-                if (!eventGroup) {
-                    const submitBtn = form.querySelector('button[type="submit"]');
-                    eventGroup = document.createElement('div');
-                    eventGroup.id = eventFieldId;
-                    eventGroup.style.marginBottom = '15px';
-                    eventGroup.innerHTML = `
-                        <label style="font-size: 0.7rem; color: #FFD700; display: block; margin-bottom: 5px;">${isEnglish ? '24h Announcement (Advanced ⚡)' : 'Anuncio 24h (Solo Advanced ⚡)'}</label>
-                        <input type="text" id="edit-event-message" name="event_message" placeholder="Ej: ¡Nuevo stock disponible! 🔥" maxlength="50" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #FFD700; background: #1a1500; color: white;">
-                    `;
-                    form.insertBefore(eventGroup, submitBtn);
-                    eventInput = document.getElementById('edit-event-message');
-                }
-                
-                if (club.event_message && new Date(club.event_expires_at) > new Date()) {
-                    eventInput.value = club.event_message;
-                } else {
-                    eventInput.value = '';
-                }
-            } else {
-                // If not Advanced, make sure the field is GONE
-                if (eventGroup) eventGroup.remove();
-            }
-
-            modal.style.display = 'block';
+        document.getElementById('open-edit-btn').onclick = () => {
+            document.getElementById('edit-id').value            = club.id;
+            document.getElementById('edit-name-display').value  = club.name;
+            document.getElementById('edit-instagram').value     = club.instagram || '';
+            document.getElementById('edit-description').value   = club.description || '';
+            document.getElementById('edit-modal').style.display = 'block';
         };
-
-        closeBtn.onclick = () => modal.style.display = 'none';
-
-        form.onsubmit = async (e) => {
+        document.getElementById('close-edit').onclick = () => { document.getElementById('edit-modal').style.display = 'none'; };
+        document.getElementById('edit-form').onsubmit = async e => {
             e.preventDefault();
-            const formData = new FormData(form);
-            const data = {
-                id: formData.get('id'),
-                username: username,
-                instagram: formData.get('instagram'),
-                description: formData.get('description'),
-                event_message: formData.get('event_message')
-            };
-
+            const fd = new FormData(document.getElementById('edit-form'));
             const res = await fetch('/api/my-club/update', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: fd.get('id'), username: tgUsername, instagram: fd.get('instagram'), description: fd.get('description') })
             });
-
-            if (res.ok) {
-                alert('Plug updated successfully!');
-                modal.style.display = 'none';
-                fetchClubs(); // Refresh main list
-            } else {
-                alert('Failed to update plug.');
-            }
+            if (res.ok) { document.getElementById('edit-modal').style.display = 'none'; fetchClubs(); }
+            else alert('Failed to update plug.');
         };
     }
 
-    // Initialize
-    initMap();
-    fetchClubs();
-
-    // Telegram WebApp integration and Deep Link Handling
+    // ─── DEEP LINK HANDLING ──────────────────────────────────────────────────
     if (tg) {
         tg.expand();
         tg.ready();
-        
-        // Auto-translate initial static text if English
         if (isEnglish) {
-            searchInput.placeholder = "Search plug or city...";
-            openApplyBtn.textContent = "Apply for Verification";
-            // More static translations can be added here
+            searchInput.placeholder = 'Search plug or city...';
+            openApplyBtn.textContent = 'Apply for Verification';
         }
-
-        // Handle Deep Link (startapp=club_123)
         const startParam = tg.initDataUnsafe?.start_param;
-        if (startParam && startParam.startsWith('club_')) {
+        if (startParam?.startsWith('club_')) {
             const clubId = parseInt(startParam.split('_')[1]);
-            // Wait a moment for clubs to load, then open detail
             setTimeout(() => {
-                const targetClub = allClubs.find(c => c.id === clubId);
-                if (targetClub) {
-                    showDetail(targetClub);
-                }
-            }, 1000);
+                const target = allClubs.find(c => c.id === clubId);
+                if (target) showDetail(target);
+            }, 1200);
         }
     }
+
+    // ─── INIT ────────────────────────────────────────────────────────────────
+    initMap();
+    fetchClubs();
 });

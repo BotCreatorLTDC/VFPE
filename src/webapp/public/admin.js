@@ -147,14 +147,22 @@ function renderView() {
 function openEditModal(id) {
     const club = allClubs.find(c => c.id === id);
     if (!club) return;
-    document.getElementById('edit-id').value = club.id;
-    document.getElementById('edit-name').value = club.name;
-    document.getElementById('edit-city').value = club.city;
-    document.getElementById('edit-country').value = club.country;
-    document.getElementById('edit-tg').value = club.telegram_username;
-    document.getElementById('edit-ig').value = club.instagram || '';
-    document.getElementById('edit-desc').value = club.description || '';
-    
+    document.getElementById('edit-id').value      = club.id;
+    document.getElementById('edit-name').value     = club.name;
+    document.getElementById('edit-city').value     = club.city;
+    document.getElementById('edit-country').value  = club.country;
+    document.getElementById('edit-tg').value       = club.telegram_username;
+    document.getElementById('edit-ig').value       = club.instagram || '';
+    document.getElementById('edit-desc').value     = club.description || '';
+    document.getElementById('edit-photo').value    = club.photo_url || '';
+
+    // Service tags checkboxes
+    const clubTags = Array.isArray(club.service_tags) ? club.service_tags : [];
+    ['delivery', 'meetup', 'postal'].forEach(tag => {
+        const cb = document.getElementById(`tag-${tag}`);
+        if (cb) cb.checked = clubTags.includes(tag);
+    });
+
     // FIX: Show event field only for Advanced plan
     const eventGroup = document.getElementById('event-group');
     if (club.selected_plan === 'Advanced') {
@@ -174,15 +182,21 @@ document.getElementById('close-modal').onclick = () => {
 
 document.getElementById('edit-form').onsubmit = async (e) => {
     e.preventDefault();
+    const selectedTags = ['delivery', 'meetup', 'postal'].filter(t => {
+        const cb = document.getElementById(`tag-${t}`);
+        return cb && cb.checked;
+    });
     const data = {
-        id: document.getElementById('edit-id').value,
-        name: document.getElementById('edit-name').value,
-        city: document.getElementById('edit-city').value,
-        country: document.getElementById('edit-country').value,
+        id:               document.getElementById('edit-id').value,
+        name:             document.getElementById('edit-name').value,
+        city:             document.getElementById('edit-city').value,
+        country:          document.getElementById('edit-country').value,
         telegram_username: document.getElementById('edit-tg').value,
-        instagram: document.getElementById('edit-ig').value,
-        description: document.getElementById('edit-desc').value,
-        event_message: document.getElementById('edit-event').value // Capture event
+        instagram:        document.getElementById('edit-ig').value,
+        description:      document.getElementById('edit-desc').value,
+        event_message:    document.getElementById('edit-event').value,
+        photo_url:        document.getElementById('edit-photo').value,
+        service_tags:     selectedTags
     };
 
     const res = await fetch('/api/admin/update', {
