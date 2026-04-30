@@ -30,6 +30,7 @@ ALTER TABLE clubs ADD COLUMN IF NOT EXISTS service_tags TEXT[] DEFAULT '{}';
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS likes_count INTEGER DEFAULT 0;
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS rating_avg NUMERIC(3,1) DEFAULT 0;
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS reviews_count INTEGER DEFAULT 0;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS view_count INTEGER DEFAULT 0;
 
 -- Table for user reviews of clubs
 CREATE TABLE IF NOT EXISTS reviews (
@@ -49,6 +50,20 @@ CREATE TABLE IF NOT EXISTS club_likes (
     user_fingerprint TEXT NOT NULL, -- tg_user_id or UUID fallback
     PRIMARY KEY (club_id, user_fingerprint)
 );
+
+-- Table for user reports
+CREATE TABLE IF NOT EXISTS reports (
+    id SERIAL PRIMARY KEY,
+    club_id INTEGER REFERENCES clubs(id) ON DELETE CASCADE,
+    reason TEXT NOT NULL,
+    details TEXT,
+    reporter_handle TEXT,
+    status TEXT DEFAULT 'pending', -- pending, resolved, dismissed
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_reports_club_id ON reports(club_id);
+CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
 
 -- Drop and recreate the status constraint to include 'accepted'
 ALTER TABLE clubs DROP CONSTRAINT IF EXISTS clubs_status_check;

@@ -226,7 +226,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 toggleLike(club.id);
             };
 
-            card.onclick = () => { logClick(club.id); showDetail(club); };
+            card.onclick = () => { 
+                logClick(club.id); 
+                logView(club.id);
+                showDetail(club); 
+            };
             clubList.appendChild(card);
         });
     }
@@ -275,6 +279,43 @@ document.addEventListener('DOMContentLoaded', () => {
     async function logClick(id) {
         fetch(`/api/clubs/click/${id}`, { method: 'POST' }).catch(() => {});
     }
+
+    async function logView(id) {
+        fetch(`/api/clubs/view/${id}`, { method: 'POST' }).catch(() => {});
+    }
+
+    // ─── REPORTING ───────────────────────────────────────────────────────────
+    const reportModal = document.getElementById('report-modal');
+    const closeReport = document.getElementById('close-report');
+    
+    document.getElementById('open-report-btn').onclick = () => {
+        if (!currentClub) return;
+        reportModal.style.display = 'block';
+    };
+
+    closeReport.onclick = () => { reportModal.style.display = 'none'; };
+
+    document.getElementById('submit-report-btn').onclick = async () => {
+        if (!currentClub) return;
+        const reason  = document.getElementById('report-reason').value;
+        const details = document.getElementById('report-details').value.trim();
+        
+        const btn = document.getElementById('submit-report-btn');
+        btn.disabled = true; btn.textContent = 'Sending...';
+
+        try {
+            const res = await fetch(`/api/clubs/report/${currentClub.id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason, details, reporter_handle: tgUsername || 'anonymous' })
+            });
+            if (res.ok) {
+                alert('Thank you. Our moderators will review this plug.');
+                reportModal.style.display = 'none';
+            }
+        } catch { alert('Error sending report.'); }
+        finally { btn.disabled = false; btn.textContent = 'Send Report'; }
+    };
 
     // ─── SHOW DETAIL ─────────────────────────────────────────────────────────
     function showDetail(club) {
@@ -521,6 +562,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit-name-display').value  = club.name;
             document.getElementById('edit-instagram').value     = club.instagram || '';
             document.getElementById('edit-description').value   = club.description || '';
+            
+            // V2: Populate Owner Stats
+            document.getElementById('owner-views').textContent  = club.view_count || 0;
+            document.getElementById('owner-clicks').textContent = club.click_count || 0;
+            document.getElementById('owner-likes').textContent  = club.likes_count || 0;
+
             // Populate service tag checkboxes
             const clubTags = Array.isArray(club.service_tags) ? club.service_tags : [];
             ['delivery', 'meetup', 'postal'].forEach(tag => {

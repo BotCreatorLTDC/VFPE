@@ -48,16 +48,18 @@ async function verifyAdmin() {
 
 async function fetchData() {
     try {
-        const [clubsRes, analyticsRes] = await Promise.all([
+        const [clubsRes, analyticsRes, reportsRes] = await Promise.all([
             fetch(`/api/admin/clubs?admin_id=${adminId}`),
-            fetch(`/api/admin/analytics?admin_id=${adminId}`)
+            fetch(`/api/admin/analytics?admin_id=${adminId}`),
+            fetch(`/api/admin/reports?admin_id=${adminId}`)
         ]);
         
         allClubs = await clubsRes.json();
         const analytics = await analyticsRes.json();
+        const reports = await reportsRes.json();
         
         updateStats(analytics);
-        renderView();
+        renderView(reports);
         renderAnalytics(analytics);
     } catch (e) {
         console.error('Fetch error:', e);
@@ -69,15 +71,27 @@ function updateStats(data) {
     statClicks.textContent = data.clicks;
 }
 
-function renderView() {
+function renderView(reports = []) {
+    const reportsView = document.getElementById('reports-view');
+    
     if (currentFilter === 'analytics') {
         clubsList.style.display = 'none';
+        reportsView.style.display = 'none';
         analyticsView.style.display = 'block';
+        return;
+    }
+    
+    if (currentFilter === 'reports') {
+        clubsList.style.display = 'none';
+        analyticsView.style.display = 'none';
+        reportsView.style.display = 'flex';
+        renderReports(reports);
         return;
     }
 
     clubsList.style.display = 'flex';
     analyticsView.style.display = 'none';
+    reportsView.style.display = 'none';
 
     const filtered = allClubs.filter(c => currentFilter === 'all' || c.status === currentFilter);
     clubsList.innerHTML = '';
@@ -223,6 +237,49 @@ function renderAnalytics(data) {
 
     citiesList.innerHTML = data.topCities.map(c => `<li><span class="n">${c.city}</span> <span class="v">${c.count} plugs</span></li>`).join('');
     clubsListAn.innerHTML = data.topClubs.map(c => `<li><span class="n">${c.name}</span> <span class="v">${c.click_count} clicks</span></li>`).join('');
+}
+
+function renderReports(reports) {
+    const reportsView = document.getElementById('reports-view');
+    reportsView.innerHTML = '';
+    
+    if (reports.length === 0) {
+        reportsView.innerHTML = `<div style="text-align:center; padding:2rem; color:#888;">No pending reports ✅</div>`;
+        return;
+    }
+
+    reports.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'club-card';
+        card.style.borderLeft = '4px solid #ff4d4d';
+        card.innerHTML = `
+            <div class="card-header">
+                <h3>⚠️ Report for ${r.club_name}</h3>
+                <span class="loc">Reason: <strong>${r.reason}</strong></span>
+            </div>
+            <div class="card-meta">
+                <p style="margin-bottom:10px;">"${r.details || 'No details provided'}"</p>
+                <span style="font-size:0.75rem; color:#888;">By: @${r.reporter_handle} • ${new Date(r.created_at).toLocaleDateString()}</span>
+            </div>
+            <div class="card-actions" style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btn-m btn-approve" onclick="handleReportAction(${r.id}, 'resolve')" style="flex:1;">Resolve</button>
+                <button class="btn-m btn-reject" onclick="handleReportAction(${r.id}, 'dismiss')" style="flex:1;">Dismiss</button>
+            </div>
+        `;
+        reportsView.appendChild(card);
+    });
+}
+
+async function handleReportAction(id, action) {
+    const response = await fetch('/api/admin/report-action', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'x-admin-id': adminId
+        },
+        body: JSON.stringify({ id, action })
+    });
+    if (response.ok) fetchData();
 }
 
 async function handleAction(id, action) {

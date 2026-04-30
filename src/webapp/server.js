@@ -64,6 +64,30 @@ app.post('/api/clubs/click/:id', async (req, res) => {
     }
 });
 
+// Increment VIEW count
+app.post('/api/clubs/view/:id', async (req, res) => {
+    try {
+        await query("UPDATE clubs SET view_count = view_count + 1 WHERE id = $1", [req.params.id]);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: "Failed" });
+    }
+});
+
+// Submit a REPORT
+app.post('/api/clubs/report/:id', async (req, res) => {
+    const { reason, details, reporter_handle } = req.body;
+    try {
+        await query(
+            "INSERT INTO reports (club_id, reason, details, reporter_handle) VALUES ($1, $2, $3, $4)",
+            [req.params.id, reason, details || null, reporter_handle || null]
+        );
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: "Failed" });
+    }
+});
+
 // GET reviews for a club
 app.get('/api/clubs/:id/reviews', async (req, res) => {
     try {
@@ -170,16 +194,16 @@ app.post('/api/select-plan', async (req, res) => {
 
 // --- CLUB OWNER SELF-MANAGEMENT ---
 
-// GET my club data based on TG username
+// GET my club data based on TG username + stats
 app.get('/api/my-club', async (req, res) => {
-    const username = req.query.username; // Should be verified via initData in production
+    const username = req.query.username;
     if (!username) return res.status(400).json({ error: "No username provided" });
 
     const tgUser = username.startsWith('@') ? username : `@${username}`;
 
     try {
-        const result = await query("SELECT * FROM clubs WHERE telegram_username = $1 AND status = 'verified'", [tgUser]);
-        if (result.rows.length === 0) return res.status(404).json({ error: "No verified club found for this user" });
+        const result = await query("SELECT id, name, city, country, telegram_username, instagram, description, selected_plan, status, click_count, likes_count, view_count, service_tags FROM clubs WHERE telegram_username = $1 AND status = 'verified'", [tgUser]);
+        if (result.rows.length === 0) return res.status(404).json({ error: "No verified club found" });
         res.json(result.rows[0]);
     } catch (err) {
         res.status(500).json({ error: "Server error" });
@@ -338,6 +362,34 @@ app.post('/api/admin/update', adminAuth, async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         console.error("Update error:", err);
+        res.status(500).json({ error: "Failed" });
+    }
+});
+
+// GET ALL REPORTS
+app.get('/api/admin/reports', adminAuth, async (req, res) => {
+    try {
+        const result = await query(`
+            SELECT r.*, c.name as club_name 
+            FROM reports r 
+            JOIN clubs c ON r.club_id = c.id 
+            WHERE r.status = 'pending'
+            ORDER BY r.created_at DESC
+        `);
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: "Failed" });
+    }
+});
+
+// RESOLVE REPORT
+app.post('/api/admin/report-action', adminAuth, async (req, res) => {
+    const { id, action } = req.body;
+    try {
+        const status = action === 'dismiss' ? 'dismissed' : 'resolved';
+        await query("UPDATE reports SET status = $1 WHERE id = $2", [status, id]);
+        res.json({ success: true });
+    } catch (err) {
         res.status(500).json({ error: "Failed" });
     }
 });

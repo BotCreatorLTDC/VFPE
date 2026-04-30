@@ -107,6 +107,11 @@
                 <p id="detail-description"></p>
             </div>
 
+            <!-- Report Button -->
+            <div style="text-align:center; margin-bottom:20px;">
+                <button id="open-report-btn" style="background:none; border:none; color:#555; font-size:0.8rem; text-decoration:underline; cursor:pointer;">⚠️ Report an issue with this plug</button>
+            </div>
+
             <!-- Verification box -->
             <div class="verification-info">
                 <h4>✅ VFPE Verified</h4>
@@ -162,6 +167,23 @@
         <div class="modal-content">
             <span class="close" id="close-edit">&times;</span>
             <h2>Manage My Plug</h2>
+            
+            <!-- V2: Owner Analytics Dashboard -->
+            <div class="owner-stats-grid" id="owner-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:20px; background:#111; padding:15px; border-radius:12px; border:1px solid #222;">
+                <div class="owner-stat-card" style="text-align:center;">
+                    <span style="display:block; font-size:0.7rem; color:#888;">VIEWS</span>
+                    <span id="owner-views" style="font-size:1.2rem; font-weight:800; color:var(--primary);">0</span>
+                </div>
+                <div class="owner-stat-card" style="text-align:center;">
+                    <span style="display:block; font-size:0.7rem; color:#888;">CLICKS</span>
+                    <span id="owner-clicks" style="font-size:1.2rem; font-weight:800; color:var(--primary);">0</span>
+                </div>
+                <div class="owner-stat-card" style="text-align:center;">
+                    <span style="display:block; font-size:0.7rem; color:#888;">LIKES</span>
+                    <span id="owner-likes" style="font-size:1.2rem; font-weight:800; color:var(--primary);">0</span>
+                </div>
+            </div>
+
             <p style="font-size: 0.8rem; color: #8e8e93; margin-bottom: 1.5rem;">Update your plug's visible information.</p>
             <form id="edit-form">
                 <input type="hidden" name="id" id="edit-id">
@@ -199,6 +221,24 @@
             <input type="text" id="review-handle" placeholder="Your Telegram @handle">
             <textarea id="review-text" placeholder="Share your experience... (optional)" maxlength="300" style="height:90px; resize:none;"></textarea>
             <button id="submit-review-btn" class="btn-review-submit">Submit Review</button>
+        </div>
+    </div>
+
+    <!-- ══ REPORT MODAL ══ -->
+    <div id="report-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-report">&times;</span>
+            <h2>⚠️ Report Plug</h2>
+            <p style="color:#888; font-size:0.85rem; margin-bottom:1.2rem;">Help us keep the directory safe. What is the issue?</p>
+            <select id="report-reason" style="margin-bottom:15px;">
+                <option value="inactive">Inactive / No response</option>
+                <option value="scam">Scam / Fraud</option>
+                <option value="wrong_info">Incorrect information</option>
+                <option value="offensive">Offensive content</option>
+                <option value="other">Other</option>
+            </select>
+            <textarea id="report-details" placeholder="Provide more details... (optional)" style="height:80px;"></textarea>
+            <button id="submit-report-btn" class="btn-review-submit" style="background:#ff4d4d; color:white;">Send Report</button>
         </div>
     </div>
 
