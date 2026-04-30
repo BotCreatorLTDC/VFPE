@@ -461,13 +461,26 @@
         }
 
         async function renderVideo() {
-            const target = document.getElementById('promo-story');
             const btn = document.getElementById('btn-video');
             const originalText = btn.innerText;
             
-            // Configuration: 5 seconds @ 20fps for speed
+            // 1. Setup High-Res Canvas
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = 1080;
+            exportCanvas.height = 1920;
+            const ctx = exportCanvas.getContext('2d');
+            
+            // 2. Prepare assets
+            const video = document.getElementById('story-video');
+            const imgBack = document.getElementById('img-back');
+            const imgFront = document.getElementById('img-front');
+            const clubName = document.getElementById('in-name').value;
+            const welcomeMsg = document.getElementById('in-msg').value.replace('<span>', '').replace('</span>', '');
+            const city = document.getElementById('in-city').value;
+
+            // 3. Setup Encoder
+            const fps = 24;
             const duration = 5;
-            const fps = 20;
             const totalFrames = duration * fps;
             const videoEncoder = new Whammy.Video(fps);
             
@@ -477,30 +490,105 @@
             for (let i = 0; i < totalFrames; i++) {
                 btn.innerText = `Rendering: ${Math.round((i / totalFrames) * 100)}%`;
                 
-                // Capture the frame
-                const canvas = await htmlToImage.toCanvas(target, {
-                    width: 540,
-                    height: 960,
-                    pixelRatio: 1 
-                });
+                // --- DRAWING LOGIC ---
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, 1080, 1920);
+
+                // A. Background Video (with blur/brightness)
+                ctx.filter = 'blur(6px) brightness(0.5)';
+                ctx.drawImage(video, 0, 0, 1080, 1920);
+                ctx.filter = 'none';
+
+                // B. Phones Animation
+                const time = i / fps;
+                const floatBack = Math.sin(time * (Math.PI * 2 / 6)) * 40;
+                const floatFront = Math.sin(time * (Math.PI * 2 / 5)) * 40;
+
+                // Phone Back
+                ctx.save();
+                ctx.translate(350, 1100 + floatBack);
+                ctx.rotate(-12 * Math.PI / 180);
+                drawPhone(ctx, imgBack, 600, 1200, 0.7);
+                ctx.restore();
+
+                // Phone Front
+                ctx.save();
+                ctx.translate(730, 1000 + floatFront);
+                ctx.rotate(10 * Math.PI / 180);
+                drawPhone(ctx, imgFront, 650, 1300, 1);
+                ctx.restore();
+
+                // C. Text Branding
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#fff';
                 
-                videoEncoder.add(canvas);
-                // Tiny delay to allow UI to breathe
-                await new Promise(r => setTimeout(r, 10));
+                // Name
+                ctx.font = '800 80px Outfit';
+                ctx.fillText(clubName + ' ✔️', 540, 250);
+                
+                // Welcome
+                ctx.font = '600 60px Outfit';
+                ctx.fillText(welcomeMsg, 540, 360);
+
+                // City
+                ctx.font = '400 40px Outfit';
+                ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                ctx.fillText('📍 ' + city, 540, 450);
+
+                // Tags
+                let currentX = 540 - (selectedTags.length * 100);
+                selectedTags.forEach(tag => {
+                    ctx.fillStyle = '#00d26a';
+                    ctx.font = '800 30px Outfit';
+                    ctx.fillText(tag.toUpperCase(), currentX, 550);
+                    currentX += 200;
+                });
+
+                videoEncoder.add(ctx);
+                await new Promise(r => setTimeout(r, 5));
             }
 
-            btn.innerText = 'Finalizing Video...';
+            btn.innerText = 'Finalizing...';
             const output = videoEncoder.compile();
             const url = URL.createObjectURL(output);
-            
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Promo_${document.getElementById('in-name').value}.webm`;
+            a.download = `Promo_${clubName}.webm`;
             a.click();
 
             btn.disabled = false;
             btn.style.opacity = '1';
             btn.innerText = originalText;
+        }
+
+        function drawPhone(ctx, img, w, h, opacity) {
+            ctx.globalAlpha = opacity;
+            // Shadow
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 50;
+            // Body
+            ctx.fillStyle = '#222';
+            roundRect(ctx, -w/2, -h/2, w, h, 80, true);
+            // Image
+            ctx.clip();
+            ctx.drawImage(img, -w/2, -h/2, w, h);
+            ctx.globalAlpha = 1;
+            ctx.shadowBlur = 0;
+        }
+
+        function roundRect(ctx, x, y, width, height, radius, fill) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            if (fill) ctx.fill();
         }
 
         function downloadPromo() {
