@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFPE Promo Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        :root { --primary: #00d26a; --premium: #FFD700; --bg: #111; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; color: #fff; font-family: 'Outfit', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+
+        /* Panel Lateral de Control */
+        .sidebar { width: 350px; background: #1a1a1a; padding: 30px; border-right: 1px solid #333; overflow-y: auto; z-index: 100; }
+        .sidebar h2 { margin-bottom: 25px; color: var(--primary); font-size: 1.2rem; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 0.8rem; color: #888; margin-bottom: 8px; text-transform: uppercase; }
+        .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 8px; color: #fff; font-family: inherit; }
+        .btn-download { width: 100%; padding: 15px; background: var(--primary); color: #000; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 20px; }
+        .tag-select { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+        .tag-btn { background: #000; border: 1px solid #333; color: #888; padding: 5px 10px; border-radius: 5px; font-size: 0.7rem; cursor: pointer; }
+        .tag-btn.active { border-color: var(--primary); color: var(--primary); }
+
+        /* Canvas de Previsualización */
+        .preview-area { flex: 1; display: flex; justify-content: center; align-items: center; background: #050505; position: relative; padding: 20px; }
+        
+        /* Contenedor de la Historia (9:16) */
+        #promo-story {
+            width: 540px; /* 1080 / 2 para ver en pantalla */
+            height: 960px; /* 1920 / 2 */
+            background: #000;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+        }
+
+        /* Fondo Desenfoque */
+        .story-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            filter: blur(3px) brightness(0.5) saturate(1.1);
+            transform: scale(1.05);
+            opacity: 1;
+            z-index: 1;
+        }
+        .story-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
+        }
+
+        /* Branding Text */
+        .branding-header {
+            margin-top: 100px;
+            text-align: center;
+            z-index: 10;
+            padding: 0 40px;
+        }
+        .club-name { font-size: 2.2rem; font-weight: 800; color: #fff; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 5px; }
+        .club-name::after { content: '✔️'; font-size: 1rem; background: #00d26a; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; color: #000; }
+        .welcome-msg { font-size: 1.8rem; font-weight: 600; line-height: 1.2; }
+        .welcome-msg span { background: #fff; color: #000; padding: 0 10px; border-radius: 10px; font-weight: 800; display: inline-block; margin: 0 5px; }
+        .welcome-msg b { color: var(--primary); }
+
+        .location-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255,255,255,0.1);
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-top: 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        .promo-tags {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            z-index: 10;
+        }
+        .promo-tag-pill {
+            background: var(--primary);
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        /* Doble Mockup de iPhones */
+        .mockups-container {
+            position: absolute;
+            bottom: 40px;
+            width: 100%;
+            height: 600px;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .phone {
+            width: 280px;
+            height: 580px;
+            background: #111;
+            border-radius: 40px;
+            border: 6px solid #222;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            position: absolute;
+            transition: all 0.3s;
+        }
+        .phone img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Teléfono Trasero (Instagram) */
+        .phone-back {
+            left: 50px;
+            transform: rotate(-12deg) translateY(60px);
+            z-index: 6;
+            filter: brightness(0.7);
+        }
+        
+        /* Teléfono Delantero (VFPE) */
+        .phone-front {
+            right: 50px;
+            transform: rotate(10deg) translateY(-20px);
+            z-index: 8;
+            border: 6px solid #333;
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute;
+            top: 15px; left: 50%;
+            transform: translateX(-50%);
+            width: 80px; height: 25px;
+            background: #000;
+            border-radius: 15px;
+            z-index: 20;
+        }
+
+        .footer-logo {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            opacity: 0.5;
+            font-weight: 800;
+            letter-spacing: 3px;
+            font-size: 0.8rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Promo Generator</h2>
+        
+        <div class="input-group">
+            <label>Club Name</label>
+            <input type="text" id="in-name" value="Static Room" oninput="updateText()">
+        </div>
+
+        <div class="input-group">
+            <label>City / Location</label>
+            <input type="text" id="in-city" value="Madrid, Spain" oninput="updateText()">
+        </div>
+
+        <div class="input-group">
+            <label>Welcome Message</label>
+            <textarea id="in-msg" rows="3" oninput="updateText()">Welcome to the <span>VFPE</span> Fam!</textarea>
+        </div>
+
+        <div class="input-group">
+            <label>Service Options</label>
+            <div class="tag-select">
+                <button class="tag-btn active" onclick="toggleTag(this, '🚚 Delivery')">🚚 Delivery</button>
+                <button class="tag-btn active" onclick="toggleTag(this, '🤝 Meetup')">🤝 Meetup</button>
+                <button class="tag-btn" onclick="toggleTag(this, '📬 Postal')">📬 Postal</button>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Instagram Screenshot (Back Phone)</label>
+            <input type="file" accept="image/*" onchange="loadFile(event, 'img-back')">
+        </div>
+
+        <div class="input-group">
+            <label>VFPE App Screenshot (Front Phone)</label>
+            <input type="file" accept="image/*" onchange="loadFile(event, 'img-front')">
+        </div>
+
+        <div class="input-group">
+            <label>Background Image</label>
+            <input type="file" accept="image/*" onchange="loadFile(event, 'story-bg')">
+        </div>
+
+        <button class="btn-download" onclick="downloadPromo()">Download IG Story</button>
+        <p style="font-size: 0.7rem; color: #666; margin-top: 15px; text-align: center;">Format: 1080x1920px (9:16)</p>
+    </div>
+
+    <div class="preview-area">
+        <div id="promo-story">
+            <!-- Background Layer -->
+            <div class="story-bg" id="story-bg" style="background-image: url('assets/fondo-plantilla.png');"></div>
+
+            <!-- Text Content -->
+            <div class="branding-header">
+                <div class="club-name" id="out-name">Static Room</div>
+                <div class="welcome-msg" id="out-msg">Welcome to the <span>VFPE</span> Fam!</div>
+                <div class="location-tag" id="out-city">📍 Madrid, Spain</div>
+                
+                <div class="promo-tags" id="out-tags">
+                    <span class="promo-tag-pill">🚚 Delivery</span>
+                    <span class="promo-tag-pill">🤝 Meetup</span>
+                </div>
+            </div>
+
+            <!-- Mockups Layer -->
+            <div class="mockups-container">
+                <div class="phone phone-back">
+                    <img id="img-back" src="assets/guia/main-grid.png">
+                </div>
+                <div class="phone phone-front">
+                    <img id="img-front" src="assets/guia/club-detail-top.png">
+                </div>
+            </div>
+
+            <div class="footer-logo">VERIFYPLUG.EU</div>
+        </div>
+    </div>
+
+    <script>
+        let selectedTags = ['🚚 Delivery', '🤝 Meetup'];
+
+        function updateText() {
+            document.getElementById('out-name').innerText = document.getElementById('in-name').value;
+            document.getElementById('out-msg').innerHTML = document.getElementById('in-msg').value;
+            document.getElementById('out-city').innerText = '📍 ' + document.getElementById('in-city').value;
+            renderTags();
+        }
+
+        function toggleTag(btn, tag) {
+            btn.classList.toggle('active');
+            if (selectedTags.includes(tag)) {
+                selectedTags = selectedTags.filter(t => t !== tag);
+            } else {
+                selectedTags.push(tag);
+            }
+            renderTags();
+        }
+
+        function renderTags() {
+            const container = document.getElementById('out-tags');
+            container.innerHTML = selectedTags.map(t => `<span class="promo-tag-pill">${t}</span>`).join('');
+        }
+
+        function loadFile(event, targetId) {
+            const output = document.getElementById(targetId);
+            if (targetId === 'story-bg') {
+                output.style.backgroundImage = `url(${URL.createObjectURL(event.target.files[0])})`;
+            } else {
+                output.src = URL.createObjectURL(event.target.files[0]);
+            }
+        }
+
+        function downloadPromo() {
+            const target = document.getElementById('promo-story');
+            const btn = document.querySelector('.btn-download');
+            btn.innerText = 'Generating...';
+
+            // Escalar para exportación real (x2 para llegar a 1080x1920)
+            html2canvas(target, {
+                scale: 2,
+                backgroundColor: '#000',
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Promo_${document.getElementById('in-name').value}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                btn.innerText = 'Download IG Story';
+            });
+        }
+    </script>
+</body>
+</html>
