@@ -212,7 +212,7 @@ app.get('/api/my-club', async (req, res) => {
 
 // UPDATE my club data
 app.post('/api/my-club/update', async (req, res) => {
-    const { id, username, instagram, description, event_message, service_tags } = req.body;
+    const { id, username, instagram, description, event_message, service_tags, photo_url } = req.body;
     
     const tgUser = username.startsWith('@') ? username : `@${username}`;
     
@@ -229,13 +229,13 @@ app.post('/api/my-club/update', async (req, res) => {
                 return res.status(403).json({ error: "Feature reserved for Advanced plans" });
             }
             await query(
-                "UPDATE clubs SET instagram = $1, description = $2, event_message = $3, event_expires_at = CURRENT_TIMESTAMP + interval '24 hours', service_tags = $5 WHERE id = $4",
-                [instagram || null, description || null, event_message.substring(0, 50), id, tagsArray]
+                "UPDATE clubs SET instagram = $1, description = $2, event_message = $3, event_expires_at = CURRENT_TIMESTAMP + interval '24 hours', service_tags = $5, photo_url = $6 WHERE id = $4",
+                [instagram || null, description || null, event_message.substring(0, 50), id, tagsArray, photo_url || null]
             );
         } else {
             await query(
-                "UPDATE clubs SET instagram = $1, description = $2, event_message = NULL, event_expires_at = NULL, service_tags = $4 WHERE id = $3",
-                [instagram || null, description || null, id, tagsArray]
+                "UPDATE clubs SET instagram = $1, description = $2, event_message = NULL, event_expires_at = NULL, service_tags = $4, photo_url = $5 WHERE id = $3",
+                [instagram || null, description || null, id, tagsArray, photo_url || null]
             );
         }
         

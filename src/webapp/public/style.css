@@ -276,11 +276,17 @@ hr { border: 0; border-top: 1px solid #333; margin: 20px 0; }
     position: fixed; z-index: 6000;
     left: 0; top: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    overflow-y: auto;
+    padding: 20px 0;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
 }
 
 .modal-content {
-    background: #111; margin: 5% auto; padding: 25px;
+    background: #111; margin: auto; padding: 25px;
     width: 90%; max-width: 450px; border-radius: 24px; border: 1px solid #333;
+    position: relative;
 }
 
 .modal-content form input, 

@@ -561,6 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit-id').value            = club.id;
             document.getElementById('edit-name-display').value  = club.name;
             document.getElementById('edit-instagram').value     = club.instagram || '';
+            document.getElementById('edit-photo-url').value    = club.photo_url || '';
             document.getElementById('edit-description').value   = club.description || '';
             
             // V2: Populate Owner Stats
@@ -590,6 +591,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     id: fd.get('id'),
                     username: tgUsername,
                     instagram: fd.get('instagram'),
+                    photo_url: fd.get('photo_url'),
                     description: fd.get('description'),
                     service_tags: selectedTags
                 })

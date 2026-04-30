@@ -202,8 +202,8 @@ li .n { font-weight: 600; }
 li .v { color: var(--accent); font-weight: 700; }
 .brand-logo-m { height: 40px; width: auto; border-radius: 6px; }
 
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 5000; display: flex; justify-content: center; align-items: center; padding: 20px; }
-.modal-card { background: var(--card); width: 100%; max-width: 500px; border-radius: 24px; border: 1px solid var(--border); padding: 1.5rem; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 5000; display: flex; justify-content: center; align-items: flex-start; padding: 20px; overflow-y: auto; }
+.modal-card { background: var(--card); width: 100%; max-width: 500px; border-radius: 24px; border: 1px solid var(--border); padding: 1.5rem; margin: auto; }
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
 .modal-header h2 { font-size: 1.2rem; }
 #close-modal { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; }

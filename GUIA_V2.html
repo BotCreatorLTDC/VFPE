@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFPE v2 - Complete Feature Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #00d26a; --premium: #FFD700; --bg: #050505; --card: #111; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: #fff; font-family: 'Outfit', sans-serif; scroll-behavior: smooth; overflow-x: hidden; }
+        
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%); position: relative; }
+        .hero img { width: 120px; border-radius: 20px; margin-bottom: 25px; box-shadow: 0 0 40px rgba(0,210,106,0.2); }
+        .hero h1 { font-size: 5rem; font-weight: 800; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 1.2rem; color: #888; margin-top: 10px; letter-spacing: 2px; }
+        
+        .section { padding: 100px 20px; max-width: 1200px; margin: 0 auto; min-height: 80vh; display: flex; align-items: center; border-bottom: 1px solid #1a1a1a; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        
+        .text-content h2 { font-size: 3rem; font-weight: 700; margin-bottom: 20px; color: var(--primary); }
+        .text-content p { font-size: 1.1rem; color: #aaa; line-height: 1.8; margin-bottom: 30px; }
+        
+        .feature-list { list-style: none; }
+        .feature-list li { margin-bottom: 15px; display: flex; align-items: center; gap: 12px; font-size: 1rem; color: #eee; }
+        .feature-list li b { color: var(--primary); }
+        
+        .visual-box { background: #111; border-radius: 40px; padding: 20px; border: 8px solid #222; box-shadow: 0 30px 60px rgba(0,0,0,0.5); position: relative; }
+        .visual-box img { width: 100%; border-radius: 20px; }
+        
+        .badge { display: inline-block; background: rgba(0,210,106,0.1); color: var(--primary); padding: 6px 16px; border-radius: 50px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 20px; }
+        .badge.gold { background: rgba(255,215,0,0.1); color: var(--premium); }
+        .badge.red { background: rgba(255,77,77,0.1); color: #ff4d4d; }
+        
+        .stats-demo { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .stat-card { background: #1a1a1a; padding: 15px; border-radius: 15px; text-align: center; border: 1px solid #333; }
+        .stat-card .val { display: block; font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .stat-card .lbl { font-size: 0.7rem; color: #666; font-weight: 600; }
+        
+        footer { padding: 80px 20px; text-align: center; color: #444; border-top: 1px solid #111; }
+        
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: 1fr; gap: 40px; text-align: center; }
+            .hero h1 { font-size: 3rem; }
+            .section { padding: 60px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="hero">
+        <img src="/assets/logo.jpg" alt="VFPE Logo">
+        <h1>VFPE Ecosystem v2</h1>
+        <p>THE GOLD STANDARD FOR VERIFIED DIRECTORIES</p>
+        <div style="margin-top: 60px; font-weight: 700; color: var(--primary); opacity: 0.6; cursor: pointer;">SCROLL TO DISCOVER ↓</div>
+    </section>
+
+    <!-- UI REDESIGN -->
+    <section class="section">
+        <div class="grid">
+            <div class="text-content">
+                <span class="badge">Visual Excellence</span>
+                <h2>Rediseño Inmersivo</h2>
+                <p>Inspirado en los mejores directorios del mundo (AmericanHash), la v2 de VFPE prioriza el impacto visual y la confianza inmediata.</p>
+                <ul class="feature-list">
+                    <li><b>Fotos Reales:</b> Soporte para logos y fotos de locales.</li>
+                    <li><b>Filtros Rápidos:</b> Sistema de tags para Delivery, Meetup y Postal.</li>
+                    <li><b>UI Premium:</b> Modo oscuro con acentos esmeralda y oro.</li>
+                </ul>
+            </div>
+            <div class="visual-box">
+                <img src="/assets/presentacion/pagina-principal-miniapp.jpg" alt="Directory View">
+                <div style="margin-top:15px; display:flex; gap:10px;">
+                    <span style="background:var(--primary); color:#000; padding:4px 10px; border-radius:4px; font-size:0.7rem; font-weight:800;">VERIFIED</span>
+                    <span style="background:#222; color:#fff; padding:4px 10px; border-radius:4px; font-size:0.7rem;">📍 Madrid, Spain</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SOCIAL PROOF -->
+    <section class="section">
+        <div class="grid">
+            <div class="visual-box">
+                <img src="/assets/presentacion/detalles-club.jpg" alt="Detail View">
+                <div style="margin-top:20px; border-top:1px solid #333; padding-top:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:var(--premium);">⭐⭐⭐⭐⭐ (4.9)</span>
+                        <span style="color:#ff4d6d;">❤️ 128 Likes</span>
+                    </div>
+                </div>
+            </div>
+            <div class="text-content">
+                <span class="badge gold">Social Proof v2</span>
+                <h2>Confianza Colectiva</h2>
+                <p>Hemos convertido un simple listado en una comunidad. Los usuarios validan la calidad de cada plug en tiempo real.</p>
+                <ul class="feature-list">
+                    <li><b>Likes en Servidor:</b> Popularidad real y persistente.</li>
+                    <li><b>Reseñas Verificadas:</b> Comentarios de usuarios reales.</li>
+                    <li><b>Rating Star System:</b> Puntuación media automática.</li>
+                    <li><b>Report System:</b> Seguridad proactiva de la comunidad.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- OWNER ANALYTICS -->
+    <section class="section">
+        <div class="grid">
+            <div class="text-content">
+                <span class="badge">Business Intelligence</span>
+                <h2>Panel para Dueños</h2>
+                <p>Vendemos datos, no solo espacio. Los plugs con plan PRO/Advanced tienen acceso a sus métricas de rendimiento en tiempo real.</p>
+                <div class="stats-demo">
+                    <div class="stat-card">
+                        <span class="val">1.2K</span>
+                        <span class="lbl">VIEWS</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="val">450</span>
+                        <span class="lbl">CLICKS</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="val">89</span>
+                        <span class="lbl">LIKES</span>
+                    </div>
+                </div>
+                <p style="margin-top:20px; font-size:0.9rem; color:#666;"><i>"Optimiza tu visibilidad basándote en lo que los usuarios realmente buscan."</i></p>
+            </div>
+            <div class="visual-box">
+                <img src="/assets/presentacion/club-promocionado-y-ajustes-manage-my-club-visibles.jpg" alt="Owner Dashboard">
+            </div>
+        </div>
+    </section>
+
+    <!-- MODERATION HQ -->
+    <section class="section">
+        <div class="grid">
+            <div class="visual-box">
+                <img src="/assets/presentacion/admin-lista-de-club-y-club-promocionado.jpg" alt="Admin View">
+            </div>
+            <div class="text-content">
+                <span class="badge red">Security & Control</span>
+                <h2>HQ Administrativo</h2>
+                <p>Un centro de mando mobile-first para que gestiones todo el ecosistema desde tu móvil en cualquier lugar.</p>
+                <ul class="feature-list">
+                    <li><b>Gestión de Reportes:</b> Resuelve disputas de usuarios.</li>
+                    <li><b>Filtros de Auditoría:</b> Inbox de pagos y activaciones.</li>
+                    <li><b>Deep Insights:</b> Analíticas de ciudades y crecimiento.</li>
+                    <li><b>Broadcast Bot:</b> Notificaciones directas a usuarios.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>VFPE v2 — The Future of Verified Directories</p>
+        <p style="font-size:0.8rem; margin-top:10px; opacity:0.3;">© 2024 VFPE Ecosystem. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
