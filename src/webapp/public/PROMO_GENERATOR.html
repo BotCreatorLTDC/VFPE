@@ -6,7 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VFPE Promo Generator</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+    <script>
+        /* Whammy Library Embedded */
+        var Whammy=function(){function n(e){for(var r=0,t=0;t<e.length;t++)r+=e[t].length;for(var n=new Uint8Array(r),i=0,t=0;t<e.length;t++)n.set(e[t],i),i+=e[t].length;return n}function i(e,r){for(var t=[],n=0;n<r;n++)t.push(e>>8*(r-n-1)&255);return new Uint8Array(t)}function o(e){return i(e,4)}function a(e){for(var r=[],t=0;t<e.length;t++)r.push(e.charCodeAt(t));return new Uint8Array(r)}function u(e){return a(e)}function s(e){for(var r=e.toString(2);r.length%8!=0;)r="0"+r;for(var t=Math.ceil(r.length/7),n=0;n<t-1;n++)r=r.substring(0,r.length-7*t+7*n+7-1)+"0"+r.substring(r.length-7*t+7*n+7-1);for(var i=new Uint8Array(t),n=0;n<t;n++)i[n]=parseInt(r.substring(8*n,8*n+8),2);return i}function f(e){var r=e.toString(16);r.length%2!=0&&(r="0"+r);for(var t=new Uint8Array(r.length/2),n=0;n<t.length;n++)t[n]=parseInt(r.substring(2*n,2*n+2),16);return t}function c(e){var r=[];return e.forEach(function(e){var t=[];t.push(f(e.id)),t.push(function(e){var r=e.toString(2);r.length%7!=0&&(r=new Array(7-r.length%7+1).join("0")+r);for(var t=Math.ceil(r.length/7),n=new Array(t).join("1")+"0",i=n+r,o=new Uint8Array(t),a=0;a<t;a++)o[a]=parseInt(i.substring(8*a,8*a+8),2);return o}(e.data.length)),t.push(e.data),r.push(n(t))}),n(r)}function l(e){for(var r=e.width,t=e.height,n=e.getContext("2d").getImageData(0,0,r,t).data,i=new Uint8Array(r*t*3),o=0;o<r*t;o++)i[3*o]=n[4*o+2],i[3*o+1]=n[4*o+1],i[3*o+2]=n[4*o];return i}return{Video:function(e){this.fps=e||30,this.frames=[],this.add=function(e,r){if("undefined"!=typeof CanvasRenderingContext2D&&e instanceof CanvasRenderingContext2D&&(e=e.canvas),r&&"undefined"!=typeof r)this.frames.push({canvas:e,duration:r});else{if(this.frames.length>0&&!this.frames[this.frames.length-1].duration)throw"Error: Reached end of fixed-duration frames";this.frames.push({canvas:e})}},this.compile=function(){var e=[],r=this.frames.map(function(e){return e.canvas});r.forEach(function(r){var t=l(r);e.push(t)});var t=1e3/this.fps,i=[{id:"1a45dfa3",data:[{id:"4286",data:o(1)},{id:"42f7",data:o(1)},{id:"42f2",data:o(4)},{id:"42f3",data:o(8)},{id:"4282",data:a("webm")},{id:"4287",data:o(1)},{id:"4285",data:o(1)}]},{id:"18538067",data:[{id:"1549a966",data:[{id:"2ad7b1",data:[{id:"4489",data:o(1e3)}]},{id:"4489",data:o(1e3)},{id:"4d80",data:o(1e3)},{id:"5741",data:a("whammy")},{id:"7ba9",data:a("whammy")}]},{id:"1654ae6b",data:[{id:"ae",data:[{id:"d7",data:o(1)},{id:"83",data:o(1)},{id:"b5",data:o(0)},{id:"86",data:a("V_VP8")},{id:"e0",data:[{id:"b0",data:s(r[0].width)},{id:"ba",data:s(r[0].height)}]}]}]}]}];e.forEach(function(e,r){var n=r*t,o=new Uint8Array(4);o[0]=129,o[1]=n>>8&255,o[2]=255&n,o[3]=0;var a=[{id:"a1",data:n([o,e])}];i[1].data.push({id:"1f43b675",data:[{id:"b1",data:s(n)},a[0]]})});var s=c(i);return new Blob([s],{type:"video/webm"})}}}}();
+    </script>
     <style>
         :root {
             --primary: #00d26a;
@@ -376,7 +380,7 @@
 
         <button class="btn-download" onclick="downloadPromo()">Download PNG</button>
         <button class="btn-download" id="btn-video" style="background:#fff; margin-top:10px;"
-            onclick="startRecording()">Record Video (10s)</button>
+            onclick="renderVideo()">Render & Download Video</button>
         <p style="font-size: 0.7rem; color: #666; margin-top: 15px; text-align: center;">Format: 1080x1920px (9:16)</p>
     </div>
 
@@ -456,71 +460,62 @@
             }
         }
 
-        async function startRecording() {
+        async function renderVideo() {
+            const target = document.getElementById('promo-story');
             const btn = document.getElementById('btn-video');
-            try {
-                // Capturar el stream de la pestaña (el usuario debe seleccionar esta pestaña)
-                const stream = await navigator.mediaDevices.getDisplayMedia({
-                    video: { frameRate: 60, width: 1080, height: 1920 },
-                    audio: false
+            const originalText = btn.innerText;
+            
+            // Configuration: 5 seconds @ 20fps for speed
+            const duration = 5;
+            const fps = 20;
+            const totalFrames = duration * fps;
+            const videoEncoder = new Whammy.Video(fps);
+            
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+
+            for (let i = 0; i < totalFrames; i++) {
+                btn.innerText = `Rendering: ${Math.round((i / totalFrames) * 100)}%`;
+                
+                // Capture the frame
+                const canvas = await htmlToImage.toCanvas(target, {
+                    width: 540,
+                    height: 960,
+                    pixelRatio: 1 
                 });
-
-                const recorder = new MediaRecorder(stream, {
-                    mimeType: 'video/webm;codecs=vp9'
-                });
-
-                const chunks = [];
-                recorder.ondataavailable = e => chunks.push(e.data);
-                recorder.onstop = () => {
-                    const blob = new Blob(chunks, { type: 'video/webm' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `Promo_${document.getElementById('in-name').value}.webm`;
-                    a.click();
-
-                    // Detener todos los tracks para quitar el aviso de "grabando"
-                    stream.getTracks().forEach(track => track.stop());
-                    btn.innerText = 'Record Video (10s)';
-                };
-
-                recorder.start();
-                btn.innerText = 'Recording... (Stop when ready)';
-
-                // Auto-stop tras 10 segundos
-                setTimeout(() => {
-                    if (recorder.state === 'recording') recorder.stop();
-                }, 10000);
-
-            } catch (err) {
-                console.error("Recording error:", err);
-                alert("Please allow screen capture to record the video.");
+                
+                videoEncoder.add(canvas);
+                // Tiny delay to allow UI to breathe
+                await new Promise(r => setTimeout(r, 10));
             }
+
+            btn.innerText = 'Finalizing Video...';
+            const output = videoEncoder.compile();
+            const url = URL.createObjectURL(output);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Promo_${document.getElementById('in-name').value}.webm`;
+            a.click();
+
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.innerText = originalText;
         }
 
         function downloadPromo() {
             const target = document.getElementById('promo-story');
             const btn = document.querySelector('.btn-download');
             const originalText = btn.innerText;
-            btn.innerText = 'Generating...';
+            btn.innerText = 'Capturing...';
 
-            // Pre-capture: reset scroll to avoid shifts
-            window.scrollTo(0, 0);
-
-            html2canvas(target, {
-                scale: 2,
+            htmlToImage.toPng(target, {
+                pixelRatio: 2,
                 backgroundColor: '#000',
-                logging: false,
-                useCORS: true,
-                allowTaint: true,
-                scrollX: 0,
-                scrollY: -window.scrollY,
-                windowWidth: document.documentElement.offsetWidth,
-                windowHeight: document.documentElement.offsetHeight
-            }).then(canvas => {
+            }).then(dataUrl => {
                 const link = document.createElement('a');
                 link.download = `Promo_${document.getElementById('in-name').value}.png`;
-                link.href = canvas.toDataURL('image/png');
+                link.href = dataUrl;
                 link.click();
                 btn.innerText = originalText;
             }).catch(err => {
