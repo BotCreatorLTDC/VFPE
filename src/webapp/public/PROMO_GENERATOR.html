@@ -544,8 +544,9 @@
                     currentX += 200;
                 });
 
-                videoEncoder.add(ctx);
-                await new Promise(r => setTimeout(r, 5));
+                videoEncoder.add(exportCanvas.toDataURL('image/webp', 0.8));
+                // Tiny delay to allow UI to breathe
+                await new Promise(r => setTimeout(r, 20));
             }
 
             btn.innerText = 'Finalizing...';
