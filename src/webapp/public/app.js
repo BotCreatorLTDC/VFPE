@@ -489,6 +489,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = Object.fromEntries(new FormData(applyForm).entries());
         if (!data.telegram_username.startsWith('@')) data.telegram_username = '@' + data.telegram_username;
         data.tg_user_id = tgUserId || null;
+        // Collect service tags from checkboxes
+        data.service_tags = [...document.querySelectorAll('.apply-tag:checked')].map(cb => cb.value);
         try {
             const res = await fetch('/api/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             const result = await res.json();
@@ -519,15 +521,31 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit-name-display').value  = club.name;
             document.getElementById('edit-instagram').value     = club.instagram || '';
             document.getElementById('edit-description').value   = club.description || '';
+            // Populate service tag checkboxes
+            const clubTags = Array.isArray(club.service_tags) ? club.service_tags : [];
+            ['delivery', 'meetup', 'postal'].forEach(tag => {
+                const cb = document.getElementById(`owner-tag-${tag}`);
+                if (cb) cb.checked = clubTags.includes(tag);
+            });
             document.getElementById('edit-modal').style.display = 'block';
         };
         document.getElementById('close-edit').onclick = () => { document.getElementById('edit-modal').style.display = 'none'; };
         document.getElementById('edit-form').onsubmit = async e => {
             e.preventDefault();
             const fd = new FormData(document.getElementById('edit-form'));
+            const selectedTags = ['delivery', 'meetup', 'postal'].filter(t => {
+                const cb = document.getElementById(`owner-tag-${t}`);
+                return cb && cb.checked;
+            });
             const res = await fetch('/api/my-club/update', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: fd.get('id'), username: tgUsername, instagram: fd.get('instagram'), description: fd.get('description') })
+                body: JSON.stringify({
+                    id: fd.get('id'),
+                    username: tgUsername,
+                    instagram: fd.get('instagram'),
+                    description: fd.get('description'),
+                    service_tags: selectedTags
+                })
             });
             if (res.ok) { document.getElementById('edit-modal').style.display = 'none'; fetchClubs(); }
             else alert('Failed to update plug.');

@@ -131,16 +131,17 @@ app.post('/api/clubs/:id/like', async (req, res) => {
 });
 
 app.post('/api/verify', async (req, res) => {
-    const { name, city, country, telegram_username, instagram, description, tg_user_id } = req.body;
+    const { name, city, country, telegram_username, instagram, description, tg_user_id, service_tags } = req.body;
     if (!name || !city || !country || !telegram_username) return res.status(400).json({ error: "Missing fields" });
     
     const COUNTRY_CODE_MAP = { 'Spain': 'ES', 'España': 'ES', 'Germany': 'DE', 'Netherlands': 'NL' };
     const normalizedCountry = COUNTRY_CODE_MAP[country] || country.toUpperCase().slice(0, 2);
+    const tagsArray = Array.isArray(service_tags) ? service_tags : [];
 
     try {
         await query(
-            "INSERT INTO clubs (name, city, country, telegram_username, instagram, description, status, tg_user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-            [name, city, normalizedCountry, telegram_username, instagram || null, description || null, 'pending', tg_user_id || null]
+            "INSERT INTO clubs (name, city, country, telegram_username, instagram, description, status, tg_user_id, service_tags) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+            [name, city, normalizedCountry, telegram_username, instagram || null, description || null, 'pending', tg_user_id || null, tagsArray]
         );
         res.json({ success: true });
     } catch (err) {
@@ -187,9 +188,8 @@ app.get('/api/my-club', async (req, res) => {
 
 // UPDATE my club data
 app.post('/api/my-club/update', async (req, res) => {
-    const { id, username, instagram, description, event_message } = req.body;
+    const { id, username, instagram, description, event_message, service_tags } = req.body;
     
-    // Security: Check if the username matches the club's owner
     const tgUser = username.startsWith('@') ? username : `@${username}`;
     
     try {
@@ -197,6 +197,7 @@ app.post('/api/my-club/update', async (req, res) => {
         if (check.rows.length === 0) return res.status(403).json({ error: "Unauthorized" });
 
         const club = check.rows[0];
+        const tagsArray = Array.isArray(service_tags) ? service_tags : [];
         
         // SECURITY: Only allow announcements for Advanced plan
         if (event_message && event_message.trim() !== '') {
@@ -204,13 +205,13 @@ app.post('/api/my-club/update', async (req, res) => {
                 return res.status(403).json({ error: "Feature reserved for Advanced plans" });
             }
             await query(
-                "UPDATE clubs SET instagram = $1, description = $2, event_message = $3, event_expires_at = CURRENT_TIMESTAMP + interval '24 hours' WHERE id = $4",
-                [instagram || null, description || null, event_message.substring(0, 50), id]
+                "UPDATE clubs SET instagram = $1, description = $2, event_message = $3, event_expires_at = CURRENT_TIMESTAMP + interval '24 hours', service_tags = $5 WHERE id = $4",
+                [instagram || null, description || null, event_message.substring(0, 50), id, tagsArray]
             );
         } else {
             await query(
-                "UPDATE clubs SET instagram = $1, description = $2, event_message = NULL, event_expires_at = NULL WHERE id = $3",
-                [instagram || null, description || null, id]
+                "UPDATE clubs SET instagram = $1, description = $2, event_message = NULL, event_expires_at = NULL, service_tags = $4 WHERE id = $3",
+                [instagram || null, description || null, id, tagsArray]
             );
         }
         

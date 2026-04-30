@@ -143,6 +143,14 @@
                 <input type="text" name="telegram_username" placeholder="Telegram @username" required>
                 <input type="text" name="instagram" placeholder="Instagram @username (optional)">
                 <textarea name="description" placeholder="Brief description (max 200 chars)" maxlength="200"></textarea>
+                <div style="margin-bottom:15px;">
+                    <p style="font-size:0.75rem; color:#00d26a; margin-bottom:8px; font-weight:700;">🏷 Service Type <span style="color:#555; font-weight:400;">(optional)</span></p>
+                    <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                        <label style="display:flex;align-items:center;gap:6px;font-size:0.9rem;cursor:pointer;"><input type="checkbox" class="apply-tag" value="delivery"> 🚚 Delivery</label>
+                        <label style="display:flex;align-items:center;gap:6px;font-size:0.9rem;cursor:pointer;"><input type="checkbox" class="apply-tag" value="meetup"> 🤝 Meetup</label>
+                        <label style="display:flex;align-items:center;gap:6px;font-size:0.9rem;cursor:pointer;"><input type="checkbox" class="apply-tag" value="postal"> 📬 Postal</label>
+                    </div>
+                </div>
                 <p class="disclaimer">⚠️ VFPE is a directory platform. We do not sell, distribute, or facilitate the acquisition of any substance. All plugs operate under local laws.</p>
                 <button type="submit">Submit Verification Request</button>
             </form>
@@ -163,6 +171,12 @@
                 <input type="text" name="instagram" id="edit-instagram" placeholder="@yourplug">
                 <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">Plug Description</label>
                 <textarea name="description" id="edit-description" placeholder="Update description..." maxlength="200"></textarea>
+                <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 8px;">🏷 Service Tags</label>
+                <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:15px; padding:12px; background:#111; border-radius:10px; border:1px solid #2a2a2a;">
+                    <label style="display:flex;align-items:center;gap:6px;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="owner-tag-delivery" value="delivery"> 🚚 Delivery</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="owner-tag-meetup" value="meetup"> 🤝 Meetup</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:0.9rem;cursor:pointer;"><input type="checkbox" id="owner-tag-postal" value="postal"> 📬 Postal</label>
+                </div>
                 <button type="submit">Save Changes</button>
             </form>
         </div>
