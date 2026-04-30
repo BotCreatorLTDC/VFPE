@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFPE v2 - Brand Presentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root { --primary: #00d26a; --premium: #FFD700; --bg: #000; --slide-w: 1080px; --slide-h: 1350px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #111; color: #fff; font-family: 'Outfit', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px 0; }
+        
+        .controls { margin-bottom: 20px; display: flex; gap: 15px; position: sticky; top: 20px; z-index: 1000; background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 50px; backdrop-filter: blur(10px); }
+        .btn { background: var(--primary); color: #000; border: none; padding: 10px 20px; border-radius: 20px; font-weight: 700; cursor: pointer; font-size: 0.9rem; transition: transform 0.2s; }
+        .btn:hover { transform: scale(1.05); }
+        .btn.secondary { background: #333; color: #fff; }
+
+        .slides-container { display: flex; flex-direction: column; gap: 40px; align-items: center; }
+
+        /* Slide Style (Instagram Portrait 4:5) */
+        .slide {
+            width: var(--slide-w);
+            height: var(--slide-h);
+            background: #000;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            border: 1px solid #222;
+        }
+
+        /* Branding Background Elements */
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: -20%; right: -10%;
+            width: 60%; height: 50%;
+            background: radial-gradient(circle, rgba(0,210,106,0.1) 0%, transparent 70%);
+            z-index: 1;
+        }
+
+        .slide-header {
+            padding: 60px;
+            z-index: 10;
+        }
+        .slide-header .badge {
+            background: var(--primary);
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .slide-header h2 {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(to bottom, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .slide-header p {
+            font-size: 1.4rem;
+            color: #aaa;
+            max-width: 80%;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 60px 100px;
+            z-index: 10;
+            position: relative;
+        }
+
+        /* Mockup for 9:16 Screenshot */
+        .phone-mockup {
+            width: 550px;
+            height: auto;
+            background: #222;
+            border-radius: 40px;
+            padding: 12px;
+            border: 4px solid #333;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .phone-mockup img {
+            width: 100%;
+            border-radius: 30px;
+            display: block;
+        }
+
+        .slide-footer {
+            padding: 40px 60px;
+            background: linear-gradient(to top, #0a0a0a, transparent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .footer-logo { display: flex; align-items: center; gap: 15px; }
+        .footer-logo img { width: 50px; border-radius: 10px; }
+        .footer-logo span { font-weight: 800; font-size: 1.2rem; letter-spacing: 1px; color: var(--primary); }
+        .slide-num { font-size: 1.2rem; color: #444; font-weight: 700; }
+
+        /* Special Intro Slide */
+        .slide.intro {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .intro h1 { font-size: 6rem; font-weight: 800; margin-bottom: 10px; }
+        .intro p { font-size: 1.5rem; color: var(--primary); letter-spacing: 5px; font-weight: 600; text-transform: uppercase; }
+
+        @media (max-width: 1100px) {
+            body { transform: scale(0.6); transform-origin: top center; }
+        }
+
+        /* PRINT STYLES FOR PDF */
+        @media print {
+            @page { size: portrait; margin: 0; }
+            html, body { height: 100%; background: #000 !important; }
+            .controls { display: none !important; }
+            .btn.secondary { display: none !important; }
+            .slides-container { display: block !important; gap: 0 !important; }
+            .slide { 
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                page-break-after: always !important; 
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                box-shadow: none !important; 
+                border: none !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #000 !important;
+                -webkit-print-color-adjust: exact;
+            }
+            .slide-header { padding: 40px 60px 20px !important; }
+            .slide-header h2 { font-size: 3rem !important; }
+            .slide-content { padding: 0 60px 40px !important; }
+            .phone-mockup { width: 450px !important; }
+            .slide-footer { padding: 20px 60px !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <span style="color:#888; font-size:0.8rem; align-self:center; margin-right:10px;">INSTAGRAM POST GENERATOR (4:5)</span>
+        <button class="btn" onclick="downloadAll()">Download All Images</button>
+        <button class="btn" style="background:#00d26a; color:#000;" onclick="window.print()">Print to PDF (Recommended ✅)</button>
+        <button class="btn" style="background:#333; color:#fff; font-size:0.7rem;" onclick="downloadPDF()">Script PDF (Fallback)</button>
+    </div>
+
+    <div class="slides-container" id="all-slides">
+        
+        <!-- SLIDE 0: INTRO -->
+        <div class="slide intro" id="slide-0">
+            <img src="assets/logo.jpg" style="width:200px; border-radius:40px; margin-bottom:40px; box-shadow: 0 0 50px rgba(0,210,106,0.3);">
+            <h1>VFPE v2</h1>
+            <p>Ecosystem Presentation</p>
+            <button class="btn secondary" style="margin-top:40px;" onclick="downloadSlide('slide-0', 'Intro')">Download this slide</button>
+        </div>
+
+        <!-- SLIDE 1: MAIN GRID -->
+        <div class="slide" id="slide-1">
+            <div class="slide-header">
+                <span class="badge">Visual Redesign</span>
+                <h2>Seamless Discovery</h2>
+                <p>A mobile-first directory designed for speed and trust. Verified labels and intuitive filtering.</p>
+            </div>
+            <div class="slide-content">
+                <div class="phone-mockup">
+                    <img src="assets/guia/main-grid.png">
+                </div>
+            </div>
+            <div class="slide-footer">
+                <div class="footer-logo"><img src="assets/logo.jpg"><span>VFPE</span></div>
+                <button class="btn secondary" onclick="downloadSlide('slide-1', 'Directory')">Download Slide</button>
+                <div class="slide-num">01 / 10</div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: DETAIL TOP -->
+        <div class="slide" id="slide-2">
+            <div class="slide-header">
+                <span class="badge">Brand Identity</span>
+                <h2>Premium Hero View</h2>
+                <p>Clubs stand out with immersive photography, real-time stats, and direct contact buttons.</p>
+            </div>
+            <div class="slide-content">
+                <div class="phone-mockup">
+                    <img src="assets/guia/club-detail-top.png">
+                </div>
+            </div>
+            <div class="slide-footer">
+                <div class="footer-logo"><img src="assets/logo.jpg"><span>VFPE</span></div>
+                <button class="btn secondary" onclick="downloadSlide('slide-2', 'Hero')">Download Slide</button>
+                <div class="slide-num">02 / 10</div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: DETAIL BOTTOM (REVIEWS) -->
+        <div class="slide" id="slide-3">
+            <div class="slide-header">
+                <span class="badge">Social Proof</span>
+                <h2>Verified Reviews</h2>
+                <p>Real feedback from the community. A transparent star-rating system to build immediate trust.</p>
+            </div>
+            <div class="slide-content">
+                <div class="phone-mockup">
+                    <img src="assets/guia/club-detail-bottom.png">
+                </div>
+            </div>
+            <div class="slide-footer">
+                <div class="footer-logo"><img src="assets/logo.jpg"><span>VFPE</span></div>
+                <button class="btn secondary" onclick="downloadSlide('slide-3', 'Reviews')">Download Slide</button>
+                <div class="slide-num">03 / 10</div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: SAFETY -->
+        <div class="slide" id="slide-4">
+            <div class="slide-header">
+                <span class="badge">Security</span>
+                <h2>Reporting System</h2>
+                <p>Empowering users to flag issues. Proactive moderation ensures a safe and active marketplace.</p>
+            </div>
+            <div class="slide-content">
+                <div class="phone-mockup">
+                    <img src="assets/guia/report-modal.png">
+                </div>
+            </div>
+            <div class="slide-footer">
+                <div class="footer-logo"><img src="assets/logo.jpg"><span>VFPE</span></div>
+                <button class="btn secondary" onclick="downloadSlide('slide-4', 'Safety')">Download Slide</button>
+                <div class="slide-num">04 / 10</div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: ANALYTICS -->
+        <div class="slide" id="slide-5">
+            <div class="slide-header">
+                <span class="badge">Owner Value</span>
+                <h2>Real-time Analytics</h2>
+                <p>Owners track their success with live data on Profile Views, Telegram Clicks, and Likes.</p>
+            </div>
+            <div class="slide-content">
+                <div class="phone-mockup">
+                    <img src="assets/guia/manage-my-plug.png">
+                </div>
+            </div>
+            <div class="slide-footer">
+                <div class="footer-logo"><img src="assets/logo.jpg"><span>VFPE</span></div>
+                <button class="btn secondary" onclick="downloadSlide('slide-5', 'Analytics')">Download Slide</button>
+                <div class="slide-num">05 / 10</div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: APPLY FORM -->
+        <div class="slide" id="slide-6">
+            <div class="slide-header">
+                <span class="badge">Onboarding</span>
+                <h2>Easy Application</h2>
+                <p>Seamless registration for new plugs. Geolocation and media upload in a simple 2-minute flow.</p>
+            </div>
+            <div class="slide-content">
+                <div class="phone-mockup">
+                    <img src="assets/guia/formulario-solicitud-plugs.png">
+                </div>
+            </div>
+            <div class="slide-footer">
+                <div class="footer-logo"><img src="assets/logo.jpg"><span>VFPE</span></div>
+                <button class="btn secondary" onclick="downloadSlide('slide-6', 'Onboarding')">Download Slide</button>
+                <div class="slide-num">06 / 10</div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: PLANS -->
+        <div class="slide" id="slide-7">
+            <div class="slide-header">
+                <span class="badge">Monetization</span>
+                <h2>Service Tiers</h2>
+                <p>Multiple plans (Basic, PRO, Advanced) tailored to club needs and marketing budgets.</p>
+            </div>
+            <div class="slide-content">
+                <div class="phone-mockup">
+                    <img src="assets/guia/pestaña-de-planes.png">
+                </div>
+            </div>
+            <div class="slide-footer">
+                <div class="footer-logo"><img src="assets/logo.jpg"><span>VFPE</span></div>
+                <button class="btn secondary" onclick="downloadSlide('slide-7', 'Plans')">Download Slide</button>
+                <div class="slide-num">07 / 10</div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: ADMIN HQ -->
+        <div class="slide" id="slide-8">
+            <div class="slide-header">
+                <span class="badge">Management</span>
+                <h2>HQ Control Center</h2>
+                <p>The Admin Dashboard. Managing payments, approvals, and reports from any mobile device.</p>
+            </div>
+            <div class="slide-content">
+                <div class="phone-mockup">
+                    <img src="assets/guia/admin-home.png">
+                </div>
+            </div>
+            <div class="slide-footer">
+                <div class="footer-logo"><img src="assets/logo.jpg"><span>VFPE</span></div>
+                <button class="btn secondary" onclick="downloadSlide('slide-8', 'Admin')">Download Slide</button>
+                <div class="slide-num">08 / 10</div>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: ADMIN EDIT -->
+        <div class="slide" id="slide-9">
+            <div class="slide-header">
+                <span class="badge">Moderation</span>
+                <h2>Data Precision</h2>
+                <p>Administrators can fine-tune every plug's data, ensuring high-quality content across the board.</p>
+            </div>
+            <div class="slide-content">
+                <div class="phone-mockup">
+                    <img src="assets/guia/admin-edit.png">
+                </div>
+            </div>
+            <div class="slide-footer">
+                <div class="footer-logo"><img src="assets/logo.jpg"><span>VFPE</span></div>
+                <button class="btn secondary" onclick="downloadSlide('slide-9', 'Moderation')">Download Slide</button>
+                <div class="slide-num">09 / 10</div>
+            </div>
+        </div>
+
+        <!-- SLIDE 10: BOT SYNERGY -->
+        <div class="slide" id="slide-10">
+            <div class="slide-header">
+                <span class="badge">Ecosystem</span>
+                <h2>Full Bot Synergy</h2>
+                <p>Integrated Telegram bots for notifications, automated group moderation, and instant support.</p>
+            </div>
+            <div class="slide-content">
+                <div class="phone-mockup">
+                    <img src="assets/guia/bot-message.png">
+                </div>
+            </div>
+            <div class="slide-footer">
+                <div class="footer-logo"><img src="assets/logo.jpg"><span>VFPE</span></div>
+                <button class="btn secondary" onclick="downloadSlide('slide-10', 'Ecosystem')">Download Slide</button>
+                <div class="slide-num">10 / 10</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function downloadSlide(id, name) {
+            const slide = document.getElementById(id);
+            // Hide the download button during capture
+            const btn = slide.querySelector('.btn.secondary');
+            if(btn) btn.style.visibility = 'hidden';
+
+            html2canvas(slide, {
+                scale: 1, // High res
+                backgroundColor: '#000',
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `VFPE_Slide_${name}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                if(btn) btn.style.visibility = 'visible';
+            });
+        }
+
+        async function downloadAll() {
+            const slides = document.querySelectorAll('.slide');
+            for (let i = 0; i < slides.length; i++) {
+                const name = slides[i].id.replace('slide-', '');
+                downloadSlide(slides[i].id, name);
+                // Tiny delay to avoid browser blocking multiple downloads
+                await new Promise(r => setTimeout(r, 1000));
+            }
+        }
+
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'px',
+                format: [1080, 1350]
+            });
+
+            const slides = document.querySelectorAll('.slide');
+            
+            // Show status
+            const btn = document.querySelector('button[onclick="downloadPDF()"]');
+            const originalText = btn.innerText;
+            btn.innerText = 'Generating PDF...';
+
+            for (let i = 0; i < slides.length; i++) {
+                const slide = slides[i];
+                // Hide download buttons inside slides
+                const sBtn = slide.querySelector('.btn.secondary');
+                if(sBtn) sBtn.style.visibility = 'hidden';
+
+                const canvas = await html2canvas(slide, { scale: 1, backgroundColor: '#000', useCORS: true });
+                const imgData = canvas.toDataURL('image/jpeg', 0.85); // Compress a bit for PDF
+
+                if (i > 0) doc.addPage([1080, 1350], 'portrait');
+                doc.addImage(imgData, 'JPEG', 0, 0, 1080, 1350);
+
+                if(sBtn) sBtn.style.visibility = 'visible';
+            }
+
+            doc.save('VFPE_V2_Full_Presentation.pdf');
+            btn.innerText = originalText;
+        }
+    </script>
+</body>
+</html>

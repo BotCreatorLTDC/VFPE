@@ -130,6 +130,7 @@
             transform: rotate(-12deg) translateY(60px);
             z-index: 6;
             filter: brightness(0.7);
+            animation: float-back 6s ease-in-out infinite;
         }
         
         /* Teléfono Delantero (VFPE) */
@@ -138,6 +139,17 @@
             transform: rotate(10deg) translateY(-20px);
             z-index: 8;
             border: 6px solid #333;
+            animation: float-front 5s ease-in-out infinite;
+        }
+
+        @keyframes float-back {
+            0%, 100% { transform: rotate(-12deg) translateY(60px); }
+            50% { transform: rotate(-10deg) translateY(40px); }
+        }
+
+        @keyframes float-front {
+            0%, 100% { transform: rotate(10deg) translateY(-20px); }
+            50% { transform: rotate(12deg) translateY(-40px); }
         }
 
         .phone::before {
@@ -205,18 +217,20 @@
         </div>
 
         <div class="input-group">
-            <label>Background Image</label>
-            <input type="file" accept="image/*" onchange="loadFile(event, 'story-bg')">
+            <label>Background Image / Video</label>
+            <input type="file" id="bg-input" accept="image/*,video/*" onchange="loadBackground(event)">
         </div>
 
-        <button class="btn-download" onclick="downloadPromo()">Download IG Story</button>
+        <button class="btn-download" onclick="downloadPromo()">Download PNG</button>
+        <button class="btn-download" id="btn-video" style="background:#fff; margin-top:10px;" onclick="startRecording()">Record Video (10s)</button>
         <p style="font-size: 0.7rem; color: #666; margin-top: 15px; text-align: center;">Format: 1080x1920px (9:16)</p>
     </div>
 
     <div class="preview-area">
         <div id="promo-story">
             <!-- Background Layer -->
-            <div class="story-bg" id="story-bg" style="background-image: url('assets/fondo-plantilla.png');"></div>
+            <div class="story-bg" id="story-bg" style="display:none; background-image: url('../../../assets/fondo-plantilla.png');"></div>
+            <video id="story-video" class="story-bg" style="display:block; object-fit:cover;" src="../../../assets/renders-vid.mp4" autoplay muted loop></video>
 
             <!-- Text Content -->
             <div class="branding-header">
@@ -233,10 +247,10 @@
             <!-- Mockups Layer -->
             <div class="mockups-container">
                 <div class="phone phone-back">
-                    <img id="img-back" src="assets/guia/main-grid.png">
+                    <img id="img-back" src="../../../assets/guia/main-grid.png">
                 </div>
                 <div class="phone phone-front">
-                    <img id="img-front" src="assets/guia/club-detail-top.png">
+                    <img id="img-front" src="../../../assets/guia/club-detail-top.png">
                 </div>
             </div>
 
@@ -269,32 +283,93 @@
             container.innerHTML = selectedTags.map(t => `<span class="promo-tag-pill">${t}</span>`).join('');
         }
 
-        function loadFile(event, targetId) {
-            const output = document.getElementById(targetId);
-            if (targetId === 'story-bg') {
-                output.style.backgroundImage = `url(${URL.createObjectURL(event.target.files[0])})`;
+        function loadBackground(event) {
+            const file = event.target.files[0];
+            const url = URL.createObjectURL(file);
+            const imgBg = document.getElementById('story-bg');
+            const videoBg = document.getElementById('story-video');
+
+            if (file.type.startsWith('video')) {
+                imgBg.style.display = 'none';
+                videoBg.style.display = 'block';
+                videoBg.src = url;
             } else {
-                output.src = URL.createObjectURL(event.target.files[0]);
+                imgBg.style.display = 'block';
+                videoBg.style.display = 'none';
+                imgBg.style.backgroundImage = `url(${url})`;
+            }
+        }
+
+        async function startRecording() {
+            const btn = document.getElementById('btn-video');
+            try {
+                // Capturar el stream de la pestaña (el usuario debe seleccionar esta pestaña)
+                const stream = await navigator.mediaDevices.getDisplayMedia({
+                    video: { frameRate: 60, width: 1080, height: 1920 },
+                    audio: false
+                });
+
+                const recorder = new MediaRecorder(stream, {
+                    mimeType: 'video/webm;codecs=vp9'
+                });
+
+                const chunks = [];
+                recorder.ondataavailable = e => chunks.push(e.data);
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Promo_${document.getElementById('in-name').value}.webm`;
+                    a.click();
+                    
+                    // Detener todos los tracks para quitar el aviso de "grabando"
+                    stream.getTracks().forEach(track => track.stop());
+                    btn.innerText = 'Record Video (10s)';
+                };
+
+                recorder.start();
+                btn.innerText = 'Recording... (Stop when ready)';
+
+                // Auto-stop tras 10 segundos
+                setTimeout(() => {
+                    if (recorder.state === 'recording') recorder.stop();
+                }, 10000);
+
+            } catch (err) {
+                console.error("Recording error:", err);
+                alert("Please allow screen capture to record the video.");
             }
         }
 
         function downloadPromo() {
             const target = document.getElementById('promo-story');
             const btn = document.querySelector('.btn-download');
+            const originalText = btn.innerText;
             btn.innerText = 'Generating...';
 
-            // Escalar para exportación real (x2 para llegar a 1080x1920)
+            // Pre-capture: reset scroll to avoid shifts
+            window.scrollTo(0, 0);
+
             html2canvas(target, {
                 scale: 2,
                 backgroundColor: '#000',
                 logging: false,
-                useCORS: true
+                useCORS: true,
+                allowTaint: true,
+                scrollX: 0,
+                scrollY: -window.scrollY,
+                windowWidth: document.documentElement.offsetWidth,
+                windowHeight: document.documentElement.offsetHeight
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `Promo_${document.getElementById('in-name').value}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-                btn.innerText = 'Download IG Story';
+                btn.innerText = originalText;
+            }).catch(err => {
+                console.error("Capture error:", err);
+                btn.innerText = 'Error! Try again';
             });
         }
     </script>
