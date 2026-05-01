@@ -443,6 +443,13 @@
             container.innerHTML = selectedTags.map(t => `<span class="promo-tag-pill">${t}</span>`).join('');
         }
 
+        function loadFile(event, targetId) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById(targetId).src = URL.createObjectURL(file);
+            }
+        }
+
         function loadBackground(event) {
             const file = event.target.files[0];
             const url = URL.createObjectURL(file);
