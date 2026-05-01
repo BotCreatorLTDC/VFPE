@@ -289,7 +289,7 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
                 const priceMap = { 'Basic': '50€', 'PRO': '80€', 'Advanced': '100€' };
                 const priceStr = priceMap[club.selected_plan] || '50€';
                 
-                const message = `¡Enhorabuena! Tu solicitud para el club *${club.name}* ha sido pre-aprobada para el *${planStr}*.\n\nPara proceder a la publicación oficial en el directorio, por favor realiza el pago de *${priceStr}* a la siguiente billetera de criptomonedas (USDT TRC20):\n\n\`[TU_BILLETERA_AQUI]\`\n\nUna vez confirmado el pago, tu club será publicado de inmediato.`;
+                const message = `¡Enhorabuena! Tu solicitud para el club *${club.name}* ha sido pre-aprobada para el *${planStr}*.\n\nPara proceder a la publicación oficial en el directorio, por favor realiza el pago de *${priceStr}* a la siguiente billetera de criptomonedas (USDT TRC20):\n\n\`TQsvr5gU8qRB6zsBFdKKppJyrZaS8qa8tk\`\n\nUna vez confirmado el pago, tu club será publicado de inmediato.`;
                 
                 await axios.post(`https://api.telegram.org/bot${process.env.MAIN_BOT_TOKEN}/sendMessage`, {
                     chat_id: club.tg_user_id,
