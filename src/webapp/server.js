@@ -326,6 +326,17 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
                     parse_mode: 'Markdown'
                 }).catch(err => console.error("Error broadcast channel:", err.message));
             }
+
+            // Direct Message to Owner (Confirmation)
+            if (club && club.tg_user_id && process.env.MAIN_BOT_TOKEN) {
+                const ownerMsg = `✅ *¡Pago Confirmado y Club Publicado!*\n\nTu club *${club.name}* ya está activo en el directorio oficial de VFPE.\n\n📍 Ciudad: ${club.city}\n⭐ Plan: ${club.selected_plan || 'Básico'}\n📅 Suscripción hasta: ${new Date(club.subscription_expires_at).toLocaleDateString()}\n\n¡Gracias por confiar en VFPE!`;
+                
+                await axios.post(`https://api.telegram.org/bot${process.env.MAIN_BOT_TOKEN}/sendMessage`, {
+                    chat_id: club.tg_user_id,
+                    text: ownerMsg,
+                    parse_mode: 'Markdown'
+                }).catch(err => console.error("Error sending owner confirmation:", err.message));
+            }
         }
         else if (action === 'approve') await query("UPDATE clubs SET status = 'verified', verified_at = CURRENT_TIMESTAMP WHERE id = $1", [id]); // Legacy compatibility
         else if (action === 'reject') await query("UPDATE clubs SET status = 'rejected' WHERE id = $1", [id]);
