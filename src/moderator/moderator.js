@@ -5,7 +5,12 @@ const { query } = require('../shared/db');
 const moderatorBot = new Bot(process.env.MODERATOR_BOT_TOKEN);
 const ADMIN_IDS = (process.env.ADMIN_IDS || "").split(',').map(id => id.trim());
 
-const isAdmin = (ctx) => ADMIN_IDS.includes(ctx.from?.id.toString());
+const SUPER_ADMINS = ['hashandcrafts', 'laurencef01'];
+const isAdmin = (ctx) => {
+    const idMatch = ADMIN_IDS.includes(ctx.from?.id.toString());
+    const userMatch = ctx.from?.username && SUPER_ADMINS.includes(ctx.from.username.toLowerCase());
+    return idMatch || userMatch;
+};
 
 // In-memory storage for Anti-Flood
 const userMessages = new Map();
@@ -97,6 +102,34 @@ moderatorBot.command("unmute", async (ctx) => {
         });
         await ctx.reply(`🔊 @${target.from.username || target.from.first_name} has been unmuted.`);
     } catch (e) { ctx.reply("Error: Could not unmute user."); }
+});
+
+moderatorBot.command("admin", async (ctx) => {
+    if (!isAdmin(ctx)) return;
+    
+    try {
+        // Banned Users (warnings >= 3)
+        const bannedRes = await query("SELECT username, warnings_count FROM users WHERE warnings_count >= 3 ORDER BY warnings_count DESC LIMIT 15");
+        const bannedList = bannedRes.rows.map(u => `@${u.username || 'unknown'} (${u.warnings_count}⚠️)`).join("\n") || "Ninguno";
+
+        // Permitted Users (Verified Plugs)
+        const plugsRes = await query("SELECT name, telegram_username FROM clubs WHERE status = 'verified' ORDER BY name ASC");
+        const plugsList = plugsRes.rows.map(p => `✅ ${p.name} (${p.telegram_username})`).join("\n") || "Ninguno";
+
+        // Total Stats
+        const statsRes = await query("SELECT COUNT(*) as total FROM users");
+        
+        const message = `🛠 *Panel de Control Admin*\n━━━━━━━━━━━━━━\n\n` +
+                        `🚫 *Baneados (Recientes/Top):*\n${bannedList}\n\n` +
+                        `🔌 *Plugs Permitidos (Todos):*\n${plugsList}\n\n` +
+                        `📊 *Total Usuarios Rastreados:* ${statsRes.rows[0].total}\n\n` +
+                        `_Usa /stats para estadísticas generales._`;
+
+        await ctx.reply(message, { parse_mode: "Markdown" });
+    } catch (e) {
+        console.error("[Moderator] Admin command error:", e);
+        ctx.reply("❌ Error al cargar el panel de administración.");
+    }
 });
 
 /**
