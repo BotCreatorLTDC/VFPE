@@ -154,7 +154,7 @@
 
         /* Branding Text */
         .branding-header {
-            margin-top: 100px;
+            margin-top: 160px;
             text-align: center;
             z-index: 10;
             padding: 0 40px;
@@ -238,7 +238,7 @@
         /* Doble Mockup de iPhones */
         .mockups-container {
             position: absolute;
-            bottom: 40px;
+            bottom: 20px;
             width: 100%;
             height: 600px;
             z-index: 5;
@@ -322,7 +322,7 @@
 
         .footer-logo {
             position: absolute;
-            bottom: 40px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 20;
@@ -531,23 +531,23 @@
                 
                 // Name
                 ctx.font = '800 80px Outfit';
-                ctx.fillText(clubName + ' ✔️', 540, 250);
+                ctx.fillText(clubName + ' ✔️', 540, 310);
                 
                 // Welcome
                 ctx.font = '600 60px Outfit';
-                ctx.fillText(welcomeMsg, 540, 360);
+                ctx.fillText(welcomeMsg, 540, 420);
 
                 // City
                 ctx.font = '400 40px Outfit';
                 ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                ctx.fillText('📍 ' + city, 540, 450);
+                ctx.fillText('📍 ' + city, 540, 510);
 
                 // Tags
                 let currentX = 540 - (selectedTags.length * 100);
                 selectedTags.forEach(tag => {
                     ctx.fillStyle = '#00d26a';
                     ctx.font = '800 30px Outfit';
-                    ctx.fillText(tag.toUpperCase(), currentX, 550);
+                    ctx.fillText(tag.toUpperCase(), currentX, 610);
                     currentX += 200;
                 });
 

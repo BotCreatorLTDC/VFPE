@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFPE - Ecosystem Evolution 2024</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700&display=swap');
+        
+        :root {
+            --primary: #00d26a;
+            --primary-glow: rgba(0, 210, 106, 0.4);
+            --secondary: #1a1a1a;
+            --accent: #FFD700;
+            --bg: #050505;
+            --text: #ffffff;
+            --text-muted: #8e8e93;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 { font-family: 'Outfit', 'Inter', sans-serif; font-weight: 700; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* Utils */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            background: var(--bg);
+        }
+        
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: url('assets/presentacion/hero_bg.png') no-repeat center center/cover;
+            opacity: 0.6;
+        }
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, var(--bg) 100%);
+        }
+
+        .hero-content { position: relative; z-index: 10; opacity: 0; transform: translateY(30px); animation: fadeInUp 1s forwards; }
+        .hero img { width: 140px; margin-bottom: 30px; filter: drop-shadow(0 0 20px var(--primary-glow)); }
+        .hero h1 { font-size: 5rem; margin-bottom: 10px; letter-spacing: -2px; line-height: 1.1; }
+        .hero p { font-size: 1.4rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+
+        /* Section Layout */
+        .section { padding: 120px 0; position: relative; }
+        .section-header { margin-bottom: 80px; text-align: center; }
+        .section-header span { color: var(--primary); font-weight: 800; font-size: 0.9rem; letter-spacing: 4px; text-transform: uppercase; }
+        .section-header h2 { font-size: 3.5rem; margin-top: 10px; }
+
+        /* Feature Grid */
+        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-bottom: 100px; }
+        .feature-text h3 { font-size: 2.5rem; color: var(--primary); margin-bottom: 20px; }
+        .feature-text p { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 30px; }
+        .feature-list { list-style: none; }
+        .feature-list li { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-weight: 500; }
+        .feature-list li svg { color: var(--primary); width: 20px; height: 20px; flex-shrink: 0; }
+
+        .mockup-wrapper {
+            position: relative;
+            border-radius: 40px;
+            padding: 10px;
+            background: linear-gradient(135deg, #333, #111);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+        }
+        .mockup-wrapper img { width: 100%; border-radius: 30px; display: block; }
+
+        /* Component Cards */
+        .components-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .comp-card {
+            text-align: left;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .comp-card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 20px 40px rgba(0, 210, 106, 0.1); }
+        .comp-icon { 
+            width: 60px; height: 60px; background: var(--primary-glow); 
+            border-radius: 16px; display: flex; align-items: center; 
+            justify-content: center; margin-bottom: 25px; color: var(--primary);
+        }
+        .comp-icon svg { width: 32px; height: 32px; }
+
+        /* Pricing Table */
+        .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .price-card {
+            position: relative;
+            padding: 40px;
+            overflow: hidden;
+        }
+        .price-card.featured { border-color: var(--accent); }
+        .price-card.featured::after {
+            content: 'MÁS POPULAR';
+            position: absolute; top: 20px; right: -30px;
+            background: var(--accent); color: #000;
+            padding: 5px 40px; font-size: 0.7rem; font-weight: 800;
+            transform: rotate(45deg);
+        }
+        .price-header h4 { font-size: 1.5rem; margin-bottom: 10px; }
+        .price-header .amount { font-size: 3rem; font-weight: 800; }
+        .price-header .amount span { font-size: 1rem; color: var(--text-muted); }
+        .price-features { margin: 30px 0; list-style: none; }
+        .price-features li { margin-bottom: 12px; font-size: 0.95rem; color: var(--text-muted); display: flex; align-items: center; }
+        .price-features li svg { color: var(--primary); margin-right: 10px; width: 18px; height: 18px; flex-shrink: 0; }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero h1 { font-size: 3.5rem; }
+            .feature-grid, .components-grid, .pricing-grid { grid-template-columns: 1fr; }
+            .feature-grid:nth-child(even) { direction: ltr; }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <img src="assets/logo.jpg" alt="VFPE Logo">
+            <h1 class="gradient-text">ECOSISTEMA VFPE</h1>
+            <p>La Plataforma Premium de Directorios Verificados y Moderación Segura en Europa.</p>
+            <div style="margin-top: 40px;">
+                <button onclick="scrollToVision()" class="glass-card" style="padding: 15px 30px; text-decoration: none; color: var(--primary); font-weight: 800; display: inline-flex; align-items: center; gap: 10px; border-radius: 50px; cursor: pointer; border: 1px solid var(--glass-border);">
+                    EXPLORAR EL FUTURO 
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="vision">
+        <div class="container">
+            <div class="section-header reveal">
+                <span>Soluciones Integradas</span>
+                <h2>Tres Pilares de Excelencia</h2>
+            </div>
+            
+            <div class="components-grid">
+                <div class="glass-card comp-card reveal">
+                    <div class="comp-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+                    </div>
+                    <h3>Mini App</h3>
+                    <p style="color: var(--text-muted);">Descubrimiento en mapa interactivo con verificación en tiempo real y gestión de perfiles.</p>
+                </div>
+                <div class="glass-card comp-card reveal">
+                    <div class="comp-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                    </div>
+                    <h3>Bot Moderador</h3>
+                    <p style="color: var(--text-muted);">Guardián inteligente que asegura un entorno libre de estafas mediante anti-flood y filtrado.</p>
+                </div>
+                <div class="glass-card comp-card reveal">
+                    <div class="comp-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                    </div>
+                    <h3>Admin HQ</h3>
+                    <p style="color: var(--text-muted);">Analíticas en tiempo real y flujo de aprobación para operaciones comerciales fluidas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 1: MINI APP -->
+    <section class="section">
+        <div class="container">
+            <div class="feature-grid">
+                <div class="feature-text reveal">
+                    <span>Interfaz de Descubrimiento</span>
+                    <h3>El Mundo en tu Mapa</h3>
+                    <p>VFPE utiliza geolocalización de alto rendimiento para conectar usuarios con plugs verificados en España, Alemania y Holanda.</p>
+                    <ul class="feature-list">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                            Clusters de ciudades y función "Cerca de mí"
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                            Insignia de confianza por verificación manual
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                            Sistema integrado de Reseñas y Valoraciones
+                        </li>
+                    </ul>
+                </div>
+                <div class="mockup-wrapper reveal">
+                    <img src="assets/presentacion/pagina-principal-miniapp.jpg" alt="Mini App Map">
+                </div>
+            </div>
+
+            <div class="feature-grid" style="direction: rtl;">
+                <div class="feature-text reveal" style="direction: ltr;">
+                    <span>Gestión para Plugs</span>
+                    <h3>Excelencia en Autogestión</h3>
+                    <p>Los dueños de plugs cuentan con un dashboard dedicado dentro de la propia Mini App.</p>
+                    <ul class="feature-list">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                            Estadísticas en vivo (Vistas/Clics)
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                            Anuncios de eventos instantáneos (24h)
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Personalización de perfil en tiempo real
+                        </li>
+                    </ul>
+                </div>
+                <div class="mockup-wrapper reveal">
+                    <img src="assets/presentacion/club-promocionado-y-ajustes-manage-my-club-visibles.jpg" alt="Owner Dashboard">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODERATOR BOT -->
+    <section class="section">
+        <div class="container">
+            <div class="feature-grid">
+                <div class="mockup-wrapper reveal">
+                    <img src="assets/presentacion/start-en-bot.jpg" alt="Bot Interface">
+                </div>
+                <div class="feature-text reveal">
+                    <span>El Guardián</span>
+                    <h3>Seguridad Impulsada por Bot</h3>
+                    <p>La comunidad está protegida por un bot moderador sofisticado que actúa como puerta de entrada y vigilancia constante.</p>
+                    <ul class="feature-list">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                            <strong>Anti-Flood:</strong> Silencio automático de 1 hora
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                            <strong>Filtrado por Keywords:</strong> Lista negra dinámica
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/><path d="m2 2 20 20"/></svg>
+                            <strong>Bloqueo Multimedia:</strong> Exclusivo para Plugs
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" x2="22" y1="8" y2="13"/><line x1="22" x2="17" y1="8" y2="13"/></svg>
+                            <strong>Sistema de Avisos:</strong> Baneo tras 3 avisos
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ADMIN PANEL -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span>Operaciones HQ</span>
+                <h2>Decisiones Basadas en Datos</h2>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-text reveal">
+                    <h3>Centro de Comando</h3>
+                    <p>Un Panel Admin mobile-first permite a los moderadores gestionar toda la plataforma desde cualquier lugar.</p>
+                    <ul class="feature-list">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                            Flujo de aprobación en dos pasos
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                            Analíticas de Top Ciudades y Top Plugs
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>
+                            Gestión de conflictos y reportes
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+                            Difusión automatizada de anuncios
+                        </li>
+                    </ul>
+                </div>
+                <div class="mockup-wrapper reveal">
+                    <img src="assets/presentacion/admin-lista-de-club-y-club-promocionado.jpg" alt="Admin Dashboard">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span>Modelo de Negocio</span>
+                <h2>Planes de Crecimiento Escalables</h2>
+            </div>
+            <div class="pricing-grid">
+                <div class="glass-card price-card reveal">
+                    <div class="price-header">
+                        <h4>Basic</h4>
+                        <div class="amount">50€<span>/30 días</span></div>
+                    </div>
+                    <ul class="price-features">
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Verificación Estándar</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Perfil con Descripción</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> 1 Enlace Redes Sociales</li>
+                        <li style="opacity: 0.3;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> Estado Premium en Mapa</li>
+                        <li style="opacity: 0.3;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> Anuncios de Eventos</li>
+                    </ul>
+                </div>
+                <div class="glass-card price-card featured reveal" style="border-color: var(--primary);">
+                    <div class="price-header">
+                        <h4>PRO</h4>
+                        <div class="amount">80€<span>/30 días</span></div>
+                    </div>
+                    <ul class="price-features">
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Verificación Prioritaria</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Todos los Enlaces Sociales</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Promo en Canal de Difusión</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Soporte Dedicado</li>
+                        <li style="opacity: 0.3;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> Anuncios de Eventos</li>
+                    </ul>
+                </div>
+                <div class="glass-card price-card reveal" style="border-color: var(--accent);">
+                    <div class="price-header">
+                        <h4 style="color: var(--accent);">Advanced</h4>
+                        <div class="amount">100€<span>/30 días</span></div>
+                    </div>
+                    <ul class="price-features">
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <strong>Estado Premium en Mapa</strong></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg> <strong>Anuncios de Eventos 24h</strong></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Soporte de Foto Personalizada</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Difusión Máxima Prioridad</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Borde Dorado Premium</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer style="padding: 100px 0; border-top: 1px solid var(--glass-border); text-align: center;">
+        <img src="assets/logo.jpg" alt="VFPE Logo" style="width: 60px; margin-bottom: 20px;">
+        <p style="color: var(--text-muted);">VFPE © 2024 — El Futuro de los Directorios Verificados.</p>
+    </footer>
+
+    <script>
+        function scrollToVision() {
+            const vision = document.getElementById('vision');
+            if (vision) vision.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>
