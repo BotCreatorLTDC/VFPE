@@ -151,13 +151,21 @@ moderatorBot.on("message", async (ctx, next) => {
         return;
     }
 
-    // Check for links and keywords using DB-loaded blacklist
-    if (ctx.message.text) {
-        const text = ctx.message.text.toLowerCase();
+    // 1. BLOCK MEDIA for non-plugs/non-admins
+    const hasMedia = ctx.message.photo || ctx.message.video || ctx.message.document || 
+                     ctx.message.sticker || ctx.message.animation || ctx.message.voice || 
+                     ctx.message.video_note || ctx.message.audio;
+
+    if (hasMedia) {
+        return handleViolation(ctx, userId, "Solo los Plugs Verificados pueden enviar archivos multimedia.");
+    }
+
+    // 2. CHECK TEXT & CAPTION for links and keywords
+    const text = (ctx.message.text || ctx.message.caption || "").toLowerCase();
+    if (text) {
         if (text.includes("t.me/") || text.includes("telegram.me/")) {
             return handleViolation(ctx, userId, "No links allowed.");
         }
-        // FIX: Use dynamicBlacklist loaded from DB
         for (const kw of dynamicBlacklist) {
             if (text.includes(kw)) return handleViolation(ctx, userId, `Forbidden keyword: ${kw}`);
         }
