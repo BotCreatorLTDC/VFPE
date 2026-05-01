@@ -104,9 +104,16 @@ moderatorBot.command("unmute", async (ctx) => {
  */
 
 moderatorBot.on("message", async (ctx, next) => {
+    const userId = ctx.from.id;
     if (isAdmin(ctx)) return next();
 
-    const userId = ctx.from.id;
+    // EXCEPTION: Check if user is a Verified Plug
+    try {
+        const plugRes = await query("SELECT id FROM clubs WHERE tg_user_id = $1 AND status = 'verified' LIMIT 1", [userId]);
+        if (plugRes.rows.length > 0) return next();
+    } catch (e) {
+        console.error('[Moderator] DB error checking plug status:', e.message);
+    }
     const now = Date.now();
 
     // Anti-Flood Logic
