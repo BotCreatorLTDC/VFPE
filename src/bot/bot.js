@@ -337,11 +337,12 @@ bot.command("admin", async (ctx) => {
     const kb = new InlineKeyboard()
         .webApp("🖥 Web Admin Panel", `${process.env.WEBAPP_URL || 'https://vfpe.onrender.com'}/admin.html`)
         .row()
-        .webApp("✨ Open MiniApp (DEMO)", `${process.env.WEBAPP_URL || 'https://vfpe.onrender.com'}/index.html?demo=true`)
+        .webApp("👥 Demo: Modo Usuario", `${process.env.WEBAPP_URL || 'https://vfpe.onrender.com'}/index.html?demo=true&owner=false`)
+        .webApp("👑 Demo: Modo Dueño", `${process.env.WEBAPP_URL || 'https://vfpe.onrender.com'}/index.html?demo=true&owner=true`)
         .row();
 
     if (pendingCount === 0) {
-        return ctx.reply("✅ No hay solicitudes pendientes.\n\nPuedes gestionar el directorio o ver el modo demo aquí:", { 
+        return ctx.reply("✅ No hay solicitudes pendientes.\n\nPuedes gestionar el directorio o ver los modos demo aquí:", { 
             parse_mode: "Markdown", 
             reply_markup: kb 
         });

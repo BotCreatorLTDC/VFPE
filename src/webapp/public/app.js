@@ -123,8 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, () => { nearMeBtn.innerHTML = '📍'; });
     };
 
-    // ─── DEMO MODE ──────────────────────────────────────────────────────────
-    const isDemo = new URLSearchParams(window.location.search).get('demo') === 'true';
+    const urlParams = new URLSearchParams(window.location.search);
+    const isDemo = urlParams.get('demo') === 'true';
+    const isDemoOwner = urlParams.get('owner') === 'true';
+    
     const DEMO_CLUBS = [
         { id: 999, name: 'Cali King Ibiza', city: 'Ibiza', country: 'ES', telegram_username: '@CaliKingIBZ', instagram: '@caliking_ibiza', description: 'Top shelf boutique imports. Only for connoisseurs in the island.', status: 'verified', is_premium: true, selected_plan: 'Advanced', event_message: '⚡ NEW CALI DROPPING TODAY!', event_expires_at: new Date(Date.now() + 86400000).toISOString(), rating_avg: 4.9, reviews_count: 124, likes_count: 850, view_count: 5400, click_count: 1200, service_tags: ['delivery', 'meetup'], photo_url: 'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&q=80&w=800' },
         { id: 998, name: 'The High Lab', city: 'Berlin', country: 'DE', telegram_username: '@HighLabBerlin', instagram: '@highlab_de', description: 'The original underground spot in Berlin. Best extracts in the city.', status: 'verified', is_premium: true, selected_plan: 'Advanced', event_message: '🔥 Live Resin tasting event', event_expires_at: new Date(Date.now() + 86400000).toISOString(), rating_avg: 4.7, reviews_count: 89, likes_count: 420, view_count: 3100, click_count: 800, service_tags: ['meetup'], photo_url: 'https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&q=80&w=800' },
@@ -142,13 +144,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── FETCH ───────────────────────────────────────────────────────────────
     async function fetchClubs() {
         if (isDemo) {
-            console.log('[Demo] Loading dummy data...');
+            console.log(`[Demo] Loading dummy data (Owner: ${isDemoOwner})...`);
             allClubs = DEMO_CLUBS;
             clubCount.textContent = allClubs.length;
             statusMessage.textContent = '';
             filterClubs();
-            // Force owner tools for demo
-            showOwnerTools(DEMO_CLUBS[0]);
+            // Force owner tools for demo ONLY IF owner=true
+            if (isDemoOwner) showOwnerTools(DEMO_CLUBS[0]);
             return;
         }
         statusMessage.textContent = 'Loading verified plugs...';

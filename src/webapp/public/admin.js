@@ -338,6 +338,6 @@ document.getElementById('refresh-btn').onclick = fetchData;
 const demoBtn = document.getElementById('demo-btn');
 if (demoBtn) {
     demoBtn.onclick = () => {
-        window.open('/index.html?demo=true', '_blank');
+        window.open('/index.html?demo=true&owner=true', '_blank');
     };
 }
