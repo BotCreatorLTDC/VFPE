@@ -608,6 +608,15 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit-photo-url').value    = club.photo_url || '';
             document.getElementById('edit-description').value   = club.description || '';
             
+            // Advanced Plan Feature
+            const eventGroup = document.getElementById('edit-event-group');
+            if (club.selected_plan === 'Advanced') {
+                eventGroup.style.display = 'block';
+                document.getElementById('edit-event-message').value = club.event_message || '';
+            } else {
+                eventGroup.style.display = 'none';
+            }
+
             // V2: Populate Owner Stats
             document.getElementById('owner-views').textContent  = club.view_count || 0;
             document.getElementById('owner-clicks').textContent = club.click_count || 0;
@@ -633,10 +642,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     id: fd.get('id'),
-                    username: tgUsername,
+                    username: tgUsername || 'DEMO_USER', // Fallback for demo
                     instagram: fd.get('instagram'),
                     photo_url: fd.get('photo_url'),
                     description: fd.get('description'),
+                    event_message: fd.get('event_message'),
                     service_tags: selectedTags
                 })
             });
