@@ -48,7 +48,7 @@ Accesible desde Telegram para los administradores designados.
 
 ### Flujo de Aprobación de Plugs:
 1. **Pendiente:** El plug envía su solicitud desde la Mini App.
-2. **Aceptar:** El admin revisa y pulsa "Aceptar". El bot envía automáticamente la billetera USDT al usuario.
+2. **Aceptar:** El admin revisa y pulsa "Aceptar". El bot envía automáticamente las opciones de pago (BTC, ETH, USDT, XRP, SOL) al usuario.
 3. **Publicar:** Una vez confirmado el pago, el admin pulsa "Confirmar Pago y Publicar". El plug pasa a estar visible y se le otorgan 30 días de suscripción.
 4. **Promoción:** Los plugs con Plan Advanced pueden ser marcados como "Premium" (borde dorado y posición prioritaria).
 

@@ -289,7 +289,14 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
                 const priceMap = { 'Basic': '50€', 'PRO': '80€', 'Advanced': '100€' };
                 const priceStr = priceMap[club.selected_plan] || '50€';
                 
-                const message = `¡Enhorabuena! Tu solicitud para el club *${club.name}* ha sido pre-aprobada para el *${planStr}*.\n\nPara proceder a la publicación oficial en el directorio, por favor realiza el pago de *${priceStr}* a la siguiente billetera de criptomonedas (USDT TRC20):\n\n\`TQsvr5gU8qRB6zsBFdKKppJyrZaS8qa8tk\`\n\nUna vez confirmado el pago, tu club será publicado de inmediato.`;
+                const message = `¡Enhorabuena! Tu solicitud para el club *${club.name}* ha sido pre-aprobada para el *${planStr}*.\n\n` +
+                                `Para proceder a la publicación oficial, por favor realiza el pago de *${priceStr}* a cualquiera de las siguientes billeteras:\n\n` +
+                                `🧡 *BTC:* \`bc1qds092w95zsfz6z6nr9axw6ccvt26rv8sz39czx\`\n` +
+                                `💎 *ETH:* \`0xdc7668CC500161e8AA8e8808673E2c1aB5cC844b\`\n` +
+                                `💵 *USDT (ERC20):* \`0xdc7668CC500161e8AA8e8808673E2c1aB5cC844b\`\n` +
+                                `💙 *XRP:* \`rJFd2TUUFRGfBvDicg26o1JKoXi3yqGGAb\`\n` +
+                                `🟣 *SOL:* \`6e4Cpahz2sHgCY6iYrpaAR5bkMorKZjk6AGzdaidBZ97\`\n\n` +
+                                `Una vez realizado el pago, envía una captura del comprobante a soporte. Tu club será publicado de inmediato tras la confirmación.`;
                 
                 await axios.post(`https://api.telegram.org/bot${process.env.MAIN_BOT_TOKEN}/sendMessage`, {
                     chat_id: club.tg_user_id,
