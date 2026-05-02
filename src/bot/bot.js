@@ -245,7 +245,16 @@ bot.callbackQuery("menu_community", async (ctx) => {
 });
 
 bot.callbackQuery("menu_verify", async (ctx) => {
-    await ctx.conversation.enter("verifyClubConversation");
+    const message = t(ctx, 'lang') === 'en' 
+        ? "✅ *How to get Verified on VFPE*\n\nTo register your plug and join the directory, please use our *Mini App*.\n\n1️⃣ Open the directory below.\n2️⃣ Tap on 'Apply for Verification'.\n3️⃣ Fill out the form and choose your plan.\n\n🛡️ Being verified gives you trust, visibility, and professional analytics."
+        : "✅ *Cómo ser Verificado en VFPE*\n\nPara registrar tu plug y unirte al directorio oficial, por favor utiliza nuestra *Mini App*.\n\n1️⃣ Abre el directorio abajo.\n2️⃣ Pulsa en 'Solicitar Verificación'.\n3️⃣ Rellena el formulario y elige tu plan.\n\n🛡️ Estar verificado te otorga confianza, visibilidad y estadísticas profesionales.";
+    
+    const kb = new InlineKeyboard()
+        .webApp("📱 Abrir Formulario", `${process.env.WEBAPP_URL || 'https://vfpe.onrender.com'}/index.html`)
+        .row()
+        .text(t(ctx, 'back'), "back_main");
+        
+    await ctx.editMessageText(message, { parse_mode: "Markdown", reply_markup: kb });
     await ctx.answerCallbackQuery();
 });
 
