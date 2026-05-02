@@ -30,7 +30,42 @@ if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
     }
 }
 
+// ─── DEMO MODE ──────────────────────────────────────────────────────────
+const isDemo = new URLSearchParams(window.location.search).get('demo') === 'true';
+const DEMO_ANALYTICS = {
+    total: 148,
+    clicks: 12450,
+    topCities: [
+        { city: 'Ibiza', count: 42 },
+        { city: 'Madrid', count: 38 },
+        { city: 'Barcelona', count: 25 },
+        { city: 'Berlin', count: 18 },
+        { city: 'Amsterdam', count: 12 }
+    ],
+    topClubs: [
+        { name: 'Cali King Ibiza', click_count: 3200 },
+        { name: 'Space Club BCN', click_count: 2850 },
+        { name: 'The High Lab', click_count: 2100 },
+        { name: 'Green Garden', click_count: 1450 }
+    ]
+};
+const DEMO_CLUBS = [
+    { id: 101, name: 'Cloud Nine', city: 'Valencia', country: 'ES', telegram_username: '@CloudNineVAL', status: 'pending', selected_plan: 'Advanced', click_count: 0 },
+    { id: 102, name: 'Bier & Bud', city: 'Munich', country: 'DE', telegram_username: '@BierBud', status: 'pending', selected_plan: 'PRO', click_count: 0 },
+    { id: 103, name: 'Cali King Ibiza', city: 'Ibiza', country: 'ES', telegram_username: '@CaliKingIBZ', status: 'verified', selected_plan: 'Advanced', is_premium: true, click_count: 3200 },
+    { id: 104, name: 'Amsterdam Express', city: 'Amsterdam', country: 'NL', telegram_username: '@AmsExp', status: 'accepted', selected_plan: 'Basic', click_count: 45 }
+];
+const DEMO_REPORTS = [
+    { id: 1, club_name: 'Sketchy Club', reason: 'Invalid handle', details: 'The telegram username is not responding for 2 days.', reporter_handle: 'User99', created_at: new Date().toISOString() }
+];
+
 async function verifyAdmin() {
+    if (isDemo) {
+        authLoading.style.display = 'none';
+        adminApp.style.display = 'block';
+        fetchData();
+        return;
+    }
     try {
         const response = await fetch(`/api/admin/clubs?admin_id=${adminId}`);
         if (response.ok) {
@@ -47,6 +82,13 @@ async function verifyAdmin() {
 }
 
 async function fetchData() {
+    if (isDemo) {
+        allClubs = DEMO_CLUBS;
+        updateStats(DEMO_ANALYTICS);
+        renderView(DEMO_REPORTS);
+        renderAnalytics(DEMO_ANALYTICS);
+        return;
+    }
     try {
         const [clubsRes, analyticsRes, reportsRes] = await Promise.all([
             fetch(`/api/admin/clubs?admin_id=${adminId}`),

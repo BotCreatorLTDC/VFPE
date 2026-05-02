@@ -123,8 +123,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }, () => { nearMeBtn.innerHTML = '📍'; });
     };
 
+    // ─── DEMO MODE ──────────────────────────────────────────────────────────
+    const isDemo = new URLSearchParams(window.location.search).get('demo') === 'true';
+    const DEMO_CLUBS = [
+        { id: 999, name: 'Cali King Ibiza', city: 'Ibiza', country: 'ES', telegram_username: '@CaliKingIBZ', instagram: '@caliking_ibiza', description: 'Top shelf boutique imports. Only for connoisseurs in the island.', status: 'verified', is_premium: true, selected_plan: 'Advanced', event_message: '⚡ NEW CALI DROPPING TODAY!', event_expires_at: new Date(Date.now() + 86400000).toISOString(), rating_avg: 4.9, reviews_count: 124, likes_count: 850, view_count: 5400, click_count: 1200, service_tags: ['delivery', 'meetup'], photo_url: 'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&q=80&w=800' },
+        { id: 998, name: 'The High Lab', city: 'Berlin', country: 'DE', telegram_username: '@HighLabBerlin', instagram: '@highlab_de', description: 'The original underground spot in Berlin. Best extracts in the city.', status: 'verified', is_premium: true, selected_plan: 'Advanced', event_message: '🔥 Live Resin tasting event', event_expires_at: new Date(Date.now() + 86400000).toISOString(), rating_avg: 4.7, reviews_count: 89, likes_count: 420, view_count: 3100, click_count: 800, service_tags: ['meetup'], photo_url: 'https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&q=80&w=800' },
+        { id: 997, name: 'Green Garden', city: 'Madrid', country: 'ES', telegram_username: '@GreenGardenMAD', instagram: '@greengarden_mad', description: 'Organic flowers grown with love. Center city delivery.', status: 'verified', is_premium: false, selected_plan: 'PRO', rating_avg: 4.5, reviews_count: 56, likes_count: 210, view_count: 1500, click_count: 340, service_tags: ['delivery'], photo_url: '' },
+        { id: 996, name: 'Dutch Delight', city: 'Amsterdam', country: 'NL', telegram_username: '@DutchDelightAMS', instagram: '@dutch_delight', description: 'Real amsterdam genetics. Shipping available worldwide.', status: 'verified', is_premium: false, selected_plan: 'Basic', rating_avg: 4.2, reviews_count: 34, likes_count: 150, view_count: 900, click_count: 120, service_tags: ['postal'], photo_url: '' },
+        { id: 995, name: 'Space Club', city: 'Barcelona', country: 'ES', telegram_username: '@SpaceClubBCN', instagram: '@spaceclub_bcn', description: 'The cosmic experience in Barcelona. High THC strains.', status: 'verified', is_premium: true, selected_plan: 'Advanced', rating_avg: 4.8, reviews_count: 110, likes_count: 670, view_count: 4200, click_count: 950, service_tags: ['delivery', 'meetup'], photo_url: 'https://images.unsplash.com/photo-1594498257602-32638e98587a?auto=format&fit=crop&q=80&w=800' }
+    ];
+
+    const DEMO_REVIEWS = [
+        { id: 1, reviewer_handle: '@User123', rating: 5, review_text: 'Best quality I found in the island. Very professional.', created_at: new Date(Date.now() - 3600000).toISOString() },
+        { id: 2, reviewer_handle: '@SmokeMaster', rating: 5, review_text: 'Fast delivery and amazing smell. 10/10.', created_at: new Date(Date.now() - 86400000).toISOString() },
+        { id: 3, reviewer_handle: '@Tester', rating: 4, review_text: 'Good stuff but a bit expensive.', created_at: new Date(Date.now() - 172800000).toISOString() }
+    ];
+
     // ─── FETCH ───────────────────────────────────────────────────────────────
     async function fetchClubs() {
+        if (isDemo) {
+            console.log('[Demo] Loading dummy data...');
+            allClubs = DEMO_CLUBS;
+            clubCount.textContent = allClubs.length;
+            statusMessage.textContent = '';
+            filterClubs();
+            // Force owner tools for demo
+            showOwnerTools(DEMO_CLUBS[0]);
+            return;
+        }
         statusMessage.textContent = 'Loading verified plugs...';
         try {
             const data = await fetch('/api/clubs').then(r => r.json());
@@ -411,6 +437,22 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadReviews(clubId) {
         const list = document.getElementById('reviews-list');
         list.innerHTML = `<p style="color:#555; font-size:0.85rem; text-align:center; padding:10px;">Loading reviews...</p>`;
+        
+        if (isDemo) {
+            const reviews = DEMO_REVIEWS;
+            list.innerHTML = reviews.map(r => `
+                <div class="review-card">
+                    <div class="review-header">
+                        <span class="review-handle">@${r.reviewer_handle.replace('@', '')}</span>
+                        <span class="review-stars">${renderStars(r.rating)}</span>
+                        <span class="review-date">${getTimeAgo(r.created_at)}</span>
+                    </div>
+                    ${r.review_text ? `<p class="review-text">${r.review_text}</p>` : ''}
+                </div>
+            `).join('');
+            return;
+        }
+
         try {
             const reviews = await fetch(`/api/clubs/${clubId}/reviews`).then(r => r.json());
             if (!reviews.length) {
