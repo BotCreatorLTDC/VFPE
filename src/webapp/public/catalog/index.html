@@ -241,6 +241,19 @@
             font-family: 'Outfit', sans-serif;
         }
 
+        .order-form {
+            margin-top: 20px; padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 0.7rem; font-weight: 700; color: var(--accent); margin-bottom: 6px; text-transform: uppercase; }
+        .form-group input, .form-group textarea {
+            width: 100%; background: #1a1a1a; border: 1px solid var(--border);
+            color: #fff; padding: 12px; border-radius: 12px;
+            font-family: 'Outfit', sans-serif; font-size: 0.9rem;
+        }
+        .form-group input:focus { border-color: var(--accent); outline: none; }
+
         .card-status {
             margin-top: 8px;
             display: inline-block;
@@ -407,7 +420,26 @@
         <div class="cart-sheet">
             <div class="modal-handle"></div>
             <h2 style="font-size:1.5rem; font-weight:900; margin-bottom:20px;">Shopping Cart</h2>
+            
             <div id="cart-items"></div>
+
+            <div class="order-form">
+                <div class="form-group">
+                    <label>📍 Delivery Address</label>
+                    <textarea id="order-address" placeholder="Street, number, floor, city..." rows="2"></textarea>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div class="form-group">
+                        <label>📞 Phone (Opt)</label>
+                        <input type="text" id="order-phone" placeholder="+34...">
+                    </div>
+                    <div class="form-group">
+                        <label>💬 Notes</label>
+                        <input type="text" id="order-notes" placeholder="Extra info...">
+                    </div>
+                </div>
+            </div>
+
             <div class="cart-footer">
                 <div class="cart-total-row">
                     <span class="total-lbl">Total Order</span>
@@ -435,11 +467,11 @@
             logo_url: '', bio: 'Premium genetics. Handcrafted with love.', theme_color: '#00d26a'
         };
         const DEMO_PRODUCTS = [
-            { id: 1, name: 'OG Kush',       category: 'flower',  price: 10, unit: 'g', description: 'Classic West Coast genetics. Earthy, pine, and lemon notes.', photo_url: 'https://images.unsplash.com/photo-1536819114556-1e10f967fb61?auto=format&fit=crop&q=80&w=400', available: true,  featured: true  },
-            { id: 2, name: 'Blue Dream',     category: 'flower',  price: 12, unit: 'g', description: 'Sweet berry aroma with full-body relaxation.',                photo_url: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?auto=format&fit=crop&q=80&w=400', available: true,  featured: false },
-            { id: 3, name: 'Live Resin 710', category: 'extract', price: 40, unit: 'g', description: 'Full-spectrum extract. Top-shelf terpene profile.',           photo_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&q=80&w=400', available: true,  featured: false },
+            { id: 1, name: 'OG Kush',       category: 'flower',  price: 10, unit: 'g', description: 'Classic West Coast genetics. Earthy, pine, and lemon notes.', photo_url: '', available: true,  featured: true  },
+            { id: 2, name: 'Blue Dream',     category: 'flower',  price: 12, unit: 'g', description: 'Sweet berry aroma with full-body relaxation.',                photo_url: '', available: true,  featured: false },
+            { id: 3, name: 'Live Resin 710', category: 'extract', price: 40, unit: 'g', description: 'Full-spectrum extract. Top-shelf terpene profile.',           photo_url: '', available: true,  featured: false },
             { id: 4, name: 'Gorilla Glue',   category: 'flower',  price: 10, unit: 'g', description: 'Heavy-handed euphoria and relaxation.',                       photo_url: '', available: false, featured: false },
-            { id: 5, name: 'Mango Gummies',  category: 'edible',  price: 25, unit: 'pack', description: 'Tropical flavour, precisely dosed.',                          photo_url: 'https://images.unsplash.com/photo-1582798358481-d199fb7347bb?auto=format&fit=crop&q=80&w=400', available: true,  featured: false },
+            { id: 5, name: 'Mango Gummies',  category: 'edible',  price: 25, unit: 'pack', description: 'Tropical flavour, precisely dosed.',                          photo_url: '', available: true,  featured: false },
             { id: 6, name: 'Hash Rosin',     category: 'extract', price: 60, unit: 'g', description: 'Cold-pressed solventless extraction. Pure and potent.',       photo_url: '', available: true,  featured: false },
         ];
 
@@ -587,19 +619,30 @@
 
         function submitOrder() {
             if (!cart.length) return;
+
+            const address = document.getElementById('order-address').value.trim();
+            const phone = document.getElementById('order-phone').value.trim();
+            const notes = document.getElementById('order-notes').value.trim();
+
+            if (!address) {
+                alert('⚠️ Please enter a delivery address.');
+                document.getElementById('order-address').focus();
+                return;
+            }
             
             const summary = cart.map(item => `- ${item.qty}x ${item.name} (${(item.price * item.qty).toFixed(2)}€)`).join('\n');
             const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0).toFixed(2);
             
             const orderData = {
                 slug,
+                address, phone, notes,
                 items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
                 total: total,
                 user: tg?.initDataUnsafe?.user || { first_name: 'Customer' }
             };
 
             if (isDemo) {
-                alert(`🚀 DEMO ORDER SENT!\n\n${summary}\n\nTotal: ${total}€`);
+                alert(`🚀 DEMO ORDER SENT!\n\n📍 Address: ${address}\n\n${summary}\n\nTotal: ${total}€`);
                 cart = [];
                 updateCartUI();
                 document.getElementById('cart-overlay').classList.remove('open');

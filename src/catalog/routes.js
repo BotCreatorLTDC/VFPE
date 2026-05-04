@@ -130,8 +130,8 @@ router.post('/api/store/color', async (req, res) => {
 
 // POST submit order (customer -> owner notification)
 router.post('/api/order/submit', async (req, res) => {
-    const { slug, items, total, user } = req.body;
-    if (!slug || !items || !total) return res.status(400).json({ error: 'Missing params' });
+    const { slug, items, total, user, address, phone, notes } = req.body;
+    if (!slug || !items || !total || !address) return res.status(400).json({ error: 'Missing params' });
 
     try {
         const storeRes = await query('SELECT name, tg_owner_id FROM catalog_stores WHERE slug = $1', [slug]);
@@ -143,11 +143,16 @@ router.post('/api/order/submit', async (req, res) => {
         const itemsText = items.map(i => `• ${i.qty}x ${i.name} (${(i.price * i.qty).toFixed(2)}€)`).join('\n');
         const userLink = user.username ? `@${user.username}` : `[${user.first_name}](tg://user?id=${user.id})`;
         
-        const message = `🛍 *New Order — ${storeName}*\n\n` +
-                        `👤 *Customer:* ${userLink}\n\n` +
-                        `📋 *Items:*\n${itemsText}\n\n` +
-                        `💰 *Total: ${total}€*\n\n` +
-                        `_Reply to the customer to close the deal!_`;
+        let message = `🛍 *New Order — ${storeName}*\n\n` +
+                      `👤 *Customer:* ${userLink}\n` +
+                      `📍 *Address:* \`${address}\`\n`;
+        
+        if (phone) message += `📞 *Phone:* \`${phone}\`\n`;
+        if (notes) message += `📝 *Notes:* _${notes}_\n`;
+        
+        message += `\n📋 *Items:*\n${itemsText}\n\n` +
+                   `💰 *Total: ${total}€*\n\n` +
+                   `_Reply to the customer to close the deal!_`;
 
         // Send via Telegram Bot API
         const axios = require('axios');
