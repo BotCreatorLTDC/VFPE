@@ -17,11 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── CATALOG INTEGRATION ─────────────────────────────────────────────────
     window.openCatalog = function(slug) {
         if (tg) tg.HapticFeedback?.impactOccurred('medium');
-        const url = `${window.location.origin}/catalog/${slug}`;
+        const url = `https://t.me/hashandcrafts_catalog_bot/app?startapp=${slug}`;
         if (tg) {
-            tg.openLink(url);
+            tg.openTelegramLink(url);
         } else {
-            window.open(url, '_blank');
+            window.open(`${window.location.origin}/catalog/${slug}`, '_blank');
         }
     };
 

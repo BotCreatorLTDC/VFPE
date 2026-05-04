@@ -518,9 +518,10 @@
     </div>
 
     <!-- Detail Modal -->
-    <div class="modal-overlay" id="modal">
+    <div class="modal-overlay" id="modal" onclick="if(event.target === this) this.classList.remove('open')">
         <div class="modal-sheet" id="modal-sheet">
             <div class="modal-handle"></div>
+            <button class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">✕</button>
             <div id="modal-content"></div>
         </div>
     </div>
@@ -599,7 +600,12 @@
 
         const params = new URLSearchParams(window.location.search);
         const isDemo = params.get('demo') === 'true';
-        const slug = window.location.pathname.split('/').filter(Boolean).pop();
+        let slug = window.location.pathname.split('/').filter(Boolean).pop();
+
+        // Handle Telegram Start Parameter (Deep Linking)
+        if (tg?.initDataUnsafe?.start_param) {
+            slug = tg.initDataUnsafe.start_param;
+        }
 
         let store = null;
         let allProducts = [];
@@ -850,14 +856,16 @@
             const p = allProducts.find(x => x.id === productId);
             if (!p) return;
 
-            modalQty = 1; // Reset for new modal
+            // Ensure price is a number
+            const price = parseFloat(p.price) || 0;
+            modalQty = 1; 
 
             const content = document.getElementById('modal-content');
             content.innerHTML = `
                 ${p.photo_url ? `<img src="${p.photo_url}" class="modal-img" alt="${p.name}">` : ''}
                 <div class="modal-category">${CATEGORY_LABELS[p.category]}</div>
                 <h2 class="modal-name">${p.name}</h2>
-                <div class="card-price" style="font-size:1.5rem; margin-bottom:15px;">${p.price}€ <span style="font-size:1rem;">/${p.unit}</span></div>
+                <div class="card-price" style="font-size:1.5rem; margin-bottom:15px;">${price.toFixed(2)}€ <span style="font-size:1rem;">/${p.unit}</span></div>
                 ${p.description ? `<p class="modal-desc">${p.description}</p>` : ''}
                 <div class="modal-status-row">
                     <div class="status-dot ${!p.available ? 'unavailable' : ''}"></div>
@@ -876,7 +884,7 @@
                         </div>
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                             <span style="font-size:0.9rem; font-weight:700; color:var(--muted);">SUBTOTAL</span>
-                            <span style="font-size:1.3rem; font-weight:900; color:var(--accent);" id="modal-subtotal">${p.price.toFixed(2)}€</span>
+                            <span style="font-size:1.3rem; font-weight:900; color:var(--accent);" id="modal-subtotal">${price.toFixed(2)}€</span>
                         </div>
                         <button class="btn-order" onclick="addToCart(${p.id}, modalQty); document.getElementById('modal').classList.remove('open');">
                             ADD TO ORDER
@@ -893,11 +901,12 @@
             const p = allProducts.find(x => x.id === productId);
             if (!p) return;
 
+            const price = parseFloat(p.price) || 0;
             modalQty += delta;
             if (modalQty < 1) modalQty = 1;
 
             document.getElementById('modal-qty-val').textContent = modalQty;
-            document.getElementById('modal-subtotal').textContent = (p.price * modalQty).toFixed(2) + '€';
+            document.getElementById('modal-subtotal').textContent = (price * modalQty).toFixed(2) + '€';
             
             if (tg) tg.HapticFeedback?.impactOccurred('light');
         }
