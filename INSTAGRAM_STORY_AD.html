@@ -3,190 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VFPE - Instagram Story Ad</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>VFPE - Ultra Premium Ad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --accent: #00d26a;
             --gold: #FFD700;
             --bg: #000000;
-            --text: #ffffff;
-            --duration: 6s; /* Duración de cada escena */
+            --duration: 5500ms;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: #111;
-            color: var(--text);
+            background-color: #050505;
+            color: #fff;
             font-family: 'Outfit', sans-serif;
             overflow: hidden;
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            width: 100vw;
         }
 
-        /* Contenedor formato Story 9:16 */
         .story-viewport {
             width: 100vw;
             height: 100vh;
-            max-width: 450px; /* Limitador para escritorio */
+            max-width: 450px;
             max-height: 800px;
-            background-color: var(--bg);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 50px rgba(0,0,0,1);
-            border-radius: 15px;
-        }
-
-        @media (max-width: 500px) {
-            .story-viewport {
-                width: 100vw;
-                height: 100vh;
-                max-width: none;
-                max-height: none;
-                border-radius: 0;
-            }
-        }
-
-        /* Barra de Progreso Superior */
-        .progress-container {
-            position: absolute;
-            top: 15px;
-            left: 10px;
-            right: 10px;
-            display: flex;
-            gap: 5px;
-            z-index: 100;
-        }
-
-        .progress-segment {
-            flex: 1;
-            height: 3px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #fff;
-            width: 0%;
-        }
-
-        .active-fill {
-            animation: fillProgress var(--duration) linear forwards;
-        }
-
-        @keyframes fillProgress {
-            from { width: 0%; }
-            to { width: 100%; }
-        }
-
-        /* Escenas */
-        .scene {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.8s ease-in-out;
-            display: flex;
-            flex-direction: column;
-            padding: 60px 30px;
-        }
-
-        .scene.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Animaciones de Texto */
-        .text-wrap {
-            margin-top: 20px;
-            z-index: 10;
-        }
-
-        .scene.active h2 {
-            animation: slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) both;
-        }
-
-        .scene.active p {
-            animation: slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.2s both;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); filter: blur(10px); }
-            to { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
-
-        h2 { font-size: 2.8rem; font-weight: 900; line-height: 1.1; margin-bottom: 15px; color: var(--accent); text-shadow: 0 0 20px rgba(0,210,106,0.3); }
-        p { font-size: 1.2rem; line-height: 1.4; color: #ccc; font-weight: 400; }
-
-        /* Contenedor de Imagen con efecto Ken Burns */
-        .image-container {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 40px;
-            position: relative;
-        }
-
-        .mobile-mockup {
-            width: 85%;
-            height: 80%;
             background: #000;
-            border-radius: 35px;
-            padding: 8px;
-            border: 4px solid #333;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            position: relative;
             overflow: hidden;
-            transform: scale(0.9);
+            perspective: 2000px; /* Para efectos 3D */
         }
 
-        .scene.active .mobile-mockup img {
-            animation: kenBurns 10s ease-in-out infinite alternate;
+        /* Fondo Dinámico con Partículas */
+        .bg-elements {
+            position: absolute; width: 100%; height: 100%;
+            z-index: 1; pointer-events: none;
+        }
+        .particle {
+            position: absolute; border-radius: 50%;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+            filter: blur(40px); opacity: 0.15;
+            animation: floatBg 20s infinite alternate;
         }
 
-        @keyframes kenBurns {
-            from { transform: scale(1); }
-            to { transform: scale(1.15) translateY(-20px); }
+        @keyframes floatBg {
+            from { transform: translate(0,0) scale(1); }
+            to { transform: translate(50px, 100px) scale(1.5); }
         }
 
-        .mobile-mockup img {
+        /* Barra de Progreso */
+        .progress-container {
+            position: absolute; top: 15px; left: 15px; right: 15px;
+            display: flex; gap: 4px; z-index: 100;
+        }
+        .progress-segment {
+            flex: 1; height: 3px; background: rgba(255,255,255,0.15); border-radius: 4px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: #fff; width: 0%;
+        }
+        .active-fill { animation: fillProgress var(--duration) linear forwards; }
+        @keyframes fillProgress { from { width: 0%; } to { width: 100%; } }
+
+        /* Estructura de Escena */
+        .scene {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; visibility: hidden;
+            display: flex; flex-direction: column;
+            transition: opacity 0.6s ease;
+            z-index: 5;
+        }
+        .scene.active { opacity: 1; visibility: visible; }
+
+        /* Animaciones de Texto Premium */
+        .text-box {
+            position: absolute; padding: 30px; z-index: 20;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 28px;
+        }
+        .scene.active .title { animation: textIn 1s cubic-bezier(0.19, 1, 0.22, 1) both; }
+        .scene.active .sub { animation: textIn 1s cubic-bezier(0.19, 1, 0.22, 1) 0.2s both; }
+
+        @keyframes textIn {
+            from { opacity: 0; transform: translateY(40px) skewY(5deg); filter: blur(10px); }
+            to { opacity: 1; transform: translateY(0) skewY(0); filter: blur(0); }
         }
 
-        /* Estilos específicos */
-        .scene-1 { background: radial-gradient(circle at center, #111 0%, #000 100%); justify-content: center; text-align: center; }
-        .scene-1 h1 { font-size: 5rem; font-weight: 900; letter-spacing: -3px; }
-        .scene-1 .badge { background: var(--accent); color: #000; padding: 5px 15px; border-radius: 20px; font-weight: 800; font-size: 0.8rem; display: inline-block; margin-bottom: 20px; }
+        .title { font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 10px; color: var(--accent); }
+        .sub { font-size: 1.3rem; color: #888; font-weight: 400; max-width: 80%; }
 
-        /* Overlay de gradiente para legibilidad */
-        .overlay {
-            position: absolute;
-            bottom: 0; left: 0; right: 0; height: 40%;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            pointer-events: none;
+        /* Contenedor 3D del Dispositivo */
+        .device-container {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10; pointer-events: none;
         }
 
-        .logo-small {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-weight: 900;
-            letter-spacing: 2px;
-            opacity: 0.5;
-            font-size: 0.8rem;
+        .phone {
+            width: 280px; height: 580px; background: #000;
+            border-radius: 40px; border: 6px solid #222;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+            overflow: hidden;
+            transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .phone img {
+            width: 100%; height: 100%; object-fit: cover;
+            animation: imgPan 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes imgPan {
+            from { transform: scale(1.1) translateY(0); }
+            to { transform: scale(1.1) translateY(-30px); }
+        }
+
+        /* Posiciones dinámicas por Escena */
+        
+        /* Scene 1: Intro */
+        .scene-1 { justify-content: center; align-items: center; text-align: center; }
+        .scene-1 .title { font-size: 6rem; color: #fff; letter-spacing: -4px; }
+        .scene-1 .badge { background: var(--accent); color: #000; padding: 4px 12px; border-radius: 20px; font-weight: 900; margin-bottom: 10px; display: inline-block; }
+
+        /* Scene 2: Trust (Phone tilts Right, Text Top Left) */
+        .scene-2 .text-box { top: 80px; text-align: left; }
+        .scene.active.scene-2 ~ .device-container .phone {
+            transform: translate(40px, 120px) rotateY(-20deg) rotateX(10deg) rotateZ(5deg) scale(0.9);
+        }
+
+        /* Scene 3: Map (Phone tilts Left, Text Bottom Right) */
+        .scene-3 .text-box { bottom: 80px; text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
+        .scene.active.scene-3 ~ .device-container .phone {
+            transform: translate(-50px, -100px) rotateY(25deg) rotateX(-5deg) rotateZ(-10deg) scale(1.1);
+        }
+
+        /* Scene 4: Catalog (Phone Center Zoom) */
+        .scene-4 .text-box { top: 60px; text-align: center; }
+        .scene.active.scene-4 ~ .device-container .phone {
+            transform: translate(0, 50px) rotateY(0) rotateX(15deg) scale(0.95);
+        }
+
+        /* Scene 5: Final (Phone Out, Full Logo) */
+        .scene-5 { justify-content: center; align-items: center; text-align: center; }
+        .scene.active.scene-5 ~ .device-container .phone {
+            transform: translateY(800px) scale(0.5); opacity: 0;
+        }
+
+        .cta-btn {
+            margin-top: 30px; padding: 15px 40px; background: var(--accent);
+            color: #000; font-weight: 900; border-radius: 50px;
+            font-size: 1.2rem; letter-spacing: 2px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,210,106,0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(0,210,106,0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,210,106,0); }
         }
 
     </style>
@@ -194,97 +168,72 @@
 <body>
 
     <div class="story-viewport">
-        <!-- Progress Bar -->
-        <div class="progress-container" id="progress-bar">
-            <!-- Se generarán dinámicamente -->
+        <!-- Background elements -->
+        <div class="bg-elements">
+            <div class="particle" style="width: 300px; height: 300px; top: -100px; left: -100px;"></div>
+            <div class="particle" style="width: 250px; height: 250px; bottom: -50px; right: -50px; background: var(--gold); opacity: 0.1;"></div>
         </div>
 
-        <!-- Scene 1: Intro -->
-        <div class="scene scene-1 active" data-duration="4000">
-            <div class="text-wrap">
-                <div class="badge">REVELACIÓN 2026</div>
-                <h1>VFPE</h1>
-                <p style="color: var(--accent); font-weight: 700; letter-spacing: 2px;">THE TRUST PROTOCOL</p>
+        <div class="progress-container" id="progress-bar"></div>
+
+        <!-- SCENE 1: THE BRAND -->
+        <div class="scene scene-1 active" data-img="" data-duration="4000">
+            <div class="text-box">
+                <div class="badge">ESTÁNDAR GLOBAL</div>
+                <div class="title">VFPE</div>
+                <div class="sub">El nuevo nivel de los perfiles verificados.</div>
             </div>
-            <div class="logo-small">VERIFIED PLUG ECOSYSTEM</div>
         </div>
 
-        <!-- Scene 2: Problem -->
-        <div class="scene" data-duration="6000">
-            <div class="text-wrap">
-                <h2>The Trust Gap</h2>
-                <p>En un mercado sin reglas, la confianza es el activo más valioso.</p>
+        <!-- SCENE 2: THE TRUST -->
+        <div class="scene scene-2" data-img="assets/Final_Presentation/Screenshot_2026-05-04-13-10-17-908_org.telegram.messenger-edit.jpg" data-duration="5500">
+            <div class="text-box">
+                <div class="title">TRUST</div>
+                <div class="sub">Se acabaron las dudas. Solo perfiles reales y contrastados.</div>
             </div>
-            <div class="image-container">
-                <div class="mobile-mockup">
-                    <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-10-17-908_org.telegram.messenger-edit.jpg" alt="">
-                </div>
-            </div>
-            <div class="overlay"></div>
         </div>
 
-        <!-- Scene 3: Map -->
-        <div class="scene" data-duration="6000">
-            <div class="text-wrap">
-                <h2>Explora tu zona</h2>
-                <p>Mapa interactivo con filtros de Delivery y Meetup en tiempo real.</p>
+        <!-- SCENE 3: THE MAP -->
+        <div class="scene scene-3" data-img="assets/Final_Presentation/Screenshot_2026-05-04-13-10-30-666_org.telegram.messenger-edit.jpg" data-duration="5500">
+            <div class="text-box">
+                <div class="title">MAPS</div>
+                <div class="sub">Navegación inteligente por zonas. Todo bajo control.</div>
             </div>
-            <div class="image-container">
-                <div class="mobile-mockup">
-                    <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-10-30-666_org.telegram.messenger-edit.jpg" alt="">
-                </div>
-            </div>
-            <div class="overlay"></div>
         </div>
 
-        <!-- Scene 4: Catalog -->
-        <div class="scene" data-duration="6000">
-            <div class="text-wrap">
-                <h2>Catálogo Nativo</h2>
-                <p>Una experiencia de compra premium integrada en Telegram.</p>
+        <!-- SCENE 4: CATALOG -->
+        <div class="scene scene-4" data-img="assets/Final_Presentation/Screenshot_2026-05-04-13-18-59-167_org.telegram.messenger-edit.jpg" data-duration="5500">
+            <div class="text-box">
+                <div class="title">SHOP</div>
+                <div class="sub">Tu menú favorito, directamente en Telegram.</div>
             </div>
-            <div class="image-container">
-                <div class="mobile-mockup">
-                    <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-18-59-167_org.telegram.messenger-edit.jpg" alt="">
-                </div>
-            </div>
-            <div class="overlay"></div>
         </div>
 
-        <!-- Scene 5: Order -->
-        <div class="scene" data-duration="6000">
-            <div class="text-wrap">
-                <h2>Ventas en segundos</h2>
-                <p>Recibe pedidos detallados y cierra tratos al instante.</p>
+        <!-- SCENE 5: CTA -->
+        <div class="scene scene-5" data-img="" data-duration="6000">
+            <div class="text-box">
+                <div class="title">ÚNETE</div>
+                <div class="sub">Sé parte del ecosistema líder en Europa.</div>
+                <div class="cta-btn">@VFPE_BOT</div>
             </div>
-            <div class="image-container">
-                <div class="mobile-mockup">
-                    <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-25-53-746_org.telegram.messenger-edit.jpg" alt="">
-                </div>
-            </div>
-            <div class="overlay"></div>
         </div>
 
-        <!-- Scene 6: Outro -->
-        <div class="scene scene-1" data-duration="5000">
-            <div class="text-wrap">
-                <h2 style="color:#fff">Únete a la Red</h2>
-                <p>VFPE: La nueva era de los verificados.</p>
-                <div style="margin-top:40px; padding:15px; border: 2px solid var(--accent); color: var(--accent); border-radius:10px; font-weight:900;">
-                    @VFPE_BOT
-                </div>
+        <!-- THE 3D DEVICE (Sincronizado por JS) -->
+        <div class="device-container">
+            <div class="phone" id="main-phone">
+                <img src="" id="phone-img" alt="">
             </div>
-            <div class="logo-small">ESCANEADO • VERIFICADO • ENTREGADO</div>
         </div>
-
     </div>
 
     <script>
         const scenes = document.querySelectorAll('.scene');
+        const phone = document.getElementById('main-phone');
+        const phoneImg = document.getElementById('phone-img');
         const progressContainer = document.getElementById('progress-bar');
         let currentScene = 0;
 
-        // Crear segmentos de progreso
+        // Generar segmentos de progreso
         scenes.forEach(() => {
             const segment = document.createElement('div');
             segment.className = 'progress-segment';
@@ -294,35 +243,47 @@
 
         const progressFills = document.querySelectorAll('.progress-fill');
 
-        function playScene() {
-            // Resetear todas las escenas
-            scenes.forEach(s => s.classList.remove('active'));
-            progressFills.forEach((f, index) => {
-                f.classList.remove('active-fill');
-                if (index < currentScene) f.style.width = '100%';
-                else f.style.width = '0%';
+        function updateScene() {
+            const scene = scenes[currentScene];
+            const imgPath = scene.getAttribute('data-img');
+            const duration = parseInt(scene.getAttribute('data-duration'));
+            
+            // Limpiar estados previos
+            scenes.forEach((s, i) => {
+                s.classList.remove('active');
+                s.classList.remove(`scene-${i+1}`); // Remove previous positioning class if needed
+                progressFills[i].classList.remove('active-fill');
+                if (i < currentScene) progressFills[i].style.width = '100%';
+                else progressFills[i].style.width = '0%';
             });
 
-            // Activar escena actual
-            const scene = scenes[currentScene];
-            const fill = progressFills[currentScene];
-            const duration = parseInt(scene.getAttribute('data-duration'));
-
+            // Activar escena
             scene.classList.add('active');
+            
+            // Actualizar Imagen y Visibilidad del Teléfono
+            if (imgPath) {
+                phoneImg.src = imgPath;
+                phone.style.opacity = "1";
+            } else {
+                phone.style.opacity = "0";
+            }
+
+            // Animación de progreso
+            const fill = progressFills[currentScene];
             fill.classList.add('active-fill');
             fill.style.animationDuration = duration + 'ms';
 
+            // Timer para siguiente escena
             setTimeout(() => {
                 currentScene++;
                 if (currentScene >= scenes.length) {
-                    currentScene = 0; // Loop
+                    currentScene = 0;
                 }
-                playScene();
+                updateScene();
             }, duration);
         }
 
-        // Iniciar
-        window.onload = playScene;
+        window.onload = updateScene;
     </script>
 </body>
 </html>
