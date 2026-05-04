@@ -44,6 +44,33 @@ router.get('/api/:slug', async (req, res) => {
     }
 });
 
+// POST update product (owner only)
+router.post('/api/product/update', async (req, res) => {
+    const { id, name, category, description, photo_url, price, unit, available, featured, tg_user_id } = req.body;
+    if (!id || !name || !tg_user_id) return res.status(400).json({ error: 'Missing params' });
+
+    try {
+        const check = await query(
+            `SELECT cp.id FROM catalog_products cp
+             JOIN catalog_stores cs ON cs.id = cp.store_id
+             WHERE cp.id = $1 AND cs.tg_owner_id = $2`,
+            [id, tg_user_id]
+        );
+        if (!check.rows.length) return res.status(403).json({ error: 'Forbidden' });
+
+        await query(
+            `UPDATE catalog_products 
+             SET name=$1, category=$2, description=$3, photo_url=$4, price=$5, unit=$6, available=$7, featured=$8
+             WHERE id=$9`,
+            [name, category, description, photo_url, price, unit, available, featured, id]
+        );
+        res.json({ ok: true });
+    } catch (e) {
+        console.error('[Catalog API update product]', e);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 // POST toggle product availability (owner only)
 router.post('/api/product/toggle', async (req, res) => {
     const { id, available, tg_user_id } = req.body;
@@ -113,13 +140,13 @@ router.post('/api/product/delete', async (req, res) => {
 
 // POST update store settings (owner only)
 router.post('/api/store/settings', async (req, res) => {
-    const { min_order_amount, is_pro, tg_user_id } = req.body;
+    const { name, bio, logo_url, min_order_amount, is_pro, tg_user_id } = req.body;
     if (tg_user_id === undefined) return res.status(400).json({ error: 'Missing user' });
 
     try {
         await query(
-            'UPDATE catalog_stores SET min_order_amount = $1, is_pro = $2 WHERE tg_owner_id = $3',
-            [min_order_amount || 0, is_pro || false, tg_user_id]
+            'UPDATE catalog_stores SET name = $1, bio = $2, logo_url = $3, min_order_amount = $4, is_pro = $5 WHERE tg_owner_id = $6',
+            [name, bio, logo_url, min_order_amount || 0, is_pro || false, tg_user_id]
         );
         res.json({ ok: true });
     } catch (e) {
