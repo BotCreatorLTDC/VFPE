@@ -609,7 +609,7 @@
         let modalQty = 1;
 
         async function loadCatalog() {
-            let store, products;
+            let products;
             if (isDemo) {
                 store = DEMO_STORE;
                 products = DEMO_PRODUCTS;
@@ -617,7 +617,9 @@
                 try {
                     const res = await fetch(`/catalog/api/${slug}`);
                     if (!res.ok) throw new Error();
-                    ({ store, products } = await res.json());
+                    const data = await res.json();
+                    store = data.store;
+                    products = data.products;
                 } catch {
                     document.getElementById('loading').innerHTML = '<div>😕</div><p>Catalog not found.</p>';
                     return;
