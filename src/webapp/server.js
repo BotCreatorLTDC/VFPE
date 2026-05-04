@@ -266,9 +266,17 @@ app.post('/api/my-club/update', async (req, res) => {
 // --- DATABASE MIGRATIONS (Ensure columns exist) ---
 async function runMigrations() {
     try {
-        await query('ALTER TABLE catalog_stores ADD COLUMN IF NOT EXISTS min_order_amount NUMERIC DEFAULT 0');
+        // catalog_stores
+        await query('ALTER TABLE catalog_stores ADD COLUMN IF NOT EXISTS min_order_amount NUMERIC(10,2) DEFAULT 0');
         await query('ALTER TABLE catalog_stores ADD COLUMN IF NOT EXISTS is_pro BOOLEAN DEFAULT FALSE');
-        console.log('✅ Catalog migrations checked.');
+        
+        // catalog_products
+        await query('ALTER TABLE catalog_products ADD COLUMN IF NOT EXISTS price NUMERIC(10,2) DEFAULT 0');
+        await query('ALTER TABLE catalog_products ADD COLUMN IF NOT EXISTS unit TEXT DEFAULT \'g\'');
+        await query('ALTER TABLE catalog_products ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT FALSE');
+        await query('ALTER TABLE catalog_products ADD COLUMN IF NOT EXISTS order_index INTEGER DEFAULT 0');
+        
+        console.log('✅ All catalog migrations checked and applied.');
     } catch (e) {
         console.error('❌ Migration error:', e);
     }
