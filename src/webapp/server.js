@@ -258,9 +258,22 @@ app.post('/api/my-club/update', async (req, res) => {
         
         res.json({ success: true });
     } catch (err) {
+        console.error('Update error:', err);
         res.status(500).json({ error: "Update failed" });
     }
 });
+
+// --- DATABASE MIGRATIONS (Ensure columns exist) ---
+async function runMigrations() {
+    try {
+        await query('ALTER TABLE catalog_stores ADD COLUMN IF NOT EXISTS min_order_amount NUMERIC DEFAULT 0');
+        await query('ALTER TABLE catalog_stores ADD COLUMN IF NOT EXISTS is_pro BOOLEAN DEFAULT FALSE');
+        console.log('✅ Catalog migrations checked.');
+    } catch (e) {
+        console.error('❌ Migration error:', e);
+    }
+}
+runMigrations();
 
 // --- ADMIN API ---
 
