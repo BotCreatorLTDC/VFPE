@@ -409,7 +409,15 @@ document.addEventListener('DOMContentLoaded', () => {
             eventBanner.style.display = 'none';
         }
 
-        // CTA links
+        // CTAs
+        const catalogBtn = document.getElementById('detail-catalog-btn');
+        if (club.catalog_slug) {
+            catalogBtn.style.display = 'block';
+            catalogBtn.onclick = () => openCatalog(club.catalog_slug);
+        } else {
+            catalogBtn.style.display = 'none';
+        }
+
         document.getElementById('detail-tg-link').href = `https://t.me/${club.telegram_username.replace('@', '')}`;
         const igLink = document.getElementById('detail-ig-link');
         if (club.instagram) {
