@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFPE - Business Presentation 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #00d26a;
+            --gold: #FFD700;
+            --bg: #050505;
+            --card: #111;
+            --text: #ffffff;
+            --muted: #888;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .presentation-container {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .slide {
+            min-width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .slide-content {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .text-side {
+            animation: slideInLeft 0.8s ease-out both;
+        }
+
+        .image-side {
+            display: flex;
+            justify-content: center;
+            perspective: 1000px;
+            animation: slideInRight 0.8s ease-out both;
+        }
+
+        .mobile-frame {
+            width: 320px;
+            height: 650px;
+            background: #000;
+            border-radius: 40px;
+            padding: 12px;
+            border: 6px solid #222;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 20px rgba(0,210,106,0.1);
+            position: relative;
+            overflow: hidden;
+            transform: rotateY(-10deg);
+            transition: transform 0.5s;
+        }
+
+        .mobile-frame:hover {
+            transform: rotateY(0deg) scale(1.02);
+        }
+
+        .mobile-screen {
+            width: 100%;
+            height: 100%;
+            background: #111;
+            border-radius: 28px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mobile-screen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        h1 { font-size: 4rem; font-weight: 900; line-height: 1; margin-bottom: 20px; letter-spacing: -2px; }
+        h2 { font-size: 3.5rem; font-weight: 900; margin-bottom: 20px; color: var(--accent); }
+        h3 { font-size: 1.5rem; color: var(--muted); font-weight: 400; margin-bottom: 30px; line-height: 1.4; }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(0,210,106,0.1);
+            color: var(--accent);
+            border-radius: 30px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .feature-list { list-style: none; margin-top: 30px; }
+        .feature-item {
+            display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px;
+            font-size: 1.1rem; color: #ccc;
+        }
+        .feature-icon {
+            width: 28px; height: 28px; background: var(--accent); color: #000;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; flex-shrink: 0; margin-top: 2px;
+        }
+
+        /* Navigation Controls */
+        .controls {
+            position: fixed; bottom: 40px; right: 40px;
+            display: flex; gap: 15px; z-index: 1000;
+        }
+        .btn-nav {
+            width: 60px; height: 60px; border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; font-size: 1.5rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.3s;
+        }
+        .btn-nav:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+
+        .progress-bar {
+            position: fixed; top: 0; left: 0; height: 4px;
+            background: var(--accent); width: 0%; transition: width 0.3s;
+            box-shadow: 0 0 15px var(--accent); z-index: 1001;
+        }
+
+        /* Slide specific styles */
+        .cover-content { text-align: center; grid-template-columns: 1fr; }
+        .cover-content h1 { font-size: 6rem; margin-bottom: 10px; }
+        .cover-content p { font-size: 1.5rem; color: var(--muted); letter-spacing: 4px; text-transform: uppercase; }
+
+        .message-box {
+            width: 450px;
+            background: #1c1c1d;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+        }
+        .message-box img { width: 100%; border-radius: 12px; }
+
+        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* Background elements */
+        .bg-glow {
+            position: absolute; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(0,210,106,0.1) 0%, transparent 70%);
+            top: -200px; right: -100px; pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progress"></div>
+    <div class="bg-glow"></div>
+
+    <div class="presentation-container" id="container">
+        
+        <!-- Slide 1: Cover -->
+        <section class="slide">
+            <div class="slide-content cover-content">
+                <div class="text-side">
+                    <div class="badge">Ecosistema Revelación 2026</div>
+                    <h1>VFPE</h1>
+                    <p>Verified Plug Directory & Sales Network</p>
+                    <div style="margin-top:50px; font-weight:700; color:var(--accent);">
+                        Pulsa → para explorar
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: El Desafío -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">El Problema</div>
+                    <h2>Trust Gap</h2>
+                    <h3>En una industria no regulada, la incertidumbre es la mayor barrera para el crecimiento. El miedo a las estafas frena la expansión.</h3>
+                    <ul class="feature-list">
+                        <li class="feature-item"><div class="feature-icon">!</div> Falta de identidades verificadas.</li>
+                        <li class="feature-item"><div class="feature-icon">!</div> Fricción en el proceso de pedido.</li>
+                        <li class="feature-item"><div class="feature-icon">!</div> Ausencia de un directorio seguro y centralizado.</li>
+                    </ul>
+                </div>
+                <div class="image-side">
+                    <div class="mobile-frame">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-10-17-908_org.telegram.messenger-edit.jpg" alt="Home">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Mini App Home -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Interfaz de Directorio</div>
+                    <h2>Precisión Geográfica</h2>
+                    <h3>Nuestra Mini App de Telegram ofrece un sistema de descubrimiento basado en mapas. Encuentra servicios con precisión absoluta.</h3>
+                    <ul class="feature-list">
+                        <li class="feature-item"><div class="feature-icon">✓</div> Mapa Interactivo con Clusters.</li>
+                        <li class="feature-item"><div class="feature-icon">✓</div> Filtros Inteligentes (Delivery/Meetup/Postal).</li>
+                        <li class="feature-item"><div class="feature-icon">✓</div> Estatus de disponibilidad en tiempo real.</li>
+                    </ul>
+                </div>
+                <div class="image-side">
+                    <div class="mobile-frame">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-10-30-666_org.telegram.messenger-edit.jpg" alt="Map View">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Puente de Conversión -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Optimización de Ventas</div>
+                    <h2>The Sales Bridge</h2>
+                    <h3>Hemos integrado un CTA de alto impacto "VER CATÁLOGO" para cerrar la brecha entre el descubrimiento y la venta final.</h3>
+                    <ul class="feature-list">
+                        <li class="feature-item"><div class="feature-icon">🛍</div> Acceso instantáneo al escaparate.</li>
+                        <li class="feature-item"><div class="feature-icon">💎</div> Branding Premium para Plugs.</li>
+                        <li class="feature-item"><div class="feature-icon">⚡️</div> Experiencia de usuario sin fricción.</li>
+                    </ul>
+                </div>
+                <div class="image-side">
+                    <div class="mobile-frame">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-10-55-925_org.telegram.messenger-edit.jpg" alt="Catalog Bridge">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Detalle del Plug -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Vista de Perfil</div>
+                    <h2>Activos de Confianza</h2>
+                    <h3>Los plugs verificados muestran reseñas, valoraciones y enlaces multi-plataforma para establecer la máxima credibilidad.</h3>
+                </div>
+                <div class="image-side">
+                    <div class="mobile-frame">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-14-14-818_org.telegram.messenger-edit.jpg" alt="Detail View">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Escaparate Nativo -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Motor de Ventas</div>
+                    <h2>Native E-Commerce</h2>
+                    <h3>Nuestro escaparate está diseñado para sentirse como una app de gama alta, totalmente integrada en Telegram.</h3>
+                    <ul class="feature-list">
+                        <li class="feature-item"><div class="feature-icon">✨</div> Navegación por categorías.</li>
+                        <li class="feature-item"><div class="feature-icon">📦</div> Estatus de stock en tiempo real.</li>
+                        <li class="feature-item"><div class="feature-icon">🛒</div> Carrito de compra avanzado.</li>
+                    </ul>
+                </div>
+                <div class="image-side">
+                    <div class="mobile-frame">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-18-59-167_org.telegram.messenger-edit.jpg" alt="Catalog">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Checkout Logic -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Diseño UX</div>
+                    <h2>Cierre de Venta Impecable</h2>
+                    <h3>Formularios minimalistas y controles de cantidad intuitivos. Eliminamos cualquier barrera para completar el pedido.</h3>
+                </div>
+                <div class="image-side">
+                    <div class="mobile-frame" style="margin-right: 20px;">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-24-12-363_org.telegram.messenger-edit.jpg" alt="Cart">
+                        </div>
+                    </div>
+                    <div class="mobile-frame">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-24-33-650_org.telegram.messenger-edit.jpg" alt="Success">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Notificación Instantánea -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Lógica de Backend</div>
+                    <h2>Ventas Automatizadas</h2>
+                    <h3>Los Plugs reciben detalles del pedido perfectamente formateados vía Telegram, permitiéndoles cerrar tratos en segundos.</h3>
+                </div>
+                <div class="image-side">
+                    <div class="message-box">
+                        <p style="color:var(--muted); font-size:0.8rem; margin-bottom:10px;">Ejemplo de Notificación Telegram:</p>
+                        <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-25-53-746_org.telegram.messenger-edit.jpg" alt="Message">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: Control Total -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Panel SaaS</div>
+                    <h2>Gestión Profesional</h2>
+                    <h3>Los dueños de plugs gestionan su negocio a través de un dashboard intuitivo. Mobile-first y ultra rápido.</h3>
+                    <ul class="feature-list">
+                        <li class="feature-item"><div class="feature-icon">⚙️</div> Personalización del perfil.</li>
+                        <li class="feature-item"><div class="feature-icon">➕</div> Gestión ágil de stock/productos.</li>
+                        <li class="feature-item"><div class="feature-icon">📊</div> Analíticas en tiempo real.</li>
+                    </ul>
+                </div>
+                <div class="image-side">
+                    <div class="mobile-frame">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-15-53-027_org.telegram.messenger-edit.jpg" alt="Manage">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10: Futuro -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Escalabilidad 2026</div>
+                    <h2>PlugPass Protocol</h2>
+                    <h3>Presentamos la próxima generación de reputación. Un pasaporte digital de confianza respaldado por historial de transacciones.</h3>
+                    <div style="margin-top:40px; padding:25px; background:rgba(255,215,0,0.05); border:1px solid var(--gold); border-radius:20px;">
+                        <h4 style="color:var(--gold); font-size:1.4rem; margin-bottom:10px;">The Digital Trust Passport</h4>
+                        <p style="color:#ccc; font-size:1rem;">Registro automatizado de transacciones, insignias de confianza por niveles y validación comunitaria.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="controls">
+        <button class="btn-nav" onclick="prevSlide()">←</button>
+        <button class="btn-nav" onclick="nextSlide()">→</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 10;
+        const container = document.getElementById('container');
+        const progress = document.getElementById('progress');
+
+        function updateView() {
+            container.style.transform = `translateX(-${currentSlide * 100}vw)`;
+            progress.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateView();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateView();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        // Initialize progress
+        updateView();
+    </script>
+</body>
+</html>
