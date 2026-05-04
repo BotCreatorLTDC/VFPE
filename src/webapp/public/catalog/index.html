@@ -450,6 +450,7 @@
         let allProducts = [];
         let currentFilter = 'all';
         let cart = [];
+        let modalQty = 1;
 
         async function loadCatalog() {
             let store, products;
@@ -527,15 +528,15 @@
         }
 
         // ── CART LOGIC ──
-        function addToCart(productId) {
+        function addToCart(productId, quantity = 1) {
             const p = allProducts.find(x => x.id === productId);
             if (!p || !p.available) return;
 
             const existing = cart.find(item => item.id === productId);
             if (existing) {
-                existing.qty++;
+                existing.qty += quantity;
             } else {
-                cart.push({ ...p, qty: 1 });
+                cart.push({ ...p, qty: quantity });
             }
             updateCartUI();
             if (tg) tg.HapticFeedback?.impactOccurred('medium');
@@ -626,6 +627,8 @@
             const p = allProducts.find(x => x.id === productId);
             if (!p) return;
 
+            modalQty = 1; // Reset for new modal
+
             const content = document.getElementById('modal-content');
             content.innerHTML = `
                 ${p.photo_url ? `<img src="${p.photo_url}" class="modal-img" alt="${p.name}">` : ''}
@@ -637,14 +640,42 @@
                     <div class="status-dot ${!p.available ? 'unavailable' : ''}"></div>
                     <span class="status-text">${p.available ? 'Currently Available' : 'Currently Unavailable'}</span>
                 </div>
+                
                 ${p.available ? `
-                    <button class="btn-order" style="margin-top:20px;" onclick="addToCart(${p.id}); document.getElementById('modal').classList.remove('open');">
-                        Add to Order
-                    </button>
+                    <div style="margin-top:25px; border-top:1px solid var(--border); padding-top:20px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                            <span style="font-size:0.9rem; font-weight:700; color:var(--muted);">QUANTITY</span>
+                            <div class="cart-controls">
+                                <button class="qty-btn" onclick="updateModalQty(${p.id}, -1)">-</button>
+                                <span class="qty-val" id="modal-qty-val">1</span>
+                                <button class="qty-btn" onclick="updateModalQty(${p.id}, 1)">+</button>
+                            </div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                            <span style="font-size:0.9rem; font-weight:700; color:var(--muted);">SUBTOTAL</span>
+                            <span style="font-size:1.3rem; font-weight:900; color:var(--accent);" id="modal-subtotal">${p.price.toFixed(2)}€</span>
+                        </div>
+                        <button class="btn-order" onclick="addToCart(${p.id}, modalQty); document.getElementById('modal').classList.remove('open');">
+                            ADD TO ORDER
+                        </button>
+                    </div>
                 ` : ''}
             `;
 
             document.getElementById('modal').classList.add('open');
+            if (tg) tg.HapticFeedback?.impactOccurred('light');
+        }
+
+        function updateModalQty(productId, delta) {
+            const p = allProducts.find(x => x.id === productId);
+            if (!p) return;
+
+            modalQty += delta;
+            if (modalQty < 1) modalQty = 1;
+
+            document.getElementById('modal-qty-val').textContent = modalQty;
+            document.getElementById('modal-subtotal').textContent = (p.price * modalQty).toFixed(2) + '€';
+            
             if (tg) tg.HapticFeedback?.impactOccurred('light');
         }
 
