@@ -132,6 +132,8 @@ CREATE TABLE IF NOT EXISTS catalog_products (
     category TEXT NOT NULL DEFAULT 'flower' CHECK (category IN ('flower', 'extract', 'edible', 'accessory', 'other')),
     description TEXT,
     photo_url TEXT,
+    price NUMERIC(10,2) DEFAULT 0,
+    unit TEXT DEFAULT 'g',
     available BOOLEAN DEFAULT TRUE,
     featured BOOLEAN DEFAULT FALSE,
     order_index INTEGER DEFAULT 0,

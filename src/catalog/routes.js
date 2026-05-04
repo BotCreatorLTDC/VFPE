@@ -31,7 +31,7 @@ router.get('/api/:slug', async (req, res) => {
 
         const store = storeRes.rows[0];
         const productsRes = await query(
-            `SELECT id, name, category, description, photo_url, available, featured
+            `SELECT id, name, category, description, photo_url, price, unit, available, featured
              FROM catalog_products WHERE store_id = $1
              ORDER BY featured DESC, order_index ASC, created_at ASC`,
             [store.id]
@@ -69,7 +69,7 @@ router.post('/api/product/toggle', async (req, res) => {
 
 // POST add product (owner only)
 router.post('/api/product/add', async (req, res) => {
-    const { name, category, description, photo_url, available, tg_user_id } = req.body;
+    const { name, category, description, photo_url, price, unit, available, tg_user_id } = req.body;
     if (!name || !tg_user_id) return res.status(400).json({ error: 'Missing params' });
 
     try {
@@ -78,9 +78,9 @@ router.post('/api/product/add', async (req, res) => {
 
         const store_id = storeRes.rows[0].id;
         const result = await query(
-            `INSERT INTO catalog_products (store_id, name, category, description, photo_url, available)
-             VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-            [store_id, name, category || 'flower', description || null, photo_url || null, available ?? true]
+            `INSERT INTO catalog_products (store_id, name, category, description, photo_url, price, unit, available)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+            [store_id, name, category || 'flower', description || null, photo_url || null, price || 0, unit || 'g', available ?? true]
         );
         res.json({ ok: true, id: result.rows[0].id });
     } catch (e) {
@@ -125,6 +125,42 @@ router.post('/api/store/color', async (req, res) => {
     } catch (e) {
         console.error('[Catalog API color]', e);
         res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// POST submit order (customer -> owner notification)
+router.post('/api/order/submit', async (req, res) => {
+    const { slug, items, total, user } = req.body;
+    if (!slug || !items || !total) return res.status(400).json({ error: 'Missing params' });
+
+    try {
+        const storeRes = await query('SELECT name, tg_owner_id FROM catalog_stores WHERE slug = $1', [slug]);
+        if (!storeRes.rows.length) return res.status(404).json({ error: 'Store not found' });
+
+        const { name: storeName, tg_owner_id } = storeRes.rows[0];
+        
+        // Format message
+        const itemsText = items.map(i => `• ${i.qty}x ${i.name} (${(i.price * i.qty).toFixed(2)}€)`).join('\n');
+        const userLink = user.username ? `@${user.username}` : `[${user.first_name}](tg://user?id=${user.id})`;
+        
+        const message = `🛍 *New Order — ${storeName}*\n\n` +
+                        `👤 *Customer:* ${userLink}\n\n` +
+                        `📋 *Items:*\n${itemsText}\n\n` +
+                        `💰 *Total: ${total}€*\n\n` +
+                        `_Reply to the customer to close the deal!_`;
+
+        // Send via Telegram Bot API
+        const axios = require('axios');
+        await axios.post(`https://api.telegram.org/bot${process.env.CATALOG_BOT_TOKEN}/sendMessage`, {
+            chat_id: tg_owner_id,
+            text: message,
+            parse_mode: 'Markdown'
+        });
+
+        res.json({ ok: true });
+    } catch (e) {
+        console.error('[Catalog API order]', e);
+        res.status(500).json({ error: 'Failed to send order' });
     }
 });
 

@@ -215,6 +215,18 @@
             </div>
         </div>
         <div class="form-group">
+            <label>Price & Unit</label>
+            <div style="display:flex; gap:10px;">
+                <input type="number" id="add-price" placeholder="0.00" style="flex:1;">
+                <select id="add-unit" style="width:100px;">
+                    <option value="g">per g</option>
+                    <option value="unit">per unit</option>
+                    <option value="ml">per ml</option>
+                    <option value="pack">per pack</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
             <label>Description <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
             <textarea id="add-desc" placeholder="Describe this product..." maxlength="200"></textarea>
         </div>
@@ -346,7 +358,7 @@ function renderProducts() {
             </div>
             <div class="product-info">
                 <div class="product-name">${p.name}</div>
-                <div class="product-cat">${CAT_LABELS[p.category]}</div>
+                <div class="product-cat">${CAT_LABELS[p.category]} • ${p.price}€/${p.unit}</div>
             </div>
             <div class="product-actions">
                 <button class="toggle-btn ${p.available ? 'available' : 'unavailable'}" onclick="toggleProduct(${p.id})">
@@ -409,11 +421,14 @@ function selectAvail(val) {
 
 function addProduct() {
     const name = document.getElementById('add-name').value.trim();
+    const price = parseFloat(document.getElementById('add-price').value) || 0;
+    const unit = document.getElementById('add-unit').value;
     if (!name) return alert('Product name is required.');
 
     const newP = {
         id: Date.now(), store_id: store.id, name,
         category: selectedCat,
+        price, unit,
         description: document.getElementById('add-desc').value.trim(),
         photo_url: document.getElementById('add-photo').value.trim(),
         available: selectedAvail, featured: false
@@ -430,6 +445,7 @@ function addProduct() {
 
     // Reset form
     document.getElementById('add-name').value = '';
+    document.getElementById('add-price').value = '';
     document.getElementById('add-desc').value = '';
     document.getElementById('add-photo').value = '';
     selectAvail(true);

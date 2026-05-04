@@ -165,6 +165,82 @@
             line-height: 1.2;
         }
 
+        .card-price {
+            font-size: 1.1rem; font-weight: 900;
+            color: var(--accent); margin-top: 6px;
+        }
+        .card-price span { font-size: 0.75rem; color: var(--muted); font-weight: 400; margin-left: 2px; }
+
+        .btn-add-cart {
+            width: 100%; background: var(--accent); color: #000;
+            border: none; border-radius: 10px; padding: 10px;
+            font-size: 0.85rem; font-weight: 800; margin-top: 12px;
+            cursor: pointer; font-family: 'Outfit', sans-serif;
+        }
+
+        /* ── CART UI ── */
+        .cart-float {
+            position: fixed; bottom: 20px; right: 20px;
+            background: var(--accent); color: #000;
+            width: 60px; height: 60px; border-radius: 30px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 24px rgba(0,210,106,0.3);
+            z-index: 90; cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .cart-float:active { transform: scale(0.9); }
+        .cart-count {
+            position: absolute; top: -5px; right: -5px;
+            background: #fff; color: #000;
+            width: 24px; height: 24px; border-radius: 12px;
+            font-size: 0.75rem; font-weight: 900;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--accent);
+        }
+
+        .cart-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.85); z-index: 200;
+            align-items: flex-end;
+        }
+        .cart-overlay.open { display: flex; }
+        .cart-sheet {
+            background: var(--card); border-radius: 24px 24px 0 0;
+            width: 100%; max-height: 85vh; overflow-y: auto;
+            padding: 24px 20px 40px; animation: slideUp 0.3s ease;
+        }
+
+        .cart-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 0; border-bottom: 1px solid var(--border);
+        }
+        .cart-item-info { flex: 1; }
+        .cart-item-name { font-size: 0.95rem; font-weight: 700; }
+        .cart-item-price { font-size: 0.8rem; color: var(--accent); font-weight: 700; }
+        .cart-controls { display: flex; align-items: center; gap: 12px; }
+        .qty-btn {
+            width: 32px; height: 32px; border-radius: 8px;
+            border: 1px solid var(--border); background: #1a1a1a;
+            color: #fff; font-size: 1.2rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .qty-val { font-weight: 700; font-size: 1rem; width: 20px; text-align: center; }
+
+        .cart-footer { margin-top: 24px; }
+        .cart-total-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-top: 15px; border-top: 2px dashed var(--border);
+        }
+        .total-lbl { font-size: 1rem; color: var(--muted); font-weight: 600; }
+        .total-val { font-size: 1.8rem; font-weight: 900; color: var(--accent); }
+
+        .btn-order {
+            width: 100%; background: var(--accent); color: #000;
+            border: none; border-radius: 16px; padding: 18px;
+            font-size: 1.1rem; font-weight: 900; cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+        }
+
         .card-status {
             margin-top: 8px;
             display: inline-block;
@@ -312,11 +388,33 @@
         <div class="powered-by">Powered by <span>VFPE</span> — Europe's Verified Plug Directory</div>
     </div>
 
+    <!-- Floating Cart Button -->
+    <div class="cart-float" id="cart-float" style="display:none;" onclick="openCart()">
+        <span style="font-size:1.5rem">🛒</span>
+        <div class="cart-count" id="cart-count">0</div>
+    </div>
+
     <!-- Detail Modal -->
     <div class="modal-overlay" id="modal">
         <div class="modal-sheet" id="modal-sheet">
             <div class="modal-handle"></div>
             <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Cart Overlay -->
+    <div class="cart-overlay" id="cart-overlay">
+        <div class="cart-sheet">
+            <div class="modal-handle"></div>
+            <h2 style="font-size:1.5rem; font-weight:900; margin-bottom:20px;">Shopping Cart</h2>
+            <div id="cart-items"></div>
+            <div class="cart-footer">
+                <div class="cart-total-row">
+                    <span class="total-lbl">Total Order</span>
+                    <span class="total-val" id="cart-total">0.00€</span>
+                </div>
+                <button class="btn-order" onclick="submitOrder()">🚀 Send Order to Plug</button>
+            </div>
         </div>
     </div>
 
@@ -337,12 +435,12 @@
             logo_url: '', bio: 'Premium genetics. Handcrafted with love.', theme_color: '#00d26a'
         };
         const DEMO_PRODUCTS = [
-            { id: 1, name: 'OG Kush',       category: 'flower',  description: 'Classic West Coast genetics. Earthy, pine, and lemon notes.', photo_url: 'https://images.unsplash.com/photo-1536819114556-1e10f967fb61?auto=format&fit=crop&q=80&w=400', available: true,  featured: true  },
-            { id: 2, name: 'Blue Dream',     category: 'flower',  description: 'Sweet berry aroma with full-body relaxation.',                photo_url: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?auto=format&fit=crop&q=80&w=400', available: true,  featured: false },
-            { id: 3, name: 'Live Resin 710', category: 'extract', description: 'Full-spectrum extract. Top-shelf terpene profile.',           photo_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&q=80&w=400', available: true,  featured: false },
-            { id: 4, name: 'Gorilla Glue',   category: 'flower',  description: 'Heavy-handed euphoria and relaxation.',                       photo_url: '', available: false, featured: false },
-            { id: 5, name: 'Mango Gummies',  category: 'edible',  description: 'Tropical flavour, precisely dosed.',                          photo_url: 'https://images.unsplash.com/photo-1582798358481-d199fb7347bb?auto=format&fit=crop&q=80&w=400', available: true,  featured: false },
-            { id: 6, name: 'Hash Rosin',     category: 'extract', description: 'Cold-pressed solventless extraction. Pure and potent.',       photo_url: '', available: true,  featured: false },
+            { id: 1, name: 'OG Kush',       category: 'flower',  price: 10, unit: 'g', description: 'Classic West Coast genetics. Earthy, pine, and lemon notes.', photo_url: 'https://images.unsplash.com/photo-1536819114556-1e10f967fb61?auto=format&fit=crop&q=80&w=400', available: true,  featured: true  },
+            { id: 2, name: 'Blue Dream',     category: 'flower',  price: 12, unit: 'g', description: 'Sweet berry aroma with full-body relaxation.',                photo_url: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?auto=format&fit=crop&q=80&w=400', available: true,  featured: false },
+            { id: 3, name: 'Live Resin 710', category: 'extract', price: 40, unit: 'g', description: 'Full-spectrum extract. Top-shelf terpene profile.',           photo_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&q=80&w=400', available: true,  featured: false },
+            { id: 4, name: 'Gorilla Glue',   category: 'flower',  price: 10, unit: 'g', description: 'Heavy-handed euphoria and relaxation.',                       photo_url: '', available: false, featured: false },
+            { id: 5, name: 'Mango Gummies',  category: 'edible',  price: 25, unit: 'pack', description: 'Tropical flavour, precisely dosed.',                          photo_url: 'https://images.unsplash.com/photo-1582798358481-d199fb7347bb?auto=format&fit=crop&q=80&w=400', available: true,  featured: false },
+            { id: 6, name: 'Hash Rosin',     category: 'extract', price: 60, unit: 'g', description: 'Cold-pressed solventless extraction. Pure and potent.',       photo_url: '', available: true,  featured: false },
         ];
 
         const params = new URLSearchParams(window.location.search);
@@ -351,6 +449,7 @@
 
         let allProducts = [];
         let currentFilter = 'all';
+        let cart = [];
 
         async function loadCatalog() {
             let store, products;
@@ -418,12 +517,109 @@
                     <div class="card-body">
                         <div class="card-category">${CATEGORY_LABELS[p.category]}</div>
                         <div class="card-name">${p.name}</div>
-                        <span class="card-status ${!p.available ? 'unavailable' : ''}">
-                            ${p.available ? '✅ Available' : '❌ Unavailable'}
-                        </span>
+                        <div class="card-price">${p.price}€<span>/${p.unit}</span></div>
+                        <button class="btn-add-cart" onclick="event.stopPropagation(); addToCart(${p.id})">
+                            ADD TO CART
+                        </button>
                     </div>
                 </div>
             `).join('');
+        }
+
+        // ── CART LOGIC ──
+        function addToCart(productId) {
+            const p = allProducts.find(x => x.id === productId);
+            if (!p || !p.available) return;
+
+            const existing = cart.find(item => item.id === productId);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ ...p, qty: 1 });
+            }
+            updateCartUI();
+            if (tg) tg.HapticFeedback?.impactOccurred('medium');
+        }
+
+        function updateCartUI() {
+            const float = document.getElementById('cart-float');
+            const count = document.getElementById('cart-count');
+            const itemsContainer = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+
+            const totalQty = cart.reduce((acc, item) => acc + item.qty, 0);
+            const totalMoney = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+
+            float.style.display = totalQty > 0 ? 'flex' : 'none';
+            count.textContent = totalQty;
+            totalEl.textContent = totalMoney.toFixed(2) + '€';
+
+            itemsContainer.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-price">${item.price}€ / ${item.unit}</div>
+                    </div>
+                    <div class="cart-controls">
+                        <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
+                        <span class="qty-val">${item.qty}</span>
+                        <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateQty(id, delta) {
+            const item = cart.find(x => x.id === id);
+            if (!item) return;
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cart = cart.filter(x => x.id !== id);
+            }
+            updateCartUI();
+            if (tg) tg.HapticFeedback?.impactOccurred('light');
+        }
+
+        function openCart() {
+            document.getElementById('cart-overlay').classList.add('open');
+        }
+
+        function submitOrder() {
+            if (!cart.length) return;
+            
+            const summary = cart.map(item => `- ${item.qty}x ${item.name} (${(item.price * item.qty).toFixed(2)}€)`).join('\n');
+            const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0).toFixed(2);
+            
+            const orderData = {
+                slug,
+                items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+                total: total,
+                user: tg?.initDataUnsafe?.user || { first_name: 'Customer' }
+            };
+
+            if (isDemo) {
+                alert(`🚀 DEMO ORDER SENT!\n\n${summary}\n\nTotal: ${total}€`);
+                cart = [];
+                updateCartUI();
+                document.getElementById('cart-overlay').classList.remove('open');
+                return;
+            }
+
+            // Real submit
+            fetch('/catalog/api/order/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            }).then(res => res.json()).then(data => {
+                if (data.ok) {
+                    alert('✅ Order sent! The plug will contact you soon.');
+                    cart = [];
+                    updateCartUI();
+                    document.getElementById('cart-overlay').classList.remove('open');
+                } else {
+                    alert('❌ Error sending order. Try again.');
+                }
+            });
         }
 
         function openModal(productId) {
@@ -435,11 +631,17 @@
                 ${p.photo_url ? `<img src="${p.photo_url}" class="modal-img" alt="${p.name}">` : ''}
                 <div class="modal-category">${CATEGORY_LABELS[p.category]}</div>
                 <h2 class="modal-name">${p.name}</h2>
+                <div class="card-price" style="font-size:1.5rem; margin-bottom:15px;">${p.price}€ <span style="font-size:1rem;">/${p.unit}</span></div>
                 ${p.description ? `<p class="modal-desc">${p.description}</p>` : ''}
                 <div class="modal-status-row">
                     <div class="status-dot ${!p.available ? 'unavailable' : ''}"></div>
                     <span class="status-text">${p.available ? 'Currently Available' : 'Currently Unavailable'}</span>
                 </div>
+                ${p.available ? `
+                    <button class="btn-order" style="margin-top:20px;" onclick="addToCart(${p.id}); document.getElementById('modal').classList.remove('open');">
+                        Add to Order
+                    </button>
+                ` : ''}
             `;
 
             document.getElementById('modal').classList.add('open');
@@ -460,6 +662,12 @@
         document.getElementById('modal').onclick = (e) => {
             if (e.target === document.getElementById('modal')) {
                 document.getElementById('modal').classList.remove('open');
+            }
+        };
+
+        document.getElementById('cart-overlay').onclick = (e) => {
+            if (e.target === document.getElementById('cart-overlay')) {
+                document.getElementById('cart-overlay').classList.remove('open');
             }
         };
 
