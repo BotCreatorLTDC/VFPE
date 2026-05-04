@@ -325,39 +325,55 @@
         if (tg) { tg.expand(); tg.ready(); }
 
         const CATEGORY_LABELS = {
-            flower: '🌿 Flower',
-            extract: '🧪 Extract',
-            edible: '🍫 Edible',
-            accessory: '🛒 Accessory',
-            other: '✨ Other'
+            flower: '🌿 Flower', extract: '🧪 Extract',
+            edible: '🍫 Edible', accessory: '🛒 Accessory', other: '✨ Other'
         };
-
         const CATEGORY_EMOJI = {
             flower: '🌿', extract: '🧪', edible: '🍫', accessory: '🛒', other: '✨'
         };
 
-        // Get slug from URL
+        const DEMO_STORE = {
+            id: 1, slug: 'hashandcrafts', name: 'HashAndCrafts',
+            logo_url: '', bio: 'Premium genetics. Handcrafted with love.', theme_color: '#00d26a'
+        };
+        const DEMO_PRODUCTS = [
+            { id: 1, name: 'OG Kush',       category: 'flower',  description: 'Classic West Coast genetics. Earthy, pine, and lemon notes.', photo_url: 'https://images.unsplash.com/photo-1536819114556-1e10f967fb61?auto=format&fit=crop&q=80&w=400', available: true,  featured: true  },
+            { id: 2, name: 'Blue Dream',     category: 'flower',  description: 'Sweet berry aroma with full-body relaxation.',                photo_url: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?auto=format&fit=crop&q=80&w=400', available: true,  featured: false },
+            { id: 3, name: 'Live Resin 710', category: 'extract', description: 'Full-spectrum extract. Top-shelf terpene profile.',           photo_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&q=80&w=400', available: true,  featured: false },
+            { id: 4, name: 'Gorilla Glue',   category: 'flower',  description: 'Heavy-handed euphoria and relaxation.',                       photo_url: '', available: false, featured: false },
+            { id: 5, name: 'Mango Gummies',  category: 'edible',  description: 'Tropical flavour, precisely dosed.',                          photo_url: 'https://images.unsplash.com/photo-1582798358481-d199fb7347bb?auto=format&fit=crop&q=80&w=400', available: true,  featured: false },
+            { id: 6, name: 'Hash Rosin',     category: 'extract', description: 'Cold-pressed solventless extraction. Pure and potent.',       photo_url: '', available: true,  featured: false },
+        ];
+
+        const params = new URLSearchParams(window.location.search);
+        const isDemo = params.get('demo') === 'true';
         const slug = window.location.pathname.split('/').filter(Boolean).pop();
 
         let allProducts = [];
         let currentFilter = 'all';
 
         async function loadCatalog() {
-            try {
-                const res = await fetch(`/catalog/api/${slug}`);
-                if (!res.ok) throw new Error('Not found');
-                const { store, products } = await res.json();
-
-                applyTheme(store.theme_color);
-                renderHero(store);
-                allProducts = products;
-                renderProducts();
-
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('app').style.display = 'block';
-            } catch (e) {
-                document.getElementById('loading').innerHTML = '<div>😕</div><p>Catalog not found.</p>';
+            let store, products;
+            if (isDemo) {
+                store = DEMO_STORE;
+                products = DEMO_PRODUCTS;
+            } else {
+                try {
+                    const res = await fetch(`/catalog/api/${slug}`);
+                    if (!res.ok) throw new Error();
+                    ({ store, products } = await res.json());
+                } catch {
+                    document.getElementById('loading').innerHTML = '<div>😕</div><p>Catalog not found.</p>';
+                    return;
+                }
             }
+
+            applyTheme(store.theme_color);
+            renderHero(store);
+            allProducts = products;
+            renderProducts();
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
         }
 
         function applyTheme(color) {
