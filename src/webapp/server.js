@@ -213,7 +213,13 @@ app.get('/api/my-club', async (req, res) => {
     const tgUser = username.startsWith('@') ? username : `@${username}`;
 
     try {
-        const result = await query("SELECT id, name, city, country, telegram_username, instagram, description, selected_plan, status, click_count, likes_count, view_count, service_tags FROM clubs WHERE telegram_username = $1 AND status = 'verified'", [tgUser]);
+        const result = await query(`
+            SELECT c.*, cs.slug as catalog_slug 
+            FROM clubs c 
+            LEFT JOIN catalog_stores cs ON c.tg_user_id = cs.tg_owner_id
+            WHERE c.telegram_username = $1 AND c.status = 'verified'
+        `, [tgUser]);
+        
         if (result.rows.length === 0) return res.status(404).json({ error: "No verified club found" });
         res.json(result.rows[0]);
     } catch (err) {
@@ -260,7 +266,12 @@ app.post('/api/my-club/update', async (req, res) => {
 
 app.get('/api/admin/clubs', adminAuth, async (req, res) => {
     try {
-        const result = await query("SELECT * FROM clubs ORDER BY created_at DESC");
+        const result = await query(`
+            SELECT c.*, cs.slug as catalog_slug 
+            FROM clubs c 
+            LEFT JOIN catalog_stores cs ON c.tg_user_id = cs.tg_owner_id
+            ORDER BY c.created_at DESC
+        `);
         res.json(result.rows);
     } catch (err) {
         res.status(500).json({ error: "Failed" });

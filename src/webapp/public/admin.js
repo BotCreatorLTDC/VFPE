@@ -139,11 +139,18 @@ function renderView(reports = []) {
                 <span>💬 ${club.telegram_username}</span>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <span>🖱 ${club.click_count || 0} clicks</span>
-                    ${club.status === 'verified' ? `
-                        <button onclick="copyDeepLink(${club.id})" style="background:#444; border:none; color:#fff; padding:2px 8px; border-radius:5px; font-size:0.7rem; cursor:pointer;">
-                            🔗 Copiar Enlace
-                        </button>
-                    ` : ''}
+                    <div style="display:flex; gap:5px;">
+                        ${club.catalog_slug ? `
+                            <button onclick="window.open('/catalog/manage.html?slug=${club.catalog_slug}', '_blank')" style="background:#00d26a; border:none; color:#000; padding:2px 8px; border-radius:5px; font-size:0.7rem; font-weight:bold; cursor:pointer;">
+                                📦 Catálogo
+                            </button>
+                        ` : ''}
+                        ${club.status === 'verified' ? `
+                            <button onclick="copyDeepLink(${club.id})" style="background:#444; border:none; color:#fff; padding:2px 8px; border-radius:5px; font-size:0.7rem; cursor:pointer;">
+                                🔗 Enlace
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
             </div>
             <div class="card-actions">

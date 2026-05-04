@@ -616,7 +616,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showOwnerTools(club) {
         const tools = document.getElementById('owner-tools');
-        tools.style.display = 'block';
+        tools.style.display = 'flex';
+        tools.style.gap = '10px';
+        tools.style.padding = '15px';
+        tools.style.justifyContent = 'center';
+
+        const catalogBtn = document.getElementById('open-catalog-manager-btn');
+        catalogBtn.onclick = () => {
+            if (tg) tg.HapticFeedback?.impactOccurred('medium');
+            if (club.catalog_slug) {
+                // Go to management panel
+                window.location.href = `/catalog/manage.html?slug=${club.catalog_slug}`;
+            } else {
+                // Go to Bot to create one
+                if (tg) {
+                    tg.openTelegramLink('https://t.me/VerifyPlugBot?start=create');
+                } else {
+                    window.open('https://t.me/VerifyPlugBot', '_blank');
+                }
+            }
+        };
+
         document.getElementById('open-edit-btn').onclick = () => {
             document.getElementById('edit-id').value            = club.id;
             document.getElementById('edit-name-display').value  = club.name;
