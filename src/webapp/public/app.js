@@ -17,16 +17,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── CATALOG INTEGRATION ─────────────────────────────────────────────────
     window.openCatalog = function(slug) {
         if (tg) tg.HapticFeedback?.impactOccurred('medium');
-        const url = `https://t.me/hashandcrafts_catalog_bot/app?startapp=${slug}`;
-        if (tg) {
-            tg.openTelegramLink(url);
-        } else {
-            window.open(`${window.location.origin}/catalog/${slug}`, '_blank');
-        }
+        // Seamless internal navigation
+        window.location.href = `/catalog/${slug}`;
     };
 
     // ─── TELEGRAM ────────────────────────────────────────────────────────────
     const tg         = window.Telegram?.WebApp;
+    if (tg) {
+        tg.expand();
+        tg.ready();
+        tg.BackButton.hide();
+    }
     const userLang   = tg?.initDataUnsafe?.user?.language_code || 'es';
     const isEnglish  = (userLang !== 'es');
     const tgUserId   = tg?.initDataUnsafe?.user?.id;

@@ -574,7 +574,16 @@
 
     <script>
         const tg = window.Telegram?.WebApp;
-        if (tg) { tg.expand(); tg.ready(); }
+        if (tg) { 
+            tg.expand(); 
+            tg.ready(); 
+            
+            // Show Native Back Button to return to Directory
+            tg.BackButton.show();
+            tg.BackButton.onClick(() => {
+                window.location.href = '/';
+            });
+        }
 
         const CATEGORY_LABELS = {
             flower: '🌿 Flower', extract: '🧪 Extract',
