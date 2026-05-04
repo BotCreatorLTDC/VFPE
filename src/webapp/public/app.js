@@ -630,9 +630,9 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 // Go to Bot to create one
                 if (tg) {
-                    tg.openTelegramLink('https://t.me/VerifyPlugBot?start=create');
+                    tg.openTelegramLink('https://t.me/hashandcrafts_catalog_bot?start=create');
                 } else {
-                    window.open('https://t.me/VerifyPlugBot', '_blank');
+                    window.open('https://t.me/hashandcrafts_catalog_bot', '_blank');
                 }
             }
         };
