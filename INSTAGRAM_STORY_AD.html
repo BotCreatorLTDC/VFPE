@@ -1,22 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VFPE - Ultra Premium Ad</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
+    <title>VFPE · Ecosistema de Confianza · Anuncio Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --accent: #00d26a;
+            --accent-glow: #00ff80;
             --gold: #FFD700;
+            --gold-glow: #ffea70;
             --bg: #000000;
-            --duration: 5500ms;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
-            background-color: #050505;
+            background: radial-gradient(ellipse at center, #0a0f0a 0%, #000000 70%);
             color: #fff;
             font-family: 'Outfit', sans-serif;
             overflow: hidden;
@@ -34,256 +40,952 @@
             background: #000;
             position: relative;
             overflow: hidden;
-            perspective: 2000px; /* Para efectos 3D */
+            perspective: 2000px;
+            box-shadow: 0 0 80px rgba(0, 210, 106, 0.08), 0 0 200px rgba(0, 0, 0, 0.9);
+            border-radius: 8px;
         }
 
-        /* Fondo Dinámico con Partículas */
-        .bg-elements {
-            position: absolute; width: 100%; height: 100%;
-            z-index: 1; pointer-events: none;
-        }
-        .particle {
-            position: absolute; border-radius: 50%;
-            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
-            filter: blur(40px); opacity: 0.15;
-            animation: floatBg 20s infinite alternate;
+        /* ── Vignette ── */
+        .vignette {
+            position: absolute;
+            inset: 0;
+            z-index: 90;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.8) 100%);
+            mix-blend-mode: multiply;
         }
 
-        @keyframes floatBg {
-            from { transform: translate(0,0) scale(1); }
-            to { transform: translate(50px, 100px) scale(1.5); }
-        }
-
-        /* Barra de Progreso */
-        .progress-container {
-            position: absolute; top: 15px; left: 15px; right: 15px;
-            display: flex; gap: 4px; z-index: 100;
-        }
-        .progress-segment {
-            flex: 1; height: 3px; background: rgba(255,255,255,0.15); border-radius: 4px; overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%; background: #fff; width: 0%;
-        }
-        .active-fill { animation: fillProgress var(--duration) linear forwards; }
-        @keyframes fillProgress { from { width: 0%; } to { width: 100%; } }
-
-        /* Estructura de Escena */
-        .scene {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0; visibility: hidden;
-            display: flex; flex-direction: column;
-            transition: opacity 0.6s ease;
-            z-index: 5;
-        }
-        .scene.active { opacity: 1; visibility: visible; }
-
-        /* Animaciones de Texto Premium */
-        .text-box {
-            position: absolute; padding: 30px; z-index: 20;
+        /* ── Scanline ── */
+        .scanline {
+            position: absolute;
             width: 100%;
-        }
-        .scene.active .title { animation: textIn 1s cubic-bezier(0.19, 1, 0.22, 1) both; }
-        .scene.active .sub { animation: textIn 1s cubic-bezier(0.19, 1, 0.22, 1) 0.2s both; }
-
-        @keyframes textIn {
-            from { opacity: 0; transform: translateY(40px) skewY(5deg); filter: blur(10px); }
-            to { opacity: 1; transform: translateY(0) skewY(0); filter: blur(0); }
-        }
-
-        .title { font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 10px; color: var(--accent); }
-        .sub { font-size: 1.3rem; color: #888; font-weight: 400; max-width: 80%; }
-
-        /* Contenedor 3D del Dispositivo */
-        .device-container {
-            position: absolute; width: 100%; height: 100%;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 10; pointer-events: none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+            z-index: 91;
+            pointer-events: none;
+            animation: scanMove 4s linear infinite;
+            opacity: 0.7;
         }
 
-        .phone {
-            width: 280px; height: 580px; background: #000;
-            border-radius: 40px; border: 6px solid #222;
-            box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+        @keyframes scanMove {
+            0% {
+                top: -5%;
+            }
+
+            100% {
+                top: 105%;
+            }
+        }
+
+        /* ── Partículas ── */
+        .bg-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: floatParticle 18s infinite alternate ease-in-out;
+            filter: blur(35px);
+            opacity: 0.18;
+            will-change: transform;
+        }
+
+        .particle:nth-child(1) {
+            width: 320px;
+            height: 320px;
+            top: -120px;
+            left: -80px;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+        }
+
+        .particle:nth-child(2) {
+            width: 260px;
+            height: 260px;
+            bottom: -90px;
+            right: -60px;
+            background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
+            opacity: 0.13;
+        }
+
+        .particle:nth-child(3) {
+            width: 180px;
+            height: 180px;
+            top: 35%;
+            left: -70px;
+            background: radial-gradient(circle, #00c6ff 0%, transparent 70%);
+            opacity: 0.09;
+        }
+
+        .particle:nth-child(4) {
+            width: 200px;
+            height: 200px;
+            bottom: 20%;
+            right: -90px;
+            background: radial-gradient(circle, #ff6ec7 0%, transparent 70%);
+            opacity: 0.07;
+        }
+
+        .particle:nth-child(5) {
+            width: 140px;
+            height: 140px;
+            top: 10%;
+            right: 15%;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            opacity: 0.11;
+        }
+
+        @keyframes floatParticle {
+            0% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+            }
+
+            25% {
+                transform: translate(60px, -40px) scale(1.4) rotate(5deg);
+            }
+
+            50% {
+                transform: translate(-30px, 70px) scale(0.8) rotate(-3deg);
+            }
+
+            75% {
+                transform: translate(-50px, -60px) scale(1.3) rotate(7deg);
+            }
+
+            100% {
+                transform: translate(40px, 30px) scale(1.1) rotate(-2deg);
+            }
+        }
+
+        /* ── Sparkles ── */
+        .sparkle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #fff;
+            border-radius: 50%;
+            z-index: 50;
+            pointer-events: none;
+            animation: sparkleFloat 6s linear infinite;
+            opacity: 0;
+            box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.7);
+        }
+
+        @keyframes sparkleFloat {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) scale(0);
+            }
+
+            10% {
+                opacity: 0.9;
+            }
+
+            40% {
+                opacity: 0.3;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-10vh) scale(1.8);
+            }
+        }
+
+        /* ── Barra de Progreso ── */
+        .progress-container {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            right: 14px;
+            display: flex;
+            gap: 5px;
+            z-index: 100;
+        }
+
+        .progress-segment {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
             overflow: hidden;
-            transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+            backdrop-filter: blur(4px);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
         }
 
-        .phone img {
-            width: 100%; height: 100%; object-fit: cover;
-            animation: imgPan 10s ease-in-out infinite alternate;
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-glow), #fff);
+            width: 0%;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 210, 106, 0.7), 0 0 25px rgba(0, 255, 128, 0.4);
         }
 
-        @keyframes imgPan {
-            from { transform: scale(1.1) translateY(0); }
-            to { transform: scale(1.1) translateY(-30px); }
+        .active-fill {
+            animation: fillProgress var(--duration) linear forwards;
         }
 
-        /* Posiciones dinámicas por Escena */
-        
-        /* Scene 1: Intro */
-        .scene-1 { justify-content: center; align-items: center; text-align: center; }
-        .scene-1 .title { font-size: 6rem; color: #fff; letter-spacing: -4px; }
-        .scene-1 .badge { background: var(--accent); color: #000; padding: 4px 12px; border-radius: 20px; font-weight: 900; margin-bottom: 10px; display: inline-block; }
-
-        /* Scene 2: Trust (Phone tilts Right, Text Top Left) */
-        .scene-2 .text-box { top: 80px; text-align: left; }
-        .scene.active.scene-2 ~ .device-container .phone {
-            transform: translate(40px, 120px) rotateY(-20deg) rotateX(10deg) rotateZ(5deg) scale(0.9);
+        .done-fill {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
         }
 
-        /* Scene 3: Map (Phone tilts Left, Text Bottom Right) */
-        .scene-3 .text-box { bottom: 80px; text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
-        .scene.active.scene-3 ~ .device-container .phone {
-            transform: translate(-50px, -100px) rotateY(25deg) rotateX(-5deg) rotateZ(-10deg) scale(1.1);
+        @keyframes fillProgress {
+            from {
+                width: 0%;
+            }
+
+            to {
+                width: 100%;
+            }
         }
 
-        /* Scene 4: Catalog (Phone Center Zoom) */
-        .scene-4 .text-box { top: 60px; text-align: center; }
-        .scene.active.scene-4 ~ .device-container .phone {
-            transform: translate(0, 50px) rotateY(0) rotateX(15deg) scale(0.95);
+        /* ── Escenas ── */
+        .scene {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            z-index: 50; /* Por encima del dispositivo (z-index 10) */
+            transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.7s;
+            pointer-events: none;
         }
 
-        /* Scene 5: Final (Phone Out, Full Logo) */
-        .scene-5 { justify-content: center; align-items: center; text-align: center; }
-        .scene.active.scene-5 ~ .device-container .phone {
-            transform: translateY(800px) scale(0.5); opacity: 0;
+        .scene.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
         }
 
-        .cta-btn {
-            margin-top: 30px; padding: 15px 40px; background: var(--accent);
-            color: #000; font-weight: 900; border-radius: 50px;
-            font-size: 1.2rem; letter-spacing: 2px;
-            animation: pulse 2s infinite;
+        /* ── Layouts de texto ── */
+        .layout-center {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .layout-left-top {
+            justify-content: flex-start;
+            align-items: flex-start;
+            text-align: left;
+            padding-top: 70px;
+            padding-left: 25px;
+        }
+
+        .layout-right-bottom {
+            justify-content: flex-end;
+            align-items: flex-end;
+            text-align: right;
+            padding-bottom: 70px;
+            padding-right: 25px;
+        }
+
+        .layout-center-top {
+            justify-content: flex-start;
+            align-items: center;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        /* ── Texto ── */
+        .text-box {
+            z-index: 100;
+            width: 100%;
+            padding: 20px;
+            pointer-events: auto;
+        }
+
+        .layout-center .text-box,
+        .layout-center-top .text-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .layout-left-top .text-box {
+            align-items: flex-start;
+        }
+
+        .layout-right-bottom .text-box {
+            align-items: flex-end;
+        }
+
+        .scene.active .title {
+            animation: textReveal 0.9s cubic-bezier(0.19, 1, 0.22, 1) both;
+        }
+
+        .scene.active .sub {
+            animation: textReveal 0.9s cubic-bezier(0.19, 1, 0.22, 1) 0.2s both;
+        }
+
+        .scene.active .badge {
+            animation: badgePop 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.05s both;
+        }
+
+        .scene.active .cta-btn {
+            animation: ctaBoom 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.4s both, pulse 2.2s ease-in-out 1.4s infinite;
+        }
+
+        @keyframes textReveal {
+            from {
+                opacity: 0;
+                transform: translateY(50px) skewY(8deg) scale(0.9);
+                filter: blur(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) skewY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes badgePop {
+            from {
+                opacity: 0;
+                transform: scale(0.3) rotate(-10deg);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        @keyframes ctaBoom {
+            from {
+                opacity: 0;
+                transform: scale(0.2) translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,210,106,0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(0,210,106,0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,210,106,0); }
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(0, 210, 106, 0.8), 0 0 30px rgba(0, 210, 106, 0.4);
+            }
+
+            50% {
+                transform: scale(1.06);
+                box-shadow: 0 0 0 18px rgba(0, 210, 106, 0), 0 0 60px rgba(0, 255, 128, 0.7);
+            }
         }
 
+        .title {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 10px;
+            color: var(--accent);
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-glow) 50%, #fff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shimmerText 4s linear infinite;
+            filter: drop-shadow(0 0 35px rgba(0, 210, 106, 0.5));
+        }
+
+        @keyframes shimmerText {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        .title.gold {
+            background: linear-gradient(135deg, #fff 0%, var(--gold) 50%, #fff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 35px rgba(255, 215, 0, 0.6));
+        }
+
+        .title.big {
+            font-size: 4.5rem;
+            letter-spacing: -4px;
+        }
+
+        .sub {
+            font-size: 1.2rem;
+            color: #bbb;
+            font-weight: 400;
+            max-width: 85%;
+            letter-spacing: 0.3px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+        }
+
+        .badge {
+            background: linear-gradient(135deg, var(--accent), #00b855);
+            color: #000;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: inline-block;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 25px rgba(0, 210, 106, 0.5);
+        }
+
+        .badge.gold-badge {
+            background: linear-gradient(135deg, var(--gold), #e6b800);
+        }
+
+        /* ── Dispositivo 3D ── */
+        .device-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            pointer-events: none;
+            perspective: 1500px;
+        }
+
+        .phone-wrapper {
+            transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1), opacity 1.5s;
+            will-change: transform, opacity;
+            transform-style: preserve-3d;
+        }
+
+        .phone {
+            width: 280px;
+            height: 580px;
+            background: #0a0a0a;
+            border-radius: 40px;
+            border: 5px solid #2a2a2a;
+            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.9), 0 0 0 2px rgba(255, 255, 255, 0.04) inset, 0 0 40px rgba(0, 210, 106, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .phone::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 43px;
+            border: 2px solid transparent;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), transparent 40%, transparent 60%, rgba(0, 210, 106, 0.2)) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .phone img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            animation: imgPan 12s ease-in-out infinite alternate;
+            transition: opacity 0.4s;
+        }
+
+        @keyframes imgPan {
+            from {
+                transform: scale(1.08) translateY(0);
+            }
+
+            to {
+                transform: scale(1.08) translateY(-35px);
+            }
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90px;
+            height: 28px;
+            background: #000;
+            border-radius: 0 0 18px 18px;
+            z-index: 3;
+            pointer-events: none;
+            border: 2px solid #1a1a1a;
+            border-top: none;
+        }
+
+        /* ── CTA ── */
+        .cta-btn {
+            margin-top: 30px;
+            padding: 16px 42px;
+            background: linear-gradient(135deg, var(--accent), #00b84d);
+            color: #000;
+            font-weight: 900;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 35px rgba(0, 210, 106, 0.55);
+            display: inline-block;
+        }
+
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 60%);
+            animation: rotateShine 3s linear infinite;
+        }
+
+        @keyframes rotateShine {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .pulse-ring {
+            position: absolute;
+            border: 3px solid var(--accent);
+            border-radius: 50px;
+            animation: ringOut 2.2s ease-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .pulse-ring:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .pulse-ring:nth-child(2) {
+            animation-delay: 0.7s;
+        }
+
+        .pulse-ring:nth-child(3) {
+            animation-delay: 1.4s;
+        }
+
+        @keyframes ringOut {
+            0% {
+                transform: scale(0.9);
+                opacity: 0.9;
+                border-color: var(--accent-glow);
+            }
+
+            100% {
+                transform: scale(1.6);
+                opacity: 0;
+                border-color: transparent;
+            }
+        }
+
+        .ring-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        /* ── Glitch ── */
+        .glitch-flash {
+            position: absolute;
+            inset: 0;
+            background: #fff;
+            z-index: 95;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.05s;
+        }
+
+        .glitch-flash.fire {
+            opacity: 0.25;
+            transition: opacity 0s;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 450px) {
+            .story-viewport {
+                max-width: 100vw;
+                max-height: 100vh;
+                border-radius: 0;
+            }
+
+            .phone {
+                width: 240px;
+                height: 500px;
+                border-radius: 34px;
+            }
+
+            .title {
+                font-size: 2.4rem;
+            }
+
+            .title.big {
+                font-size: 3.6rem;
+            }
+
+            .sub {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
+
 <body>
 
-    <div class="story-viewport">
-        <!-- Background elements -->
-        <div class="bg-elements">
-            <div class="particle" style="width: 300px; height: 300px; top: -100px; left: -100px;"></div>
-            <div class="particle" style="width: 250px; height: 250px; bottom: -50px; right: -50px; background: var(--gold); opacity: 0.1;"></div>
+    <div class="story-viewport" id="viewport">
+        <div class="vignette"></div>
+        <div class="scanline"></div>
+
+        <div class="bg-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
         </div>
 
+        <div id="sparkles-container" style="position:absolute;inset:0;z-index:50;pointer-events:none;"></div>
+        <div class="glitch-flash" id="glitch-flash"></div>
         <div class="progress-container" id="progress-bar"></div>
 
-        <!-- SCENE 1: THE BRAND -->
-        <div class="scene scene-1 active" data-img="" data-duration="4000">
+        <!-- ── 12 ESCENAS ── -->
+        <!-- 01 Portada -->
+        <div class="scene scene-1 layout-center active" data-img="" data-duration="4000">
             <div class="text-box">
-                <div class="badge">ESTÁNDAR GLOBAL</div>
-                <div class="title">VFPE</div>
-                <div class="sub">El nuevo nivel de los perfiles verificados.</div>
+                <div class="badge">PROTOCOLO GLOBAL</div>
+                <div class="title big">VFPE</div>
+                <div class="sub">Elevando el estándar de seguridad y ventas en el ecosistema digital.</div>
             </div>
         </div>
 
-        <!-- SCENE 2: THE TRUST -->
-        <div class="scene scene-2" data-img="assets/Final_Presentation/Screenshot_2026-05-04-13-10-17-908_org.telegram.messenger-edit.jpg" data-duration="5500">
+        <!-- 02 El Problema -->
+        <div class="scene scene-2 layout-center" data-img="" data-duration="4000">
             <div class="text-box">
-                <div class="title">TRUST</div>
-                <div class="sub">Se acabaron las dudas. Solo perfiles reales y contrastados.</div>
+                <div class="badge">PROBLEMA</div>
+                <div class="title">Desconfianza</div>
+                <div class="sub">El mercado actual sufre de información dispersa y altos riesgos de fraude.</div>
             </div>
         </div>
 
-        <!-- SCENE 3: THE MAP -->
-        <div class="scene scene-3" data-img="assets/Final_Presentation/Screenshot_2026-05-04-13-10-30-666_org.telegram.messenger-edit.jpg" data-duration="5500">
+        <!-- 03 La Solución -->
+        <div class="scene scene-3 layout-left-top" data-img="assets/Final_Presentation/2-lista-plugs.jpg"
+            data-duration="5000">
             <div class="text-box">
-                <div class="title">MAPS</div>
-                <div class="sub">Navegación inteligente por zonas. Todo bajo control.</div>
+                <div class="badge">SOLUCIÓN</div>
+                <div class="title">Ecosistema 360°</div>
+                <div class="sub">Directorio de Confianza + Tienda Nativa + Verificación de Identidad.</div>
             </div>
         </div>
 
-        <!-- SCENE 4: CATALOG -->
-        <div class="scene scene-4" data-img="assets/Final_Presentation/Screenshot_2026-05-04-13-18-59-167_org.telegram.messenger-edit.jpg" data-duration="5500">
+        <!-- 04 El Directorio -->
+        <div class="scene scene-4 layout-right-bottom" data-img="assets/Final_Presentation/3-filtros.jpg"
+            data-duration="5000">
             <div class="text-box">
-                <div class="title">SHOP</div>
-                <div class="sub">Tu menú favorito, directamente en Telegram.</div>
+                <div class="badge">DIRECTORIO</div>
+                <div class="title">Mapa Interactivo</div>
+                <div class="sub">Navegación geográfica por zonas y filtros avanzados de servicio.</div>
             </div>
         </div>
 
-        <!-- SCENE 5: CTA -->
-        <div class="scene scene-5" data-img="" data-duration="6000">
+        <!-- 05 Verificación -->
+        <div class="scene scene-5 layout-center-top" data-img="assets/Final_Presentation/4-perfil-detallado.jpg"
+            data-duration="5000">
             <div class="text-box">
-                <div class="title">ÚNETE</div>
-                <div class="sub">Sé parte del ecosistema líder en Europa.</div>
-                <div class="cta-btn">@VFPE_BOT</div>
+                <div class="badge">VERIFICACIÓN</div>
+                <div class="title">Perfiles Premium</div>
+                <div class="sub">Branding exclusivo, reseñas reales y estatus de verificación inalterable.</div>
             </div>
         </div>
 
-        <!-- THE 3D DEVICE (Sincronizado por JS) -->
+        <!-- 06 Escaparate -->
+        <div class="scene scene-6 layout-center-top" data-img="assets/Final_Presentation/6-main-catalogo.jpg"
+            data-duration="5000">
+            <div class="text-box">
+                <div class="badge">TIENDA NATIVA</div>
+                <div class="title">Escaparate Visual</div>
+                <div class="sub">Catálogo avanzado, organizado por categorías y optimizado para móvil.</div>
+            </div>
+        </div>
+
+        <!-- 07 Producto -->
+        <div class="scene scene-7 layout-left-top" data-img="assets/Final_Presentation/7-ficha-producto.jpg"
+            data-duration="5000">
+            <div class="text-box">
+                <div class="badge">PRODUCTO</div>
+                <div class="title">Detalle Real</div>
+                <div class="sub">Fichas claras con precios, descripciones y control de stock.</div>
+            </div>
+        </div>
+
+        <!-- 08 Carrito -->
+        <div class="scene scene-8 layout-right-bottom" data-img="assets/Final_Presentation/8-carrito.jpg"
+            data-duration="5000">
+            <div class="text-box">
+                <div class="badge">CARRITO</div>
+                <div class="title">Pedido Inteligente</div>
+                <div class="sub">Gestión de cantidades, carrito inteligente y confirmación instantánea.</div>
+            </div>
+        </div>
+
+        <!-- 09 Éxito -->
+        <div class="scene scene-9 layout-center" data-img="assets/Final_Presentation/9-exito.jpg" data-duration="4000">
+            <div class="text-box">
+                <div class="badge gold-badge">¡ÉXITO!</div>
+                <div class="title gold">ORDER SENT</div>
+                <div class="sub">Proceso finalizado. Experiencia fluida y satisfactoria.</div>
+            </div>
+        </div>
+
+        <!-- 10 Notificación -->
+        <div class="scene scene-10 layout-left-top"
+            data-img="assets/Final_Presentation/10-mensaje-que-recibe-plug-con-carrito.jpg" 
+            data-fit="contain"
+            data-duration="5000">
+            <div class="text-box">
+                <div class="badge">NOTIFICACIÓN</div>
+                <div class="title">Ventas Automatizadas</div>
+                <div class="sub">El plug recibe el pedido completo con todos los detalles vía Telegram.</div>
+            </div>
+        </div>
+
+        <!-- 11 Gestión -->
+        <div class="scene scene-11 layout-center-top" data-img="assets/Final_Presentation/5-barra-lateral-dueños.jpg"
+            data-duration="5000">
+            <div class="text-box">
+                <div class="badge">PANEL ADMIN</div>
+                <div class="title">Centro de Control</div>
+                <div class="sub">Gestión SaaS de stock, precios y ajustes del perfil.</div>
+            </div>
+        </div>
+
+        <!-- 12 PlugPass -->
+        <div class="scene scene-12 layout-center" data-img="" data-duration="5500">
+            <div class="text-box">
+                <div class="badge gold-badge">ROADMAP 2026</div>
+                <div class="title gold big">PlugPass</div>
+                <div class="sub">PRÓXIMAMENTE: El protocolo de reputación basado en hechos reales.</div>
+                <div style="position:relative;display:inline-block;margin-top:30px;">
+                    <div class="ring-container">
+                        <div class="pulse-ring" style="width:100%;height:100%;border-radius:50px;"></div>
+                        <div class="pulse-ring" style="width:100%;height:100%;border-radius:50px;"></div>
+                        <div class="pulse-ring" style="width:100%;height:100%;border-radius:50px;"></div>
+                    </div>
+                    <div class="cta-btn">@VFPE_BOT</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dispositivo 3D -->
         <div class="device-container">
-            <div class="phone" id="main-phone">
-                <img src="" id="phone-img" alt="">
+            <div class="phone-wrapper" id="phone-wrapper">
+                <div class="phone" id="main-phone">
+                    <div class="phone-notch"></div>
+                    <img src="" id="phone-img" alt="">
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        const scenes = document.querySelectorAll('.scene');
-        const phone = document.getElementById('main-phone');
-        const phoneImg = document.getElementById('phone-img');
-        const progressContainer = document.getElementById('progress-bar');
-        let currentScene = 0;
+        (function () {
+            const scenes = document.querySelectorAll('.scene');
+            const phoneWrapper = document.getElementById('phone-wrapper');
+            const phoneImg = document.getElementById('phone-img');
+            const mainPhone = document.getElementById('main-phone');
+            const progressContainer = document.getElementById('progress-bar');
+            const glitchFlash = document.getElementById('glitch-flash');
+            const sparklesContainer = document.getElementById('sparkles-container');
 
-        // Generar segmentos de progreso
-        scenes.forEach(() => {
-            const segment = document.createElement('div');
-            segment.className = 'progress-segment';
-            segment.innerHTML = '<div class="progress-fill"></div>';
-            progressContainer.appendChild(segment);
-        });
+            // Configuración de transformaciones del teléfono para cada escena (índice 0..11)
+            const phoneConfig = [
+                { transform: 'translateY(180px) scale(0.5)', opacity: 0 }, // 01 Portada
+                { transform: 'translateY(180px) scale(0.5)', opacity: 0 }, // 02 Problema
+                {
+                    transform: 'translate(35px, 140px) rotateY(-22deg) rotateX(12deg) rotateZ(6deg) scale(0.88)',
+                    opacity: 1
+                }, // 03 Solución
+                {
+                    transform: 'translate(-55px, -110px) rotateY(28deg) rotateX(-6deg) rotateZ(-12deg) scale(1.12)',
+                    opacity: 1
+                }, // 04 Directorio
+                { transform: 'translate(0, 50px) rotateY(0) rotateX(15deg) scale(0.92)', opacity: 1 }, // 05 Verificación
+                { transform: 'translate(0, 65px) rotateY(0) rotateX(18deg) scale(0.9)', opacity: 1 }, // 06 Escaparate
+                {
+                    transform: 'translate(40px, 130px) rotateY(-25deg) rotateX(10deg) rotateZ(4deg) scale(0.9)',
+                    opacity: 1
+                }, // 07 Producto
+                {
+                    transform: 'translate(-45px, -120px) rotateY(30deg) rotateX(-8deg) rotateZ(-10deg) scale(1.1)',
+                    opacity: 1
+                }, // 08 Carrito
+                { transform: 'translate(0, 0) rotateY(0) rotateX(0) scale(1)', opacity: 1 }, // 09 Éxito
+                {
+                    transform: 'translate(30px, 135px) rotateY(-20deg) rotateX(12deg) rotateZ(5deg) scale(0.88)',
+                    opacity: 1
+                }, // 10 Notificación
+                { transform: 'translate(0, 55px) rotateY(0) rotateX(16deg) scale(0.93)', opacity: 1 }, // 11 Gestión
+                { transform: 'translateY(850px) scale(0.3)', opacity: 0 } // 12 PlugPass
+            ];
 
-        const progressFills = document.querySelectorAll('.progress-fill');
+            let currentScene = 0;
+            let sceneTimeout = null;
 
-        function updateScene() {
-            const scene = scenes[currentScene];
-            const imgPath = scene.getAttribute('data-img');
-            const duration = parseInt(scene.getAttribute('data-duration'));
-            
-            // Limpiar estados previos
-            scenes.forEach((s, i) => {
-                s.classList.remove('active');
-                s.classList.remove(`scene-${i+1}`); // Remove previous positioning class if needed
-                progressFills[i].classList.remove('active-fill');
-                if (i < currentScene) progressFills[i].style.width = '100%';
-                else progressFills[i].style.width = '0%';
+            // Generar barra de progreso
+            progressContainer.innerHTML = '';
+            scenes.forEach(() => {
+                const segment = document.createElement('div');
+                segment.className = 'progress-segment';
+                segment.innerHTML = '<div class="progress-fill"></div>';
+                progressContainer.appendChild(segment);
             });
+            const progressFills = document.querySelectorAll('.progress-fill');
 
-            // Activar escena
-            scene.classList.add('active');
-            
-            // Actualizar Imagen y Visibilidad del Teléfono
-            if (imgPath) {
-                phoneImg.src = imgPath;
-                phone.style.opacity = "1";
-            } else {
-                phone.style.opacity = "0";
+            // Sparkles
+            function createSparkles() {
+                const count = 25;
+                for (let i = 0; i < count; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.style.left = Math.random() * 100 + '%';
+                    sparkle.style.animationDelay = Math.random() * 8 + 's';
+                    sparkle.style.animationDuration = (4 + Math.random() * 8) + 's';
+                    sparkle.style.width = (2 + Math.random() * 3) + 'px';
+                    sparkle.style.height = sparkle.style.width;
+                    sparklesContainer.appendChild(sparkle);
+                }
+            }
+            createSparkles();
+
+            function triggerGlitchFlash() {
+                glitchFlash.classList.add('fire');
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        glitchFlash.classList.remove('fire');
+                    });
+                });
             }
 
-            // Animación de progreso
-            const fill = progressFills[currentScene];
-            fill.classList.add('active-fill');
-            fill.style.animationDuration = duration + 'ms';
+            function updateScene() {
+                const scene = scenes[currentScene];
+                const imgPath = scene.getAttribute('data-img');
+                const duration = parseInt(scene.getAttribute('data-duration')) || 5000;
+                const config = phoneConfig[currentScene];
 
-            // Timer para siguiente escena
-            setTimeout(() => {
-                currentScene++;
-                if (currentScene >= scenes.length) {
-                    currentScene = 0;
+                // Limpiar estados
+                scenes.forEach((s, i) => {
+                    s.classList.remove('active');
+                    progressFills[i].classList.remove('active-fill', 'done-fill');
+                    if (i < currentScene) {
+                        progressFills[i].style.width = '100%';
+                        progressFills[i].classList.add('done-fill');
+                    } else {
+                        progressFills[i].style.width = '0%';
+                    }
+                });
+
+                triggerGlitchFlash();
+
+                // Parpadeo sutil del teléfono si cambia imagen
+                if (imgPath && phoneImg.src !== imgPath) {
+                    mainPhone.style.opacity = '0.5';
+                    setTimeout(() => { mainPhone.style.opacity = '1'; }, 80);
                 }
-                updateScene();
-            }, duration);
-        }
 
-        window.onload = updateScene;
+                // Activar escena
+                scene.classList.add('active');
+
+                // Aplicar transformación del teléfono
+                phoneWrapper.style.transform = config.transform;
+                phoneWrapper.style.opacity = config.opacity;
+                
+                // Manejar ajuste de imagen (Fit)
+                const fitType = scene.getAttribute('data-fit') || 'cover';
+                phoneImg.style.objectFit = fitType;
+                if (fitType === 'contain') {
+                    mainPhone.style.background = '#000'; // Fondo para imágenes contenidas
+                }
+
+                if (imgPath) {
+                    phoneImg.src = imgPath;
+                    phoneWrapper.style.pointerEvents = 'none';
+                } else {
+                    phoneWrapper.style.pointerEvents = 'none';
+                }
+
+                // Barra de progreso
+                const fill = progressFills[currentScene];
+                fill.classList.add('active-fill');
+                fill.style.setProperty('--duration', duration + 'ms');
+                fill.style.animation = 'none';
+                fill.offsetHeight;
+                fill.style.animation = `fillProgress ${duration}ms linear forwards`;
+
+                if (sceneTimeout) clearTimeout(sceneTimeout);
+                sceneTimeout = setTimeout(() => {
+                    currentScene++;
+                    if (currentScene >= scenes.length) {
+                        currentScene = 0;
+                    }
+                    updateScene();
+                }, duration);
+            }
+
+            // Parallax con ratón
+            const viewport = document.getElementById('viewport');
+            viewport.addEventListener('mousemove', function (e) {
+                const rect = viewport.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const deltaX = (x - centerX) / centerX;
+                const deltaY = (y - centerY) / centerY;
+                const particles = document.querySelectorAll('.bg-particles .particle');
+                particles.forEach((p, i) => {
+                    const factor = (i + 1) * 8;
+                    p.style.transform = `translate(${deltaX * factor}px, ${deltaY * factor}px)`;
+                });
+            });
+
+            window.addEventListener('load', () => {
+                scenes.forEach(s => {
+                    const img = s.getAttribute('data-img');
+                    if (img) {
+                        const preload = new Image();
+                        preload.src = img;
+                    }
+                });
+                updateScene();
+            });
+
+            window.addEventListener('beforeunload', () => {
+                if (sceneTimeout) clearTimeout(sceneTimeout);
+            });
+        })();
     </script>
 </body>
+
 </html>
