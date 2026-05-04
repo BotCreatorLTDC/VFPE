@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VFPE · Ecosistema de Confianza · Anuncio Premium</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
-    <script src="https://www.recordrtc.org/latest.js"></script>
     <style>
         :root {
             --accent: #00d26a;
@@ -618,37 +617,6 @@
             pointer-events: none;
         }
 
-        /* ── Botón Exportar ── */
-        .export-panel {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 200;
-            background: rgba(0,0,0,0.8);
-            padding: 15px 25px;
-            border-radius: 50px;
-            border: 1px solid var(--accent);
-            display: flex;
-            gap: 15px;
-            backdrop-filter: blur(10px);
-            transition: opacity 0.3s;
-        }
-        .export-panel.recording { opacity: 0; pointer-events: none; }
-        
-        .export-btn {
-            background: var(--accent);
-            color: #000;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-weight: 800;
-            cursor: pointer;
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.9rem;
-        }
-        .export-btn:hover { transform: scale(1.05); }
-
         /* ── Glitch ── */
         .glitch-flash {
             position: absolute;
@@ -697,12 +665,6 @@
 <body>
 
     <div class="story-viewport" id="viewport">
-        <!-- Panel de Exportación -->
-        <div class="export-panel" id="export-panel">
-            <span style="font-size: 0.8rem; opacity: 0.8; display: flex; align-items: center;">MODO EXPORTACIÓN:</span>
-            <button class="export-btn" onclick="startExport()">EXPORTAR VIDEO HD</button>
-        </div>
-
         <div class="vignette"></div>
         <div class="scanline"></div>
 
@@ -728,16 +690,7 @@
             </div>
         </div>
 
-        <!-- 02 El Problema -->
-        <div class="scene scene-2 layout-center" data-img="" data-duration="4000">
-            <div class="text-box">
-                <div class="badge">PROBLEMA</div>
-                <div class="title">Desconfianza</div>
-                <div class="sub">El mercado actual sufre de información dispersa y altos riesgos de fraude.</div>
-            </div>
-        </div>
-
-        <!-- 03 La Solución -->
+        <!-- 02 La Solución -->
         <div class="scene scene-3 layout-left-top" data-img="assets/Final_Presentation/2-lista-plugs.jpg"
             data-duration="5000">
             <div class="text-box">
@@ -866,35 +819,34 @@
             const glitchFlash = document.getElementById('glitch-flash');
             const sparklesContainer = document.getElementById('sparkles-container');
 
-            // Configuración de transformaciones del teléfono para cada escena (índice 0..11)
+            // Configuración de transformaciones del teléfono para cada escena
             const phoneConfig = [
                 { transform: 'translateY(180px) scale(0.5)', opacity: 0 }, // 01 Portada
-                { transform: 'translateY(180px) scale(0.5)', opacity: 0 }, // 02 Problema
                 {
                     transform: 'translate(35px, 140px) rotateY(-22deg) rotateX(12deg) rotateZ(6deg) scale(0.88)',
                     opacity: 1
-                }, // 03 Solución
+                }, // 02 Solución
                 {
                     transform: 'translate(-55px, -110px) rotateY(28deg) rotateX(-6deg) rotateZ(-12deg) scale(1.12)',
                     opacity: 1
-                }, // 04 Directorio
-                { transform: 'translate(0, 50px) rotateY(0) rotateX(15deg) scale(0.92)', opacity: 1 }, // 05 Verificación
-                { transform: 'translate(0, 65px) rotateY(0) rotateX(18deg) scale(0.9)', opacity: 1 }, // 06 Escaparate
+                }, // 03 Directorio
+                { transform: 'translate(0, 50px) rotateY(0) rotateX(15deg) scale(0.92)', opacity: 1 }, // 04 Verificación
+                { transform: 'translate(0, 65px) rotateY(0) rotateX(18deg) scale(0.9)', opacity: 1 }, // 05 Escaparate
                 {
                     transform: 'translate(40px, 130px) rotateY(-25deg) rotateX(10deg) rotateZ(4deg) scale(0.9)',
                     opacity: 1
-                }, // 07 Producto
+                }, // 06 Producto
                 {
                     transform: 'translate(-45px, -120px) rotateY(30deg) rotateX(-8deg) rotateZ(-10deg) scale(1.1)',
                     opacity: 1
-                }, // 08 Carrito
-                { transform: 'translate(0, 100px) rotateY(0) rotateX(15deg) scale(0.85)', opacity: 1 }, // 09 Éxito
+                }, // 07 Carrito
+                { transform: 'translate(0, 100px) rotateY(0) rotateX(15deg) scale(0.85)', opacity: 1 }, // 08 Éxito
                 {
                     transform: 'translate(30px, 135px) rotateY(-20deg) rotateX(12deg) rotateZ(5deg) scale(0.88)',
                     opacity: 1
-                }, // 10 Notificación
-                { transform: 'translate(0, 55px) rotateY(0) rotateX(16deg) scale(0.93)', opacity: 1 }, // 11 Gestión
-                { transform: 'translateY(850px) scale(0.3)', opacity: 0 } // 12 PlugPass
+                }, // 09 Notificación
+                { transform: 'translate(0, 55px) rotateY(0) rotateX(16deg) scale(0.93)', opacity: 1 }, // 10 Gestión
+                { transform: 'translateY(850px) scale(0.3)', opacity: 0 } // 11 PlugPass
             ];
 
             let currentScene = 0;
@@ -999,50 +951,6 @@
                     updateScene();
                 }, duration);
             }
-
-            // ── Sistema de Exportación ──
-            window.startExport = async function() {
-                const panel = document.getElementById('export-panel');
-                panel.classList.add('recording');
-                
-                try {
-                    const stream = await navigator.mediaDevices.getDisplayMedia({
-                        video: { width: 1080, height: 1920, frameRate: 60 },
-                        audio: false
-                    });
-
-                    const recorder = new RecordRTCPromisesHandler(stream, {
-                        type: 'video',
-                        mimeType: 'video/webm;codecs=vp9',
-                        bitsPerSecond: 128000000 // Alta calidad
-                    });
-
-                    recorder.startRecording();
-                    
-                    // Reiniciar y reproducir
-                    currentScene = 0;
-                    updateScene();
-
-                    // Calcular duración total
-                    let totalDuration = 0;
-                    scenes.forEach(s => totalDuration += parseInt(s.getAttribute('data-duration')));
-
-                    setTimeout(async () => {
-                        await recorder.stopRecording();
-                        let blob = await recorder.getBlob();
-                        invokeSaveAsDialog(blob, `VFPE_AD_2026.webm`);
-                        
-                        stream.getTracks().forEach(track => track.stop());
-                        panel.classList.remove('recording');
-                        alert("¡Video exportado con éxito!");
-                    }, totalDuration + 500);
-
-                } catch (err) {
-                    console.error(err);
-                    panel.classList.remove('recording');
-                    alert("Error al exportar. Asegúrate de seleccionar esta pestaña para la grabación.");
-                }
-            };
 
             // Parallax con ratón
             const viewport = document.getElementById('viewport');
