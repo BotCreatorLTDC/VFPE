@@ -53,19 +53,22 @@
         }
 
         @media (max-width: 900px) {
-            body { overflow-y: auto; height: auto; }
+            body { overflow-y: auto; height: auto; width: 100vw; overflow-x: hidden; }
             .presentation-container {
                 flex-direction: column;
                 height: auto;
+                width: 100vw;
                 transform: none !important;
             }
             .slide {
-                min-width: 100%;
+                min-width: 100vw;
+                width: 100vw;
                 height: auto;
                 min-height: 100vh;
                 padding: 60px 20px;
                 border-bottom: 1px solid #222;
                 display: block;
+                overflow-x: hidden;
             }
             .slide-content {
                 grid-template-columns: 1fr;
@@ -73,9 +76,18 @@
                 text-align: center;
                 display: flex;
                 flex-direction: column;
+                width: 100%;
             }
-            .text-side { order: 1; }
-            .image-side { order: 2; perspective: none; }
+            .text-side { order: 1; width: 100%; }
+            .image-side { 
+                order: 2; 
+                perspective: none; 
+                display: flex; 
+                flex-direction: column; 
+                align-items: center; 
+                gap: 20px;
+                width: 100%;
+            }
             
             h1 { font-size: 3.5rem; }
             h2 { font-size: 2.2rem; }
@@ -87,6 +99,7 @@
                 margin: 0 auto !important; 
                 transform: none !important; 
                 border-width: 4px;
+                flex-shrink: 0;
             }
             .controls { display: none; }
             .progress-bar { position: fixed; }
@@ -355,7 +368,7 @@
                     <h3>El usuario añade artículos al carrito, especifica los datos de entrega y revisa el resumen antes de confirmar el envío al plug.</h3>
                 </div>
                 <div class="image-side">
-                    <div class="mobile-frame" style="margin-right: 20px;">
+                    <div class="mobile-frame">
                         <div class="mobile-screen">
                             <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-24-12-363_org.telegram.messenger-edit.jpg" alt="Cart">
                         </div>
