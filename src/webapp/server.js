@@ -51,10 +51,17 @@ function adminAuth(req, res, next) {
 
 app.get('/api/clubs', async (req, res) => {
     try {
-        // Priority to premium clubs
-        const clubsRes = await query("SELECT * FROM clubs WHERE status = 'verified' ORDER BY is_premium DESC, verified_at DESC");
+        // Priority to premium clubs + link to catalog if exists
+        const clubsRes = await query(`
+            SELECT c.*, cs.slug as catalog_slug 
+            FROM clubs c 
+            LEFT JOIN catalog_stores cs ON c.tg_user_id = cs.tg_owner_id
+            WHERE c.status = 'verified' 
+            ORDER BY c.is_premium DESC, c.verified_at DESC
+        `);
         res.json(clubsRes.rows);
     } catch (err) {
+        console.error('[API clubs]', err);
         res.status(500).json({ error: "Failed to fetch clubs" });
     }
 });

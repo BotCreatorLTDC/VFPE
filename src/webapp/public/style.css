@@ -63,6 +63,31 @@ header {
     filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
 }
 
+.btn-catalog {
+    width: 100%;
+    background: linear-gradient(135deg, #00d26a 0%, #00a854 100%);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    margin-top: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 210, 106, 0.2);
+}
+.btn-catalog:active {
+    transform: scale(0.97);
+    filter: brightness(0.9);
+}
+.club-card.premium .btn-catalog {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
 /* --- FIXED PIN STYLES --- */
 .custom-marker {
     background: var(--primary);

@@ -19,7 +19,8 @@ bot.command('start', async (ctx) => {
 
     if (store) {
         kb.webApp('📖 View My Catalog', `${BASE_URL}/catalog/${store.slug}`).row()
-          .webApp('⚙️ Manage My Catalog', `${BASE_URL}/catalog/manage.html?slug=${store.slug}`).row();
+          .webApp('⚙️ Manage My Catalog', `${BASE_URL}/catalog/manage.html?slug=${store.slug}`).row()
+          .url('📲 Open VFPE Directory', 'https://t.me/VerifyPlugBot/app').row();
     }
 
     // Demo buttons — always visible for showcasing
@@ -31,8 +32,8 @@ bot.command('start', async (ctx) => {
     }
 
     const text = store
-        ? `🏪 *${store.name}*\n\n📦 Your catalog is live. Manage it below or preview the demo.`
-        : `🌿 *HashANDCrafts Catalog Bot*\n\nCreate a professional product catalog and share it with your clients via a beautiful Mini App.\n\nTap *Demo* to preview, or *Create My Catalog* to get started.`;
+        ? `🏪 *${store.name}*\n\n📦 Your catalog is live and linked to your *VFPE Verified Profile*.\nManage your products or visit the directory below.`
+        : `🌿 *HashANDCrafts Catalog Bot*\n\nCreate a professional product catalog linked to the *VFPE Ecosystem*.\n\nTap *Demo* to preview, or *Create My Catalog* to get started.`;
 
     await ctx.reply(text, { parse_mode: 'Markdown', reply_markup: kb });
 });

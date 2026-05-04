@@ -14,6 +14,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const reviewModal     = document.getElementById('review-modal');
     const closeReviewBtn  = document.getElementById('close-review');
 
+    // ─── CATALOG INTEGRATION ─────────────────────────────────────────────────
+    window.openCatalog = function(slug) {
+        if (tg) tg.HapticFeedback?.impactOccurred('medium');
+        const url = `${window.location.origin}/catalog/${slug}`;
+        if (tg) {
+            tg.openLink(url);
+        } else {
+            window.open(url, '_blank');
+        }
+    };
+
     // ─── TELEGRAM ────────────────────────────────────────────────────────────
     const tg         = window.Telegram?.WebApp;
     const userLang   = tg?.initDataUnsafe?.user?.language_code || 'es';
@@ -245,6 +256,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${ratingHtml}
                         <div class="card-tags">${tagsHtml}</div>
                     </div>
+                    ${club.catalog_slug ? `
+                        <button class="btn-catalog" onclick="event.stopPropagation(); openCatalog('${club.catalog_slug}')">
+                            🛍️ VER CATÁLOGO
+                        </button>
+                    ` : ''}
                 </div>
             `;
 
