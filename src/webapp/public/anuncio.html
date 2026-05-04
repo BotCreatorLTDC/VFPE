@@ -299,9 +299,16 @@
         /* ── Texto ── */
         .text-box {
             z-index: 100;
-            width: 100%;
-            padding: 20px;
+            width: 90%;
+            padding: 20px 25px;
             pointer-events: auto;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         .layout-center .text-box,
@@ -608,6 +615,38 @@
             pointer-events: none;
         }
 
+        /* ── Controles de Grabación ── */
+        .recording-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 200;
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover {
+            background: var(--accent);
+            color: #000;
+            transform: scale(1.1);
+        }
+
         /* ── Glitch ── */
         .glitch-flash {
             position: absolute;
@@ -751,11 +790,14 @@
         </div>
 
         <!-- 09 Éxito -->
-        <div class="scene scene-9 layout-center" data-img="assets/Final_Presentation/9-exito.jpg" data-duration="4000">
-            <div class="text-box">
+        <div class="scene scene-9 layout-center" data-img="assets/Final_Presentation/9-exito.jpg" data-is-full="true" data-duration="4000">
+            <div class="full-bg-img" style="position:absolute; inset:0; z-index:-1;">
+                <img src="assets/Final_Presentation/9-exito.jpg" style="width:100%; height:100%; object-fit:cover; opacity:0.6;">
+            </div>
+            <div class="text-box" style="background: rgba(0,210,106,0.2); border: 2px solid var(--accent);">
                 <div class="badge gold-badge">¡ÉXITO!</div>
                 <div class="title gold">ORDER SENT</div>
-                <div class="sub">Proceso finalizado. Experiencia fluida y satisfactoria.</div>
+                <div class="sub" style="color:#fff; font-weight:bold;">Proceso finalizado. Experiencia fluida y satisfactoria.</div>
             </div>
         </div>
 
@@ -796,6 +838,12 @@
                     <div class="cta-btn">@VFPE_BOT</div>
                 </div>
             </div>
+        </div>
+
+        <!-- Controles -->
+        <div class="recording-controls">
+            <div class="control-btn" id="btn-pause" title="Pausar/Reproducir">⏸</div>
+            <div class="control-btn" id="btn-snap" title="Descargar Captura">📸</div>
         </div>
 
         <!-- Dispositivo 3D -->
@@ -923,9 +971,20 @@
                 
                 // Manejar ajuste de imagen (Fit)
                 const fitType = scene.getAttribute('data-fit') || 'cover';
+                const isFull = scene.getAttribute('data-is-full') === 'true';
+
                 phoneImg.style.objectFit = fitType;
                 if (fitType === 'contain') {
-                    mainPhone.style.background = '#000'; // Fondo para imágenes contenidas
+                    mainPhone.style.background = '#000';
+                }
+
+                // Si es escena completa, ocultar teléfono con gracia
+                if (isFull) {
+                    phoneWrapper.style.opacity = '0';
+                    phoneWrapper.style.transform = 'scale(0.5) translateY(200px)';
+                } else {
+                    phoneWrapper.style.transform = config.transform;
+                    phoneWrapper.style.opacity = config.opacity;
                 }
 
                 if (imgPath) {
@@ -944,14 +1003,37 @@
                 fill.style.animation = `fillProgress ${duration}ms linear forwards`;
 
                 if (sceneTimeout) clearTimeout(sceneTimeout);
-                sceneTimeout = setTimeout(() => {
-                    currentScene++;
-                    if (currentScene >= scenes.length) {
-                        currentScene = 0;
-                    }
-                    updateScene();
-                }, duration);
+                if (!isPaused) {
+                    sceneTimeout = setTimeout(() => {
+                        currentScene++;
+                        if (currentScene >= scenes.length) {
+                            currentScene = 0;
+                        }
+                        updateScene();
+                    }, duration);
+                }
             }
+
+            // Controles de Pausa y Captura
+            let isPaused = false;
+            const btnPause = document.getElementById('btn-pause');
+            const btnSnap = document.getElementById('btn-snap');
+
+            btnPause.addEventListener('click', () => {
+                isPaused = !isPaused;
+                btnPause.innerText = isPaused ? '▶' : '⏸';
+                if (!isPaused) updateScene();
+                else if (sceneTimeout) clearTimeout(sceneTimeout);
+            });
+
+            btnSnap.addEventListener('click', () => {
+                // Para capturar video real se necesitaría una librería como html2canvas
+                // Aquí simulamos la intención permitiendo "pausar" para grabación manual
+                alert("Modo Captura: La escena se ha pausado. Usa tu grabador de pantalla para capturar este clip en HD.");
+                isPaused = true;
+                btnPause.innerText = '▶';
+                if (sceneTimeout) clearTimeout(sceneTimeout);
+            });
 
             // Parallax con ratón
             const viewport = document.getElementById('viewport');
