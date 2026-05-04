@@ -753,14 +753,14 @@
             const totalEl = document.getElementById('cart-total');
 
             const totalQty = cart.reduce((acc, item) => acc + item.qty, 0);
-            const totalMoney = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            const totalMoney = cart.reduce((acc, item) => acc + (parseFloat(item.price) * item.qty), 0);
 
             float.style.display = totalQty > 0 ? 'flex' : 'none';
             count.textContent = totalQty;
             totalEl.textContent = totalMoney.toFixed(2) + '€';
 
-            // Min order check
-            const minAmount = store?.min_order_amount || 0;
+            // Min order check - Fix: ensure minAmount is a number
+            const minAmount = parseFloat(store?.min_order_amount) || 0;
             const minMsg = document.getElementById('min-order-msg');
             const submitBtn = document.getElementById('btn-submit-order');
             
@@ -769,25 +769,31 @@
                 minMsg.querySelector('span').textContent = minAmount.toFixed(2) + '€';
                 submitBtn.style.opacity = '0.5';
                 submitBtn.style.pointerEvents = 'none';
+                submitBtn.textContent = `Minimum order is ${minAmount.toFixed(2)}€`;
             } else {
                 minMsg.style.display = 'none';
                 submitBtn.style.opacity = '1';
                 submitBtn.style.pointerEvents = 'auto';
+                submitBtn.textContent = '🚀 Send Order to Plug';
             }
 
-            itemsContainer.innerHTML = cart.map(item => `
-                <div class="cart-item">
-                    <div class="cart-item-info">
-                        <div class="cart-item-name">${item.name}</div>
-                        <div class="cart-item-price">${item.price}€ / ${item.unit}</div>
+            if (cart.length === 0) {
+                itemsContainer.innerHTML = '<div style="text-align:center; padding:40px; color:#666;">Your cart is empty.</div>';
+            } else {
+                itemsContainer.innerHTML = cart.map(item => `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">${parseFloat(item.price).toFixed(2)}€ / ${item.unit}</div>
+                        </div>
+                        <div class="cart-controls">
+                            <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
+                            <span class="qty-val">${item.qty}</span>
+                            <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
+                        </div>
                     </div>
-                    <div class="cart-controls">
-                        <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
-                        <span class="qty-val">${item.qty}</span>
-                        <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
-                    </div>
-                </div>
-            `).join('');
+                `).join('');
+            }
         }
 
         function updateQty(id, delta) {
