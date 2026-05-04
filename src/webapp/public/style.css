@@ -755,3 +755,53 @@ footer { text-align: center; padding: 40px 20px; color: var(--text-dim); font-si
 .btn-review-submit:hover { opacity: 0.9; }
 .btn-review-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* ══════════════════════════════════════════
+   V2.1 — SIDEBAR & ADMIN MENU
+   ══════════════════════════════════════════ */
+.header-left { display: flex; align-items: center; gap: 12px; }
+.menu-btn {
+    background: #1a1a1a; border: 1px solid #333; color: var(--primary);
+    width: 42px; height: 42px; border-radius: 10px; font-size: 1.2rem;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+}
+.menu-btn:active { transform: scale(0.9); background: #222; }
+
+.side-menu {
+    position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
+    background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 6000; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5); border-right: 1px solid #222;
+}
+.side-menu.open { left: 0; }
+
+.menu-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 5999;
+    display: none; backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+.menu-overlay.active { display: block; }
+
+.side-menu-header {
+    padding: 25px 20px; border-bottom: 1px solid #222;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.close-menu-btn { background: #222; border: none; color: #666; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; }
+
+.side-menu-content { padding: 25px 15px; }
+.menu-item-btn {
+    width: 100%; text-align: left; background: none; border: none;
+    color: #ccc; padding: 14px 15px; border-radius: 12px;
+    font-size: 0.95rem; font-weight: 600; cursor: pointer;
+    margin-bottom: 8px; display: flex; align-items: center; gap: 12px;
+    text-decoration: none; font-family: 'Outfit', sans-serif;
+    transition: all 0.2s;
+}
+.menu-item-btn:hover { background: #1a1a1a; color: #fff; }
+.menu-item-btn.gold { 
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); 
+    color: #000; margin-top: 5px;
+}
+.menu-item-btn.gold:hover { filter: brightness(1.1); }
+

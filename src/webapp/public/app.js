@@ -624,14 +624,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showOwnerTools(club) {
-        const tools = document.getElementById('owner-tools');
-        tools.style.display = 'flex';
-        tools.style.gap = '10px';
-        tools.style.padding = '15px';
-        tools.style.justifyContent = 'center';
+        const menuBtn = document.getElementById('menu-btn');
+        const sideMenu = document.getElementById('side-menu');
+        const overlay = document.getElementById('side-menu-overlay');
+        const closeMenu = document.getElementById('close-menu');
+
+        if (menuBtn) menuBtn.style.display = 'flex';
+
+        menuBtn.onclick = () => {
+            sideMenu.classList.add('open');
+            overlay.classList.add('active');
+            if (tg) tg.HapticFeedback?.impactOccurred('light');
+        };
+
+        const hideMenu = () => {
+            sideMenu.classList.remove('open');
+            overlay.classList.remove('active');
+        };
+
+        closeMenu.onclick = hideMenu;
+        overlay.onclick = hideMenu;
 
         const catalogBtn = document.getElementById('open-catalog-manager-btn');
         catalogBtn.onclick = () => {
+            hideMenu();
             if (tg) tg.HapticFeedback?.impactOccurred('medium');
             if (club.catalog_slug) {
                 // Go to management panel
@@ -647,6 +663,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         document.getElementById('open-edit-btn').onclick = () => {
+            hideMenu();
             document.getElementById('edit-id').value            = club.id;
             document.getElementById('edit-name-display').value  = club.name;
             document.getElementById('edit-instagram').value     = club.instagram || '';
