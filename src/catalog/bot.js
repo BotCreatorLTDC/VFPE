@@ -29,7 +29,7 @@ bot.command('start', async (ctx) => {
     if (store) {
         kb.webApp('📖 View My Catalog', `${BASE_URL}/catalog/${store.slug}`).row()
           .webApp('⚙️ Manage My Catalog', `${BASE_URL}/catalog/manage.html?slug=${store.slug}`).row()
-          .url('📲 Open VFPE Directory', 'https://t.me/VerifyPlugBot/app').row();
+          .url('📲 Open VFPE Directory', 'https://t.me/VerifyPlugEU_bot/app').row();
     }
 
     // Demo buttons — always visible for showcasing
