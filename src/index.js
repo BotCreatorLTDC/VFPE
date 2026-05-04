@@ -16,6 +16,14 @@ async function startApp() {
     const moderator = require('./moderator/moderator');
     moderator.start().catch(err => console.error("Moderator Bot Error:", err));
 
+    // Start Catalog Bot (HashANDCrafts Catalog Service)
+    if (process.env.CATALOG_BOT_TOKEN) {
+        const catalogBot = require('./catalog/bot');
+        catalogBot.start().catch(err => console.error("Catalog Bot Error:", err));
+    } else {
+        console.log("⚠️  CATALOG_BOT_TOKEN not set — Catalog Bot skipped.");
+    }
+
     // Start Web App
     require('./webapp/server');
 

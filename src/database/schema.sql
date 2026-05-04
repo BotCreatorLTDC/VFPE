@@ -103,3 +103,40 @@ SELECT 'keyword', pattern FROM (
         ('whatsapp'), ('wp:'), ('wa:')
 ) AS t(pattern)
 WHERE NOT EXISTS (SELECT 1 FROM moderation_rules WHERE pattern = t.pattern);
+
+-- ══════════════════════════════════════════════════
+-- CATALOG SERVICE TABLES (HashANDCrafts Catalog Bot)
+-- ══════════════════════════════════════════════════
+
+-- Each plug's catalog store configuration
+CREATE TABLE IF NOT EXISTS catalog_stores (
+    id SERIAL PRIMARY KEY,
+    slug TEXT UNIQUE NOT NULL,              -- URL-friendly name: 'hashandcrafts'
+    name TEXT NOT NULL,                     -- Display name: 'HashAndCrafts'
+    tg_owner_id BIGINT NOT NULL,            -- Telegram user ID of the owner
+    logo_url TEXT,
+    bio TEXT,
+    theme_color TEXT DEFAULT '#00d26a',     -- Hex color for UI accent
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_catalog_stores_slug ON catalog_stores(slug);
+CREATE INDEX IF NOT EXISTS idx_catalog_stores_owner ON catalog_stores(tg_owner_id);
+
+-- Products listed in each catalog
+CREATE TABLE IF NOT EXISTS catalog_products (
+    id SERIAL PRIMARY KEY,
+    store_id INTEGER REFERENCES catalog_stores(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    category TEXT NOT NULL DEFAULT 'flower' CHECK (category IN ('flower', 'extract', 'edible', 'accessory', 'other')),
+    description TEXT,
+    photo_url TEXT,
+    available BOOLEAN DEFAULT TRUE,
+    featured BOOLEAN DEFAULT FALSE,
+    order_index INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_catalog_products_store ON catalog_products(store_id);
+CREATE INDEX IF NOT EXISTS idx_catalog_products_available ON catalog_products(store_id, available);

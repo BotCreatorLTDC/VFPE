@@ -33,6 +33,10 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/assets', express.static(path.join(__dirname, '../../assets')));
 
+// ── CATALOG SERVICE ───────────────────────────────────────────────────────────
+const catalogRoutes = require('../catalog/routes');
+app.use('/catalog', catalogRoutes);
+
 // FIX: Admin Auth based on Telegram User ID
 function adminAuth(req, res, next) {
     const userId = req.headers['x-admin-id'] || req.query.admin_id;

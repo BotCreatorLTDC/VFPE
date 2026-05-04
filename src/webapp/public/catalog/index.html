@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Catalog — Powered by VFPE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --accent: #00d26a;
+            --bg: #0a0a0a;
+            --card: #141414;
+            --border: #1e1e1e;
+            --text: #f0f0f0;
+            --muted: #666;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 20%, transparent) 0%, var(--bg) 100%);
+            padding: 48px 20px 32px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        .hero-logo {
+            width: 88px; height: 88px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            object-fit: cover;
+            margin-bottom: 16px;
+            background: var(--card);
+        }
+
+        .hero-logo-placeholder {
+            width: 88px; height: 88px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            background: var(--card);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 16px;
+        }
+
+        .hero h1 {
+            font-size: 1.8rem; font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        .hero-bio {
+            font-size: 0.9rem; color: var(--muted);
+            margin-top: 8px; max-width: 300px;
+            margin-left: auto; margin-right: auto;
+            line-height: 1.5;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 0.7rem; font-weight: 700;
+            color: var(--accent);
+            border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+        }
+
+        /* ── FILTERS ── */
+        .filters {
+            display: flex; gap: 8px;
+            overflow-x: auto; padding: 16px 20px;
+            scrollbar-width: none;
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0;
+            background: var(--bg); z-index: 10;
+        }
+        .filters::-webkit-scrollbar { display: none; }
+
+        .filter-btn {
+            flex-shrink: 0;
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem; font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #000;
+        }
+
+        /* ── GRID ── */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 16px;
+        }
+
+        .product-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            position: relative;
+        }
+
+        .product-card:active { transform: scale(0.97); }
+
+        .product-card.unavailable { opacity: 0.55; }
+
+        .product-card.featured {
+            border-color: var(--accent);
+            grid-column: span 2;
+        }
+
+        .card-img {
+            width: 100%; aspect-ratio: 1 / 1;
+            object-fit: cover;
+            background: #1a1a1a;
+        }
+
+        .card-img-placeholder {
+            width: 100%; aspect-ratio: 1 / 1;
+            background: linear-gradient(135deg, #1a1a1a, #111);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem;
+        }
+
+        .card-body {
+            padding: 12px;
+        }
+
+        .card-category {
+            font-size: 0.65rem; font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .card-name {
+            font-size: 0.95rem; font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .card-status {
+            margin-top: 8px;
+            display: inline-block;
+            font-size: 0.65rem; font-weight: 700;
+            padding: 3px 8px; border-radius: 10px;
+            background: color-mix(in srgb, var(--accent) 15%, transparent);
+            color: var(--accent);
+        }
+
+        .card-status.unavailable {
+            background: rgba(255,77,77,0.12);
+            color: #ff4d4d;
+        }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            align-items: flex-end;
+        }
+
+        .modal-overlay.open { display: flex; }
+
+        .modal-sheet {
+            background: var(--card);
+            border-radius: 24px 24px 0 0;
+            width: 100%; max-height: 85vh;
+            overflow-y: auto;
+            padding: 24px 20px 40px;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-handle {
+            width: 40px; height: 4px;
+            background: #333; border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+
+        .modal-img {
+            width: 100%; max-height: 260px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+
+        .modal-category {
+            font-size: 0.75rem; font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-name {
+            font-size: 1.6rem; font-weight: 900;
+            margin: 6px 0 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .modal-desc {
+            font-size: 0.9rem; color: #aaa;
+            line-height: 1.6;
+        }
+
+        .modal-status-row {
+            display: flex; align-items: center; gap: 10px;
+            margin-top: 20px;
+            padding: 12px 16px;
+            background: #0f0f0f;
+            border-radius: 12px;
+        }
+
+        .status-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+        .status-dot.unavailable { background: #ff4d4d; }
+
+        .status-text {
+            font-size: 0.85rem; font-weight: 600;
+        }
+
+        .modal-close {
+            position: absolute; top: 16px; right: 16px;
+            background: #222; border: none; color: #fff;
+            width: 32px; height: 32px; border-radius: 50%;
+            font-size: 1rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* ── EMPTY ── */
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+        .empty p { margin-top: 12px; font-size: 0.9rem; }
+
+        /* ── LOADING ── */
+        .loading {
+            text-align: center; padding: 80px 20px; color: var(--muted);
+        }
+
+        /* ── FOOTER ── */
+        .powered-by {
+            text-align: center;
+            font-size: 0.7rem; color: var(--muted);
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            margin-top: 20px;
+        }
+        .powered-by span { color: var(--accent); font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <div id="loading" class="loading">
+        <div>🌿</div>
+        <p>Loading catalog...</p>
+    </div>
+
+    <div id="app" style="display:none;">
+        <div class="hero" id="hero">
+            <!-- Injected by JS -->
+        </div>
+
+        <div class="filters" id="filters">
+            <button class="filter-btn active" data-cat="all">🌐 All</button>
+            <button class="filter-btn" data-cat="flower">🌿 Flower</button>
+            <button class="filter-btn" data-cat="extract">🧪 Extract</button>
+            <button class="filter-btn" data-cat="edible">🍫 Edible</button>
+            <button class="filter-btn" data-cat="accessory">🛒 Accessories</button>
+            <button class="filter-btn" data-cat="other">✨ Other</button>
+        </div>
+
+        <div class="grid" id="product-grid"></div>
+
+        <div class="powered-by">Powered by <span>VFPE</span> — Europe's Verified Plug Directory</div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-sheet" id="modal-sheet">
+            <div class="modal-handle"></div>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram?.WebApp;
+        if (tg) { tg.expand(); tg.ready(); }
+
+        const CATEGORY_LABELS = {
+            flower: '🌿 Flower',
+            extract: '🧪 Extract',
+            edible: '🍫 Edible',
+            accessory: '🛒 Accessory',
+            other: '✨ Other'
+        };
+
+        const CATEGORY_EMOJI = {
+            flower: '🌿', extract: '🧪', edible: '🍫', accessory: '🛒', other: '✨'
+        };
+
+        // Get slug from URL
+        const slug = window.location.pathname.split('/').filter(Boolean).pop();
+
+        let allProducts = [];
+        let currentFilter = 'all';
+
+        async function loadCatalog() {
+            try {
+                const res = await fetch(`/catalog/api/${slug}`);
+                if (!res.ok) throw new Error('Not found');
+                const { store, products } = await res.json();
+
+                applyTheme(store.theme_color);
+                renderHero(store);
+                allProducts = products;
+                renderProducts();
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+            } catch (e) {
+                document.getElementById('loading').innerHTML = '<div>😕</div><p>Catalog not found.</p>';
+            }
+        }
+
+        function applyTheme(color) {
+            document.documentElement.style.setProperty('--accent', color);
+        }
+
+        function renderHero(store) {
+            const heroEl = document.getElementById('hero');
+            const logoHtml = store.logo_url
+                ? `<img src="${store.logo_url}" alt="Logo" class="hero-logo" onerror="this.style.display='none'">`
+                : `<div class="hero-logo-placeholder">🌿</div>`;
+
+            heroEl.innerHTML = `
+                ${logoHtml}
+                <h1>${store.name}</h1>
+                ${store.bio ? `<p class="hero-bio">${store.bio}</p>` : ''}
+                <span class="hero-badge">✅ VERIFIED CATALOG</span>
+            `;
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            const filtered = currentFilter === 'all'
+                ? allProducts
+                : allProducts.filter(p => p.category === currentFilter);
+
+            if (!filtered.length) {
+                grid.innerHTML = `<div class="empty" style="grid-column:span 2">
+                    <div style="font-size:2.5rem">📦</div>
+                    <p>No products in this category yet.</p>
+                </div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(p => `
+                <div class="product-card ${!p.available ? 'unavailable' : ''} ${p.featured ? 'featured' : ''}"
+                     onclick="openModal(${p.id})">
+                    ${p.photo_url
+                        ? `<img src="${p.photo_url}" class="card-img" alt="${p.name}" onerror="this.outerHTML='<div class=\\'card-img-placeholder\\'>${CATEGORY_EMOJI[p.category] || '🌿'}</div>'">`
+                        : `<div class="card-img-placeholder">${CATEGORY_EMOJI[p.category] || '🌿'}</div>`
+                    }
+                    <div class="card-body">
+                        <div class="card-category">${CATEGORY_LABELS[p.category]}</div>
+                        <div class="card-name">${p.name}</div>
+                        <span class="card-status ${!p.available ? 'unavailable' : ''}">
+                            ${p.available ? '✅ Available' : '❌ Unavailable'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openModal(productId) {
+            const p = allProducts.find(x => x.id === productId);
+            if (!p) return;
+
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                ${p.photo_url ? `<img src="${p.photo_url}" class="modal-img" alt="${p.name}">` : ''}
+                <div class="modal-category">${CATEGORY_LABELS[p.category]}</div>
+                <h2 class="modal-name">${p.name}</h2>
+                ${p.description ? `<p class="modal-desc">${p.description}</p>` : ''}
+                <div class="modal-status-row">
+                    <div class="status-dot ${!p.available ? 'unavailable' : ''}"></div>
+                    <span class="status-text">${p.available ? 'Currently Available' : 'Currently Unavailable'}</span>
+                </div>
+            `;
+
+            document.getElementById('modal').classList.add('open');
+            if (tg) tg.HapticFeedback?.impactOccurred('light');
+        }
+
+        // Filters
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.cat;
+                renderProducts();
+            };
+        });
+
+        // Close modal
+        document.getElementById('modal').onclick = (e) => {
+            if (e.target === document.getElementById('modal')) {
+                document.getElementById('modal').classList.remove('open');
+            }
+        };
+
+        loadCatalog();
+    </script>
+</body>
+</html>

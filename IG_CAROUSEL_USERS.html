@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFPE - Users Carousel (English)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+        
+        :root {
+            --primary: #00d26a;
+            --bg: #050505;
+            --accent: #FFD700;
+        }
+
+        body { 
+            background: #111; color: white; font-family: 'Outfit', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; padding: 100px 20px;
+            margin: 0;
+        }
+
+        .controls {
+            position: fixed; top: 20px; z-index: 1000; background: rgba(0,0,0,0.8);
+            padding: 15px 25px; border-radius: 50px; border: 1px solid var(--primary);
+            display: flex; gap: 15px; backdrop-filter: blur(10px);
+        }
+
+        .btn-download {
+            background: var(--primary); color: black; border: none; padding: 10px 20px;
+            border-radius: 25px; font-weight: 800; cursor: pointer; transition: 0.3s;
+        }
+        .btn-download:hover { transform: scale(1.05); }
+
+        .carousel-container {
+            display: flex; flex-direction: column; gap: 60px;
+        }
+
+        .ig-post {
+            width: 1080px; height: 1350px;
+            background: var(--bg);
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+            border: 1px solid #222;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+
+        /* Slide Design */
+        .slide-content {
+            padding: 80px 60px;
+            z-index: 10;
+            flex: 1;
+            display: flex; flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .header-logo {
+            display: flex; align-items: center; gap: 15px;
+        }
+        .header-logo img { width: 80px; border-radius: 50%; }
+        .header-logo span { font-size: 1.8rem; font-weight: 900; letter-spacing: 2px; color: var(--primary); }
+
+        .main-text {
+            max-width: 520px; /* Even tighter safe zone */
+            position: relative;
+            z-index: 100; /* Force text on top */
+        }
+
+        .main-text h1 {
+            font-size: 4rem; line-height: 0.9; font-weight: 900; margin: 0;
+            text-transform: uppercase; letter-spacing: -2px;
+            color: #fff;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .main-text p {
+            font-size: 1.6rem; color: #aaa; margin-top: 25px; 
+            line-height: 1.4;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .phone-mockup {
+            position: absolute; bottom: 120px; right: -150px;
+            width: 600px; 
+            transform: rotate(-6deg);
+            filter: drop-shadow(0 50px 80px rgba(0,0,0,0.8));
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 5;
+        }
+
+        .ig-post:hover .phone-mockup {
+            transform: rotate(-2deg) translateY(-20px);
+        }
+
+        .footer-cta {
+            font-size: 1.2rem; font-weight: 700; color: var(--primary);
+            border-top: 1px solid #222; padding-top: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            letter-spacing: 1px;
+        }
+
+        /* Specific Slide Accents */
+        .slide-2 .main-text h1 { color: #fff; }
+        .slide-3 .main-text h1 { color: var(--primary); }
+        .slide-4 .accent-text { color: var(--accent); }
+
+        /* Abstract backgrounds */
+        .bg-glow {
+            position: absolute; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(0, 210, 106, 0.15) 0%, transparent 70%);
+            top: 20%; left: -10%; z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <button class="btn-download" onclick="downloadAll()">⬇️ Download All Slides (PNG)</button>
+    </div>
+
+    <div class="carousel-container" id="carousel">
+        
+        <!-- Slide 1: COVER -->
+        <div class="ig-post slide-1" id="slide-1">
+            <div class="bg-glow"></div>
+            <div class="slide-content">
+                <div class="header-logo">
+                    <img src="assets/logo.jpg" alt="Logo" crossorigin="anonymous">
+                    <span>VFPE</span>
+                </div>
+                <div class="main-text">
+                    <h1>Find<br>Verified<br>Plugs</h1>
+                    <p>Europe's most trusted directory. <br>Safe. Real. No scams.</p>
+                </div>
+                <div class="footer-cta">
+                    <span>JOIN THE ECOSYSTEM</span>
+                    <span>@VerifyPlugEU</span>
+                </div>
+            </div>
+            <img src="assets/user_presentation/main-page.png" class="phone-mockup" crossorigin="anonymous">
+        </div>
+
+        <!-- Slide 2: MAP -->
+        <div class="ig-post slide-2" id="slide-2">
+            <div class="slide-content">
+                <div class="header-logo">
+                    <img src="assets/logo.jpg" alt="Logo" crossorigin="anonymous">
+                    <span>VFPE</span>
+                </div>
+                <div class="main-text">
+                    <h1>Interactive<br>Explorer</h1>
+                    <p>Search by city across Spain, Germany, and the Netherlands. Real-time updates.</p>
+                </div>
+                <div class="footer-cta">
+                    <span>SWIPE FOR MORE</span>
+                    <span>02 / 05</span>
+                </div>
+            </div>
+            <img src="assets/user_presentation/main-page-with-germany-meetup.png" class="phone-mockup" crossorigin="anonymous">
+        </div>
+
+        <!-- Slide 3: FILTERS -->
+        <div class="ig-post slide-3" id="slide-3">
+            <div class="slide-content">
+                <div class="header-logo">
+                    <img src="assets/logo.jpg" alt="Logo" crossorigin="anonymous">
+                    <span>VFPE</span>
+                </div>
+                <div class="main-text">
+                    <h1>Smart<br>Filters</h1>
+                    <p>Choose your preferred service: <br>🚚 Delivery, 🤝 Meetup, or 📬 Postal.</p>
+                </div>
+                <div class="footer-cta">
+                    <span>SECURITY FIRST</span>
+                    <span>03 / 05</span>
+                </div>
+            </div>
+            <img src="assets/user_presentation/main-page-diferent-badges.png" class="phone-mockup" crossorigin="anonymous">
+        </div>
+
+        <!-- Slide 4: REVIEWS -->
+        <div class="ig-post slide-4" id="slide-4">
+            <div class="slide-content">
+                <div class="header-logo">
+                    <img src="assets/logo.jpg" alt="Logo" crossorigin="anonymous">
+                    <span>VFPE</span>
+                </div>
+                <div class="main-text">
+                    <h1 class="accent-text">Real<br>Trust</h1>
+                    <p>Check authentic ratings and reviews from the community before you connect.</p>
+                </div>
+                <div class="footer-cta">
+                    <span>VERIFIED REVIEWS</span>
+                    <span>04 / 05</span>
+                </div>
+            </div>
+            <img src="assets/user_presentation/plug-profile-bottom-reviews.png" class="phone-mockup" crossorigin="anonymous">
+        </div>
+
+        <!-- Slide 5: CONTACT -->
+        <div class="ig-post slide-5" id="slide-5">
+            <div class="slide-content">
+                <div class="header-logo">
+                    <img src="assets/logo.jpg" alt="Logo" crossorigin="anonymous">
+                    <span>VFPE</span>
+                </div>
+                <div class="main-text">
+                    <h1>Direct<br>Access</h1>
+                    <p>View verified profiles and jump straight to Telegram. Fast and professional.</p>
+                </div>
+                <div class="footer-cta">
+                    <span>START EXPLORING</span>
+                    <span>@VerifyPlugEU</span>
+                </div>
+            </div>
+            <img src="assets/user_presentation/plug-profile-top.png" class="phone-mockup" crossorigin="anonymous">
+        </div>
+
+    </div>
+
+    <script>
+        async function downloadAll() {
+            const slides = ['slide-1', 'slide-2', 'slide-3', 'slide-4', 'slide-5'];
+            for (let id of slides) {
+                const element = document.getElementById(id);
+                try {
+                    const canvas = await html2canvas(element, { 
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: false, // Must be false for toDataURL
+                        backgroundColor: '#050505',
+                        logging: true
+                    });
+                    const link = document.createElement('a');
+                    link.download = `VFPE_USER_${id}.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                } catch (err) {
+                    console.error("Error generating slide " + id, err);
+                    alert("Error exporting " + id + ". Make sure you are using http://localhost:3000");
+                }
+            }
+        }
+    </script>
+</body>
+</html>

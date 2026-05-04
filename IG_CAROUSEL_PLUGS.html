@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFPE - Plugs Carousel (English)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+        
+        :root {
+            --primary: #FFD700; /* Gold for business */
+            --bg: #050505;
+            --accent: #00d26a;
+        }
+
+        body { 
+            background: #111; color: white; font-family: 'Outfit', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; padding: 100px 20px;
+            margin: 0;
+        }
+
+        .controls {
+            position: fixed; top: 20px; z-index: 1000; background: rgba(0,0,0,0.8);
+            padding: 15px 25px; border-radius: 50px; border: 1px solid var(--primary);
+            display: flex; gap: 15px; backdrop-filter: blur(10px);
+        }
+
+        .btn-download {
+            background: var(--primary); color: black; border: none; padding: 10px 20px;
+            border-radius: 25px; font-weight: 800; cursor: pointer; transition: 0.3s;
+        }
+        .btn-download:hover { transform: scale(1.05); }
+
+        .carousel-container {
+            display: flex; flex-direction: column; gap: 60px;
+        }
+
+        .ig-post {
+            width: 1080px; height: 1350px;
+            background: var(--bg);
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+            border: 1px solid #222;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+
+        /* Slide Design */
+        .slide-content {
+            padding: 80px 60px;
+            z-index: 10;
+            flex: 1;
+            display: flex; flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .header-logo {
+            display: flex; align-items: center; gap: 15px;
+        }
+        .header-logo img { width: 80px; border-radius: 50%; }
+        .header-logo span { font-size: 1.8rem; font-weight: 900; letter-spacing: 2px; color: var(--primary); }
+
+        .main-text {
+            max-width: 520px; /* Safe zone */
+            position: relative;
+            z-index: 100; /* Text on top */
+        }
+
+        .main-text h1 {
+            font-size: 4rem; line-height: 0.9; font-weight: 900; margin: 0;
+            text-transform: uppercase; letter-spacing: -2px;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .main-text p {
+            font-size: 1.6rem; color: #aaa; margin-top: 25px;
+            line-height: 1.4;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .phone-mockup {
+            position: absolute; bottom: 150px; right: -150px;
+            width: 600px; 
+            transform: rotate(-7deg);
+            filter: drop-shadow(0 60px 100px rgba(0,0,0,0.9));
+            transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 5;
+        }
+
+        .ig-post:hover .phone-mockup {
+            transform: rotate(-3deg) translateY(-15px);
+        }
+
+        .footer-cta {
+            font-size: 1.2rem; font-weight: 700; color: var(--primary);
+            border-top: 1px solid #222; padding-top: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            letter-spacing: 1px;
+        }
+
+        /* Specific Slide Accents */
+        .slide-1 .main-text h1 { color: var(--primary); }
+        .slide-2 .main-text h1 { color: #fff; }
+        .slide-3 .accent-text { color: var(--accent); }
+
+        /* Abstract backgrounds */
+        .bg-glow {
+            position: absolute; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            top: 20%; left: -10%; z-index: 1;
+        }
+        
+        .split-mockups {
+            position: absolute; bottom: -50px; right: -120px;
+            display: flex; flex-direction: row; align-items: flex-end;
+            width: 750px; gap: -80px;
+        }
+        .split-mockups img { 
+            width: 420px; 
+            object-fit: contain;
+            filter: drop-shadow(0 40px 60px rgba(0,0,0,0.8));
+            transition: 0.5s;
+        }
+        .split-mockups img:first-child { transform: rotate(-8deg) translateX(100px); z-index: 4; }
+        .split-mockups img:last-child { transform: rotate(-3deg) translateY(-20px); z-index: 5; }
+        
+        .ig-post:hover .split-mockups img { transform: rotate(0deg) translateY(-20px); }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <button class="btn-download" onclick="downloadAll()">⬇️ Download All Slides (PNG)</button>
+    </div>
+
+    <div class="carousel-container" id="carousel">
+        
+        <!-- Slide 1: COVER -->
+        <div class="ig-post slide-1" id="slide-1">
+            <div class="bg-glow"></div>
+            <div class="slide-content">
+                <div class="header-logo">
+                    <img src="assets/logo.jpg" alt="Logo" crossorigin="anonymous">
+                    <span>VFPE</span>
+                </div>
+                <div class="main-text">
+                    <h1>Scale<br>Your<br>Business</h1>
+                    <p>Stop wasting time with scammers. Join the elite verified network in Europe.</p>
+                </div>
+                <div class="footer-cta">
+                    <span>BECOME A PARTNER</span>
+                    <span>@VerifyPlugEU</span>
+                </div>
+            </div>
+            <img src="assets/plug_presentation/main-page-with-manage-m,y-plug-button.png" class="phone-mockup" crossorigin="anonymous">
+        </div>
+
+        <!-- Slide 2: ANALYTICS -->
+        <div class="ig-post slide-2" id="slide-2">
+            <div class="slide-content">
+                <div class="header-logo">
+                    <img src="assets/logo.jpg" alt="Logo" crossorigin="anonymous">
+                    <span>VFPE</span>
+                </div>
+                <div class="main-text">
+                    <h1>Real-Time<br>Analytics</h1>
+                    <p>Track your growth with precise data on Views, Clicks, and Likes. Know your ROI.</p>
+                </div>
+                <div class="footer-cta">
+                    <span>DATA DRIVEN</span>
+                    <span>02 / 05</span>
+                </div>
+            </div>
+            <img src="assets/plug_presentation/manage-my-plug-main.png" class="phone-mockup" crossorigin="anonymous">
+        </div>
+
+        <!-- Slide 3: ANNOUNCEMENTS -->
+        <div class="ig-post slide-3" id="slide-3">
+            <div class="slide-content">
+                <div class="header-logo">
+                    <img src="assets/logo.jpg" alt="Logo" crossorigin="anonymous">
+                    <span>VFPE</span>
+                </div>
+                <div class="main-text">
+                    <h1 class="accent-text">24H<br>Flash Ads</h1>
+                    <p>Exclusive for Advanced Plans: Post limited-time announcements to all your members.</p>
+                </div>
+                <div class="footer-cta">
+                    <span>BOOST VISIBILITY</span>
+                    <span>03 / 05</span>
+                </div>
+            </div>
+            <img src="assets/plug_presentation/manage-my-plug-with-24h-announce.png" class="phone-mockup" crossorigin="anonymous">
+        </div>
+
+        <!-- Slide 4: PLANS -->
+        <div class="ig-post slide-4" id="slide-4">
+            <div class="slide-content">
+                <div class="header-logo">
+                    <img src="assets/logo.jpg" alt="Logo" crossorigin="anonymous">
+                    <span>VFPE</span>
+                </div>
+                <div class="main-text">
+                    <h1>Tailored<br>Plans</h1>
+                    <p>From Basic visibility to PRO & Advanced power. Choose what fits your volume.</p>
+                </div>
+                <div class="footer-cta">
+                    <span>CHOOSE YOUR TIER</span>
+                    <span>04 / 05</span>
+                </div>
+            </div>
+            <div class="split-mockups">
+                <img src="assets/plug_presentation/plans-priccing-top.png" crossorigin="anonymous">
+                <img src="assets/plug_presentation/plans-priccing-bottom.png" crossorigin="anonymous">
+            </div>
+        </div>
+
+        <!-- Slide 5: ADMIN HQ -->
+        <div class="ig-post slide-5" id="slide-5">
+            <div class="slide-content">
+                <div class="header-logo">
+                    <img src="assets/logo.jpg" alt="Logo" crossorigin="anonymous">
+                    <span>VFPE</span>
+                </div>
+                <div class="main-text">
+                    <h1>Full<br>Control</h1>
+                    <p>Manage your entire presence through our professional Admin HQ on Telegram.</p>
+                </div>
+                <div class="footer-cta">
+                    <span>GET STARTED TODAY</span>
+                    <span>@VerifyPlugEU</span>
+                </div>
+            </div>
+            <img src="assets/plug_presentation/admin-panel.png" class="phone-mockup" crossorigin="anonymous">
+        </div>
+
+    </div>
+
+    <script>
+        async function downloadAll() {
+            const slides = ['slide-1', 'slide-2', 'slide-3', 'slide-4', 'slide-5'];
+            for (let id of slides) {
+                const element = document.getElementById(id);
+                try {
+                    const canvas = await html2canvas(element, { 
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: false, // Must be false for toDataURL
+                        backgroundColor: '#050505',
+                        logging: true
+                    });
+                    const link = document.createElement('a');
+                    link.download = `VFPE_PLUG_${id}.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                } catch (err) {
+                    console.error("Error generating slide " + id, err);
+                    alert("Error exporting " + id + ". Make sure you are using http://localhost:3000");
+                }
+            }
+        }
+    </script>
+</body>
+</html>
