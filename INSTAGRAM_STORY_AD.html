@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFPE - Instagram Story Ad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #00d26a;
+            --gold: #FFD700;
+            --bg: #000000;
+            --text: #ffffff;
+            --duration: 6s; /* Duración de cada escena */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #111;
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Contenedor formato Story 9:16 */
+        .story-viewport {
+            width: 100vw;
+            height: 100vh;
+            max-width: 450px; /* Limitador para escritorio */
+            max-height: 800px;
+            background-color: var(--bg);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,1);
+            border-radius: 15px;
+        }
+
+        @media (max-width: 500px) {
+            .story-viewport {
+                width: 100vw;
+                height: 100vh;
+                max-width: none;
+                max-height: none;
+                border-radius: 0;
+            }
+        }
+
+        /* Barra de Progreso Superior */
+        .progress-container {
+            position: absolute;
+            top: 15px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+            z-index: 100;
+        }
+
+        .progress-segment {
+            flex: 1;
+            height: 3px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #fff;
+            width: 0%;
+        }
+
+        .active-fill {
+            animation: fillProgress var(--duration) linear forwards;
+        }
+
+        @keyframes fillProgress {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+
+        /* Escenas */
+        .scene {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 60px 30px;
+        }
+
+        .scene.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Animaciones de Texto */
+        .text-wrap {
+            margin-top: 20px;
+            z-index: 10;
+        }
+
+        .scene.active h2 {
+            animation: slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) both;
+        }
+
+        .scene.active p {
+            animation: slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.2s both;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); filter: blur(10px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        h2 { font-size: 2.8rem; font-weight: 900; line-height: 1.1; margin-bottom: 15px; color: var(--accent); text-shadow: 0 0 20px rgba(0,210,106,0.3); }
+        p { font-size: 1.2rem; line-height: 1.4; color: #ccc; font-weight: 400; }
+
+        /* Contenedor de Imagen con efecto Ken Burns */
+        .image-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 40px;
+            position: relative;
+        }
+
+        .mobile-mockup {
+            width: 85%;
+            height: 80%;
+            background: #000;
+            border-radius: 35px;
+            padding: 8px;
+            border: 4px solid #333;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            overflow: hidden;
+            transform: scale(0.9);
+        }
+
+        .scene.active .mobile-mockup img {
+            animation: kenBurns 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes kenBurns {
+            from { transform: scale(1); }
+            to { transform: scale(1.15) translateY(-20px); }
+        }
+
+        .mobile-mockup img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 28px;
+        }
+
+        /* Estilos específicos */
+        .scene-1 { background: radial-gradient(circle at center, #111 0%, #000 100%); justify-content: center; text-align: center; }
+        .scene-1 h1 { font-size: 5rem; font-weight: 900; letter-spacing: -3px; }
+        .scene-1 .badge { background: var(--accent); color: #000; padding: 5px 15px; border-radius: 20px; font-weight: 800; font-size: 0.8rem; display: inline-block; margin-bottom: 20px; }
+
+        /* Overlay de gradiente para legibilidad */
+        .overlay {
+            position: absolute;
+            bottom: 0; left: 0; right: 0; height: 40%;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            pointer-events: none;
+        }
+
+        .logo-small {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 900;
+            letter-spacing: 2px;
+            opacity: 0.5;
+            font-size: 0.8rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="story-viewport">
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progress-bar">
+            <!-- Se generarán dinámicamente -->
+        </div>
+
+        <!-- Scene 1: Intro -->
+        <div class="scene scene-1 active" data-duration="4000">
+            <div class="text-wrap">
+                <div class="badge">REVELACIÓN 2026</div>
+                <h1>VFPE</h1>
+                <p style="color: var(--accent); font-weight: 700; letter-spacing: 2px;">THE TRUST PROTOCOL</p>
+            </div>
+            <div class="logo-small">VERIFIED PLUG ECOSYSTEM</div>
+        </div>
+
+        <!-- Scene 2: Problem -->
+        <div class="scene" data-duration="6000">
+            <div class="text-wrap">
+                <h2>The Trust Gap</h2>
+                <p>En un mercado sin reglas, la confianza es el activo más valioso.</p>
+            </div>
+            <div class="image-container">
+                <div class="mobile-mockup">
+                    <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-10-17-908_org.telegram.messenger-edit.jpg" alt="">
+                </div>
+            </div>
+            <div class="overlay"></div>
+        </div>
+
+        <!-- Scene 3: Map -->
+        <div class="scene" data-duration="6000">
+            <div class="text-wrap">
+                <h2>Explora tu zona</h2>
+                <p>Mapa interactivo con filtros de Delivery y Meetup en tiempo real.</p>
+            </div>
+            <div class="image-container">
+                <div class="mobile-mockup">
+                    <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-10-30-666_org.telegram.messenger-edit.jpg" alt="">
+                </div>
+            </div>
+            <div class="overlay"></div>
+        </div>
+
+        <!-- Scene 4: Catalog -->
+        <div class="scene" data-duration="6000">
+            <div class="text-wrap">
+                <h2>Catálogo Nativo</h2>
+                <p>Una experiencia de compra premium integrada en Telegram.</p>
+            </div>
+            <div class="image-container">
+                <div class="mobile-mockup">
+                    <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-18-59-167_org.telegram.messenger-edit.jpg" alt="">
+                </div>
+            </div>
+            <div class="overlay"></div>
+        </div>
+
+        <!-- Scene 5: Order -->
+        <div class="scene" data-duration="6000">
+            <div class="text-wrap">
+                <h2>Ventas en segundos</h2>
+                <p>Recibe pedidos detallados y cierra tratos al instante.</p>
+            </div>
+            <div class="image-container">
+                <div class="mobile-mockup">
+                    <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-25-53-746_org.telegram.messenger-edit.jpg" alt="">
+                </div>
+            </div>
+            <div class="overlay"></div>
+        </div>
+
+        <!-- Scene 6: Outro -->
+        <div class="scene scene-1" data-duration="5000">
+            <div class="text-wrap">
+                <h2 style="color:#fff">Únete a la Red</h2>
+                <p>VFPE: La nueva era de los verificados.</p>
+                <div style="margin-top:40px; padding:15px; border: 2px solid var(--accent); color: var(--accent); border-radius:10px; font-weight:900;">
+                    @VFPE_BOT
+                </div>
+            </div>
+            <div class="logo-small">ESCANEADO • VERIFICADO • ENTREGADO</div>
+        </div>
+
+    </div>
+
+    <script>
+        const scenes = document.querySelectorAll('.scene');
+        const progressContainer = document.getElementById('progress-bar');
+        let currentScene = 0;
+
+        // Crear segmentos de progreso
+        scenes.forEach(() => {
+            const segment = document.createElement('div');
+            segment.className = 'progress-segment';
+            segment.innerHTML = '<div class="progress-fill"></div>';
+            progressContainer.appendChild(segment);
+        });
+
+        const progressFills = document.querySelectorAll('.progress-fill');
+
+        function playScene() {
+            // Resetear todas las escenas
+            scenes.forEach(s => s.classList.remove('active'));
+            progressFills.forEach((f, index) => {
+                f.classList.remove('active-fill');
+                if (index < currentScene) f.style.width = '100%';
+                else f.style.width = '0%';
+            });
+
+            // Activar escena actual
+            const scene = scenes[currentScene];
+            const fill = progressFills[currentScene];
+            const duration = parseInt(scene.getAttribute('data-duration'));
+
+            scene.classList.add('active');
+            fill.classList.add('active-fill');
+            fill.style.animationDuration = duration + 'ms';
+
+            setTimeout(() => {
+                currentScene++;
+                if (currentScene >= scenes.length) {
+                    currentScene = 0; // Loop
+                }
+                playScene();
+            }, duration);
+        }
+
+        // Iniciar
+        window.onload = playScene;
+    </script>
+</body>
+</html>
