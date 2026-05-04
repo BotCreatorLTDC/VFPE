@@ -53,22 +53,44 @@
         }
 
         @media (max-width: 900px) {
-            .slide { padding: 20px; overflow-y: auto; }
+            body { overflow-y: auto; height: auto; }
+            .presentation-container {
+                flex-direction: column;
+                height: auto;
+                transform: none !important;
+            }
+            .slide {
+                min-width: 100%;
+                height: auto;
+                min-height: 100vh;
+                padding: 60px 20px;
+                border-bottom: 1px solid #222;
+                display: block;
+            }
             .slide-content {
                 grid-template-columns: 1fr;
-                gap: 30px;
+                gap: 40px;
                 text-align: center;
-                padding-top: 60px;
-                padding-bottom: 100px;
+                display: flex;
+                flex-direction: column;
             }
             .text-side { order: 1; }
-            .image-side { order: 2; margin-top: 20px; }
-            h1 { font-size: 3rem; }
+            .image-side { order: 2; perspective: none; }
+            
+            h1 { font-size: 3.5rem; }
             h2 { font-size: 2.2rem; }
             h3 { font-size: 1.1rem; }
-            .mobile-frame { width: 260px; height: 530px; margin: 0 auto !important; transform: none !important; }
-            .controls { bottom: 20px; right: 50%; transform: translateX(50%); }
-            .btn-nav { width: 50px; height: 50px; }
+            
+            .mobile-frame { 
+                width: 280px; 
+                height: 570px; 
+                margin: 0 auto !important; 
+                transform: none !important; 
+                border-width: 4px;
+            }
+            .controls { display: none; }
+            .progress-bar { position: fixed; }
+            .cover-content { padding-top: 100px; }
         }
 
         .text-side {
@@ -416,9 +438,20 @@
         const progress = document.getElementById('progress');
 
         function updateView() {
-            container.style.transform = `translateX(-${currentSlide * 100}vw)`;
-            progress.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            if (window.innerWidth > 900) {
+                container.style.transform = `translateX(-${currentSlide * 100}vw)`;
+                progress.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            }
         }
+
+        window.addEventListener('scroll', () => {
+            if (window.innerWidth <= 900) {
+                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (winScroll / height) * 100;
+                progress.style.width = scrolled + "%";
+            }
+        });
 
         function nextSlide() {
             if (currentSlide < totalSlides - 1) {
