@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFPE - Business Presentation 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #00d26a;
+            --gold: #FFD700;
+            --bg: #050505;
+            --card: #111;
+            --text: #ffffff;
+            --muted: #888;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .presentation-container {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .slide {
+            min-width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .slide-content {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        @media (max-width: 900px) {
+            body { overflow-y: auto; height: auto; }
+            .presentation-container {
+                flex-direction: column;
+                height: auto;
+                transform: none !important;
+            }
+            .slide {
+                min-width: 100%;
+                height: auto;
+                min-height: 100vh;
+                padding: 60px 20px;
+                border-bottom: 1px solid #222;
+                display: block;
+            }
+            .slide-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+            }
+            .text-side { order: 1; }
+            .image-side { order: 2; perspective: none; }
+            
+            h1 { font-size: 3.5rem; }
+            h2 { font-size: 2.2rem; }
+            h3 { font-size: 1.1rem; }
+            
+            .mobile-frame { 
+                width: 280px; 
+                height: 570px; 
+                margin: 0 auto !important; 
+                transform: none !important; 
+                border-width: 4px;
+            }
+            .controls { display: none; }
+            .progress-bar { position: fixed; }
+            .cover-content { padding-top: 100px; }
+        }
+
+        .text-side {
+            animation: slideInLeft 0.8s ease-out both;
+        }
+
+        .image-side {
+            display: flex;
+            justify-content: center;
+            perspective: 1000px;
+            animation: slideInRight 0.8s ease-out both;
+        }
+
+        .mobile-frame {
+            width: 320px;
+            height: 650px;
+            background: #000;
+            border-radius: 40px;
+            padding: 12px;
+            border: 6px solid #222;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 20px rgba(0,210,106,0.1);
+            position: relative;
+            overflow: hidden;
+            transform: rotateY(-10deg);
+            transition: transform 0.5s;
+        }
+
+        .mobile-frame:hover {
+            transform: rotateY(0deg) scale(1.02);
+        }
+
+        .mobile-screen {
+            width: 100%;
+            height: 100%;
+            background: #111;
+            border-radius: 28px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mobile-screen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        h1 { font-size: 4rem; font-weight: 900; line-height: 1; margin-bottom: 20px; letter-spacing: -2px; }
+        h2 { font-size: 3.5rem; font-weight: 900; margin-bottom: 20px; color: var(--accent); }
+        h3 { font-size: 1.5rem; color: var(--muted); font-weight: 400; margin-bottom: 30px; line-height: 1.4; }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(0,210,106,0.1);
+            color: var(--accent);
+            border-radius: 30px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .feature-list { list-style: none; margin-top: 30px; }
+        .feature-item {
+            display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px;
+            font-size: 1.1rem; color: #ccc;
+        }
+        .feature-icon {
+            width: 28px; height: 28px; background: var(--accent); color: #000;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; flex-shrink: 0; margin-top: 2px;
+        }
+
+        /* Navigation Controls */
+        .controls {
+            position: fixed; bottom: 40px; right: 40px;
+            display: flex; gap: 15px; z-index: 1000;
+        }
+        .btn-nav {
+            width: 60px; height: 60px; border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; font-size: 1.5rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.3s;
+        }
+        .btn-nav:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+
+        .progress-bar {
+            position: fixed; top: 0; left: 0; height: 4px;
+            background: var(--accent); width: 0%; transition: width 0.3s;
+            box-shadow: 0 0 15px var(--accent); z-index: 1001;
+        }
+
+        /* Slide specific styles */
+        .cover-content { text-align: center; grid-template-columns: 1fr !important; }
+        .cover-content h1 { font-size: 6rem; margin-bottom: 10px; }
+        @media (max-width: 600px) { .cover-content h1 { font-size: 4rem; } }
+        .cover-content p { font-size: 1.5rem; color: var(--muted); letter-spacing: 4px; text-transform: uppercase; }
+
+        .message-box {
+            width: 450px;
+            max-width: 100%;
+            background: #1c1c1d;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+            margin: 0 auto;
+        }
+        .message-box img { width: 100%; border-radius: 12px; }
+
+        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* Background elements */
+        .bg-glow {
+            position: absolute; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(0,210,106,0.1) 0%, transparent 70%);
+            top: -200px; right: -100px; pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progress"></div>
+    <div class="bg-glow"></div>
+
+    <div class="presentation-container" id="container">
+        
+        <!-- Slide 1: Cover -->
+        <section class="slide">
+            <div class="slide-content cover-content">
+                <div class="text-side">
+                    <div class="badge">Ecosistema VFPE v1.0</div>
+                    <h1>VFPE</h1>
+                    <p>Directorio de Verificados y Red de Catálogos</p>
+                    <div style="margin-top:50px; font-weight:700; color:var(--accent);">
+                        Pulsa → para ver el funcionamiento
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: El Desafío -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Contexto</div>
+                    <h2>Orden en el sector</h2>
+                    <h3>Actualmente la información está dispersa en cientos de canales de Telegram. VFPE centraliza y organiza los servicios verificados en un solo punto de acceso.</h3>
+                    <ul class="feature-list">
+                        <li class="feature-item"><div class="feature-icon">i</div> Filtro de perfiles fraudulentos.</li>
+                        <li class="feature-item"><div class="feature-icon">i</div> Estructura de datos unificada.</li>
+                        <li class="feature-item"><div class="feature-icon">i</div> Acceso rápido desde Telegram Mini App.</li>
+                    </ul>
+                </div>
+                <div class="image-side">
+                    <div class="mobile-frame">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-10-17-908_org.telegram.messenger-edit.jpg" alt="Home">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Mini App Home -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Funcionalidad</div>
+                    <h2>Así funciona el mapa</h2>
+                    <h3>El usuario puede navegar geográficamente por los servicios disponibles. El sistema agrupa los plugs por zonas para facilitar la búsqueda.</h3>
+                    <ul class="feature-list">
+                        <li class="feature-item"><div class="feature-icon">✓</div> Visualización por clusters geográficos.</li>
+                        <li class="feature-item"><div class="feature-icon">✓</div> Filtros de servicio: Delivery, Meetup o Postal.</li>
+                        <li class="feature-item"><div class="feature-icon">✓</div> Buscador por nombre o ciudad.</li>
+                    </ul>
+                </div>
+                <div class="image-side">
+                    <div class="mobile-frame">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-10-30-666_org.telegram.messenger-edit.jpg" alt="Map View">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Puente de Conversión -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Integración</div>
+                    <h2>Del directorio al catálogo</h2>
+                    <h3>Hemos conectado el directorio con un sistema de catálogo propio. Desde la ficha de cada plug, el usuario puede saltar directamente al menú de productos.</h3>
+                    <ul class="feature-list">
+                        <li class="feature-item"><div class="feature-icon">🛍</div> Botón de acceso directo al inventario.</li>
+                        <li class="feature-item"><div class="feature-icon">⚡️</div> Transición fluida sin salir de la app.</li>
+                        <li class="feature-item"><div class="feature-icon">🔗</div> Enlace único por cada tienda.</li>
+                    </ul>
+                </div>
+                <div class="image-side">
+                    <div class="mobile-frame">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-10-55-925_org.telegram.messenger-edit.jpg" alt="Catalog Bridge">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Detalle del Plug -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Ficha Técnica</div>
+                    <h2>Lo que ve el usuario</h2>
+                    <h3>Cada perfil muestra la información relevante del servicio: reviews, redes sociales, métodos de contacto y el sello de verificación de VFPE.</h3>
+                </div>
+                <div class="image-side">
+                    <div class="mobile-frame">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-14-14-818_org.telegram.messenger-edit.jpg" alt="Detail View">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Escaparate Nativo -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Escaparate</div>
+                    <h2>Navegación del catálogo</h2>
+                    <h3>Los productos se organizan de forma visual por categorías. El sistema permite ver precios, unidades y descripciones detalladas de cada artículo.</h3>
+                    <ul class="feature-list">
+                        <li class="feature-item"><div class="feature-icon">✨</div> Interfaz optimizada para móvil.</li>
+                        <li class="feature-item"><div class="feature-icon">📦</div> Control de stock y disponibilidad.</li>
+                        <li class="feature-item"><div class="feature-icon">🔍</div> Buscador interno de productos.</li>
+                    </ul>
+                </div>
+                <div class="image-side">
+                    <div class="mobile-frame">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-18-59-167_org.telegram.messenger-edit.jpg" alt="Catalog">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Checkout Logic -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Proceso</div>
+                    <h2>Gestión del pedido</h2>
+                    <h3>El usuario añade artículos al carrito, especifica los datos de entrega y revisa el resumen antes de confirmar el envío al plug.</h3>
+                </div>
+                <div class="image-side">
+                    <div class="mobile-frame" style="margin-right: 20px;">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-24-12-363_org.telegram.messenger-edit.jpg" alt="Cart">
+                        </div>
+                    </div>
+                    <div class="mobile-frame">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-24-33-650_org.telegram.messenger-edit.jpg" alt="Success">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Notificación Instantánea -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Notificaciones</div>
+                    <h2>Recepción de pedidos</h2>
+                    <h3>Una vez confirmado, el plug recibe un mensaje automático en Telegram con todos los detalles: cliente, dirección y lista de productos.</h3>
+                </div>
+                <div class="image-side">
+                    <div class="message-box">
+                        <p style="color:var(--muted); font-size:0.8rem; margin-bottom:10px;">Formato de pedido en Telegram:</p>
+                        <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-25-53-746_org.telegram.messenger-edit.jpg" alt="Message">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: Control Total -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">SaaS</div>
+                    <h2>Panel de administración</h2>
+                    <h3>Cada dueño de plug dispone de un panel privado para gestionar su catálogo: editar productos, cambiar precios y personalizar su perfil.</h3>
+                    <ul class="feature-list">
+                        <li class="feature-item"><div class="feature-icon">⚙️</div> Configuración de pedido mínimo.</li>
+                        <li class="feature-item"><div class="feature-icon">➕</div> Alta y baja de productos en tiempo real.</li>
+                        <li class="feature-item"><div class="feature-icon">📈</div> Estadísticas básicas de visualización.</li>
+                    </ul>
+                </div>
+                <div class="image-side">
+                    <div class="mobile-frame">
+                        <div class="mobile-screen">
+                            <img src="assets/Final_Presentation/Screenshot_2026-05-04-13-15-53-027_org.telegram.messenger-edit.jpg" alt="Manage">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10: Futuro -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="text-side">
+                    <div class="badge">Roadmap</div>
+                    <h2>Próximo paso: PlugPass</h2>
+                    <h3>Estamos desarrollando un protocolo de reputación basado en transacciones reales. Un sistema para validar la fiabilidad de cada actor del ecosistema.</h3>
+                    <div style="margin-top:40px; padding:25px; background:rgba(255,215,0,0.05); border:1px solid var(--gold); border-radius:20px;">
+                        <h4 style="color:var(--gold); font-size:1.4rem; margin-bottom:10px;">Reputación por hechos</h4>
+                        <p style="color:#ccc; font-size:1rem;">Historial de entregas exitosas, insignias de confianza y validación comunitaria automatizada.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="controls">
+        <button class="btn-nav" onclick="prevSlide()">←</button>
+        <button class="btn-nav" onclick="nextSlide()">→</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 10;
+        const container = document.getElementById('container');
+        const progress = document.getElementById('progress');
+
+        function updateView() {
+            if (window.innerWidth > 900) {
+                container.style.transform = `translateX(-${currentSlide * 100}vw)`;
+                progress.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            }
+        }
+
+        window.addEventListener('scroll', () => {
+            if (window.innerWidth <= 900) {
+                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (winScroll / height) * 100;
+                progress.style.width = scrolled + "%";
+            }
+        });
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateView();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateView();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        // Initialize progress
+        updateView();
+    </script>
+</body>
+</html>
