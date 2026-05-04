@@ -15,6 +15,15 @@ async function getStore(tgOwnerId) {
 // /start — main menu
 bot.command('start', async (ctx) => {
     const store = await getStore(ctx.from.id);
+    
+    // Auto-trigger creation if deep linked
+    if (!store && ctx.match === 'create') {
+        return ctx.reply(
+            `📋 *Let\'s set up your catalog!*\n\nSend me the name for your catalog:\n_(e.g. HashAndCrafts, The Green Lab, Cali King...)_`,
+            { parse_mode: 'Markdown' }
+        );
+    }
+
     const kb = new InlineKeyboard();
 
     if (store) {
