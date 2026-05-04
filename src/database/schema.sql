@@ -117,6 +117,8 @@ CREATE TABLE IF NOT EXISTS catalog_stores (
     logo_url TEXT,
     bio TEXT,
     theme_color TEXT DEFAULT '#00d26a',     -- Hex color for UI accent
+    min_order_amount NUMERIC(10,2) DEFAULT 0,
+    is_pro BOOLEAN DEFAULT FALSE,
     active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

@@ -24,7 +24,7 @@ router.get('/api/:slug', async (req, res) => {
     const { slug } = req.params;
     try {
         const storeRes = await query(
-            'SELECT id, slug, name, logo_url, bio, theme_color FROM catalog_stores WHERE slug = $1 AND active = TRUE',
+            'SELECT id, slug, name, logo_url, bio, theme_color, min_order_amount, is_pro FROM catalog_stores WHERE slug = $1 AND active = TRUE',
             [slug]
         );
         if (!storeRes.rows.length) return res.status(404).json({ error: 'Catalog not found' });
@@ -69,7 +69,7 @@ router.post('/api/product/toggle', async (req, res) => {
 
 // POST add product (owner only)
 router.post('/api/product/add', async (req, res) => {
-    const { name, category, description, photo_url, price, unit, available, tg_user_id } = req.body;
+    const { name, category, description, photo_url, price, unit, available, featured, tg_user_id } = req.body;
     if (!name || !tg_user_id) return res.status(400).json({ error: 'Missing params' });
 
     try {
@@ -78,9 +78,9 @@ router.post('/api/product/add', async (req, res) => {
 
         const store_id = storeRes.rows[0].id;
         const result = await query(
-            `INSERT INTO catalog_products (store_id, name, category, description, photo_url, price, unit, available)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-            [store_id, name, category || 'flower', description || null, photo_url || null, price || 0, unit || 'g', available ?? true]
+            `INSERT INTO catalog_products (store_id, name, category, description, photo_url, price, unit, available, featured)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+            [store_id, name, category || 'flower', description || null, photo_url || null, price || 0, unit || 'g', available ?? true, featured ?? false]
         );
         res.json({ ok: true, id: result.rows[0].id });
     } catch (e) {
@@ -107,6 +107,45 @@ router.post('/api/product/delete', async (req, res) => {
         res.json({ ok: true });
     } catch (e) {
         console.error('[Catalog API delete]', e);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// POST update store settings (owner only)
+router.post('/api/store/settings', async (req, res) => {
+    const { min_order_amount, is_pro, tg_user_id } = req.body;
+    if (tg_user_id === undefined) return res.status(400).json({ error: 'Missing user' });
+
+    try {
+        await query(
+            'UPDATE catalog_stores SET min_order_amount = $1, is_pro = $2 WHERE tg_owner_id = $3',
+            [min_order_amount || 0, is_pro || false, tg_user_id]
+        );
+        res.json({ ok: true });
+    } catch (e) {
+        console.error('[Catalog API settings]', e);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// POST toggle product featured (owner only)
+router.post('/api/product/featured', async (req, res) => {
+    const { id, featured, tg_user_id } = req.body;
+    if (!id || featured === undefined || !tg_user_id) return res.status(400).json({ error: 'Missing params' });
+
+    try {
+        const check = await query(
+            `SELECT cp.id FROM catalog_products cp
+             JOIN catalog_stores cs ON cs.id = cp.store_id
+             WHERE cp.id = $1 AND cs.tg_owner_id = $2`,
+            [id, tg_user_id]
+        );
+        if (!check.rows.length) return res.status(403).json({ error: 'Forbidden' });
+
+        await query('UPDATE catalog_products SET featured = $1 WHERE id = $2', [featured, id]);
+        res.json({ ok: true });
+    } catch (e) {
+        console.error('[Catalog API featured]', e);
         res.status(500).json({ error: 'Server error' });
     }
 });

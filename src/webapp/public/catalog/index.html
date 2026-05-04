@@ -85,7 +85,10 @@
             scrollbar-width: none;
             border-bottom: 1px solid var(--border);
             position: sticky; top: 0;
-            background: var(--bg); z-index: 10;
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 10;
         }
         .filters::-webkit-scrollbar { display: none; }
 
@@ -160,9 +163,85 @@
             margin-bottom: 4px;
         }
 
-        .card-name {
-            font-size: 0.95rem; font-weight: 700;
-            line-height: 1.2;
+        /* ── GLASSMORPHISM & BLUR ── */
+        .glass {
+            background: rgba(20, 20, 20, 0.7) !important;
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        }
+
+        .header {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(15px);
+            position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* ── SKELETON LOADERS ── */
+        .skeleton {
+            background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 12px;
+        }
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ── SEARCH BAR ── */
+        .search-container {
+            padding: 0 20px 15px;
+        }
+        .search-box {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+        }
+        .search-box input {
+            background: none; border: none; color: #fff; width: 100%;
+            font-family: 'Outfit', sans-serif; font-size: 0.95rem; outline: none;
+        }
+
+        /* ── FEATURED CAROUSEL ── */
+        .featured-section { padding: 20px 0; overflow: hidden; }
+        .featured-title { padding: 0 20px; margin-bottom: 12px; font-size: 0.8rem; color: var(--accent); font-weight: 800; letter-spacing: 1px; }
+        .featured-track {
+            display: flex; gap: 15px; overflow-x: auto; padding: 0 20px 10px;
+            scrollbar-width: none;
+        }
+        .featured-track::-webkit-scrollbar { display: none; }
+        .featured-card {
+            flex-shrink: 0; width: 260px; height: 160px;
+            border-radius: 20px; overflow: hidden; position: relative;
+            background: var(--card); border: 1px solid var(--border);
+        }
+        .featured-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
+        .featured-info {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 15px; background: linear-gradient(transparent, rgba(0,0,0,0.9));
+        }
+
+        /* ── SUCCESS SCREEN ── */
+        .success-overlay {
+            position: fixed; inset: 0; background: var(--bg); z-index: 1000;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 40px;
+        }
+        .success-overlay.open { display: flex; }
+        .checkmark-circle {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: var(--accent); color: #000;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; margin-bottom: 24px;
+            box-shadow: 0 0 30px rgba(0,210,106,0.4);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        
+        .min-order-msg {
+            color: #ff4d4d; font-size: 0.75rem; font-weight: 600; text-align: center;
+            margin-top: 10px; display: none;
         }
 
         .card-price {
@@ -205,7 +284,11 @@
         }
         .cart-overlay.open { display: flex; }
         .cart-sheet {
-            background: var(--card); border-radius: 24px 24px 0 0;
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 24px 24px 0 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             width: 100%; max-height: 85vh; overflow-y: auto;
             padding: 24px 20px 40px; animation: slideUp 0.3s ease;
         }
@@ -280,8 +363,11 @@
         .modal-overlay.open { display: flex; }
 
         .modal-sheet {
-            background: var(--card);
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border-radius: 24px 24px 0 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             width: 100%; max-height: 85vh;
             overflow-y: auto;
             padding: 24px 20px 40px;
@@ -377,14 +463,38 @@
 </head>
 <body>
 
-    <div id="loading" class="loading">
-        <div>🌿</div>
-        <p>Loading catalog...</p>
+    <div id="loading">
+        <div class="header">
+            <div style="padding: 16px 20px;"><div class="skeleton" style="width:120px; height:24px;"></div></div>
+        </div>
+        <div style="padding: 20px;">
+            <div class="skeleton" style="width:100%; height:180px; margin-bottom:20px;"></div>
+            <div class="grid">
+                <div class="skeleton" style="height:240px;"></div>
+                <div class="skeleton" style="height:240px;"></div>
+                <div class="skeleton" style="height:240px;"></div>
+                <div class="skeleton" style="height:240px;"></div>
+            </div>
+        </div>
     </div>
 
     <div id="app" style="display:none;">
         <div class="hero" id="hero">
             <!-- Injected by JS -->
+        </div>
+
+        <!-- Search & Filters -->
+        <div class="search-container">
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" id="search-input" placeholder="Search products..." oninput="handleSearch()">
+            </div>
+        </div>
+
+        <!-- Featured Section (PRO only) -->
+        <div id="featured-section" class="featured-section" style="display:none;">
+            <div class="featured-title">⭐ FEATURED SELECTION</div>
+            <div class="featured-track" id="featured-track"></div>
         </div>
 
         <div class="filters" id="filters">
@@ -445,9 +555,20 @@
                     <span class="total-lbl">Total Order</span>
                     <span class="total-val" id="cart-total">0.00€</span>
                 </div>
-                <button class="btn-order" onclick="submitOrder()">🚀 Send Order to Plug</button>
+                <div id="min-order-msg" class="min-order-msg">Minimum order is <span>0.00€</span></div>
+                <button class="btn-order" id="btn-submit-order" onclick="submitOrder()">🚀 Send Order to Plug</button>
             </div>
         </div>
+    </div>
+
+    <!-- Success Screen -->
+    <div class="success-overlay" id="success-overlay">
+        <div class="checkmark-circle">✓</div>
+        <h2 style="font-size:2rem; font-weight:900; margin-bottom:10px;">ORDER SENT!</h2>
+        <p style="color:var(--muted); font-size:1.1rem; line-height:1.5; margin-bottom:30px;">
+            The plug has received your order.<br>They will contact you on Telegram soon.
+        </p>
+        <button class="btn-order" style="width:200px;" onclick="location.reload()">Back to Catalog</button>
     </div>
 
     <script>
@@ -464,7 +585,8 @@
 
         const DEMO_STORE = {
             id: 1, slug: 'hashandcrafts', name: 'HashAndCrafts',
-            logo_url: '', bio: 'Premium genetics. Handcrafted with love.', theme_color: '#00d26a'
+            logo_url: '', bio: 'Premium genetics. Handcrafted with love.', 
+            theme_color: '#00d26a', min_order_amount: 50, is_pro: true
         };
         const DEMO_PRODUCTS = [
             { id: 1, name: 'OG Kush',       category: 'flower',  price: 10, unit: 'g', description: 'Classic West Coast genetics. Earthy, pine, and lemon notes.', photo_url: '', available: true,  featured: true  },
@@ -479,8 +601,10 @@
         const isDemo = params.get('demo') === 'true';
         const slug = window.location.pathname.split('/').filter(Boolean).pop();
 
+        let store = null;
         let allProducts = [];
         let currentFilter = 'all';
+        let searchQuery = '';
         let cart = [];
         let modalQty = 1;
 
@@ -503,9 +627,33 @@
             applyTheme(store.theme_color);
             renderHero(store);
             allProducts = products;
+            renderFeatured();
             renderProducts();
             document.getElementById('loading').style.display = 'none';
             document.getElementById('app').style.display = 'block';
+        }
+
+        function renderFeatured() {
+            const section = document.getElementById('featured-section');
+            const track = document.getElementById('featured-track');
+            const featured = allProducts.filter(p => p.featured && p.available);
+
+            if (!store.is_pro || featured.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            track.innerHTML = featured.map(p => `
+                <div class="featured-card" onclick="openModal(${p.id})">
+                    ${p.photo_url ? `<img src="${p.photo_url}" class="featured-img">` : `<div style="height:100%; display:flex; align-items:center; justify-content:center; font-size:4rem; opacity:0.2;">${CATEGORY_EMOJI[p.category]}</div>`}
+                    <div class="featured-info">
+                        <div style="font-size:0.7rem; color:var(--accent); font-weight:800;">TOP PICK</div>
+                        <div style="font-weight:700; font-size:1rem; margin:2px 0;">${p.name}</div>
+                        <div style="font-size:0.85rem; font-weight:600;">${p.price}€ / ${p.unit}</div>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function applyTheme(color) {
@@ -528,14 +676,21 @@
 
         function renderProducts() {
             const grid = document.getElementById('product-grid');
-            const filtered = currentFilter === 'all'
-                ? allProducts
-                : allProducts.filter(p => p.category === currentFilter);
+            let filtered = allProducts;
+            
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(p => p.category === currentFilter);
+            }
+
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(q));
+            }
 
             if (!filtered.length) {
                 grid.innerHTML = `<div class="empty" style="grid-column:span 2">
-                    <div style="font-size:2.5rem">📦</div>
-                    <p>No products in this category yet.</p>
+                    <div style="font-size:2.5rem">😕</div>
+                    <p>No products found matching your search.</p>
                 </div>`;
                 return;
             }
@@ -586,6 +741,22 @@
             float.style.display = totalQty > 0 ? 'flex' : 'none';
             count.textContent = totalQty;
             totalEl.textContent = totalMoney.toFixed(2) + '€';
+
+            // Min order check
+            const minAmount = store?.min_order_amount || 0;
+            const minMsg = document.getElementById('min-order-msg');
+            const submitBtn = document.getElementById('btn-submit-order');
+            
+            if (totalMoney > 0 && totalMoney < minAmount) {
+                minMsg.style.display = 'block';
+                minMsg.querySelector('span').textContent = minAmount.toFixed(2) + '€';
+                submitBtn.style.opacity = '0.5';
+                submitBtn.style.pointerEvents = 'none';
+            } else {
+                minMsg.style.display = 'none';
+                submitBtn.style.opacity = '1';
+                submitBtn.style.pointerEvents = 'auto';
+            }
 
             itemsContainer.innerHTML = cart.map(item => `
                 <div class="cart-item">
@@ -642,10 +813,11 @@
             };
 
             if (isDemo) {
-                alert(`🚀 DEMO ORDER SENT!\n\n📍 Address: ${address}\n\n${summary}\n\nTotal: ${total}€`);
                 cart = [];
                 updateCartUI();
                 document.getElementById('cart-overlay').classList.remove('open');
+                document.getElementById('success-overlay').classList.add('open');
+                if (tg) tg.HapticFeedback?.notificationOccurred('success');
                 return;
             }
 
@@ -656,14 +828,20 @@
                 body: JSON.stringify(orderData)
             }).then(res => res.json()).then(data => {
                 if (data.ok) {
-                    alert('✅ Order sent! The plug will contact you soon.');
                     cart = [];
                     updateCartUI();
                     document.getElementById('cart-overlay').classList.remove('open');
+                    document.getElementById('success-overlay').classList.add('open');
+                    if (tg) tg.HapticFeedback?.notificationOccurred('success');
                 } else {
                     alert('❌ Error sending order. Try again.');
                 }
             });
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('search-input').value.trim();
+            renderProducts();
         }
 
         function openModal(productId) {

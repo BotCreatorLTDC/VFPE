@@ -171,7 +171,10 @@
 <body>
 <div class="header">
     <div>
-        <div class="header h1" id="header-title" style="font-size:1.1rem;font-weight:700;">Catalog Manager</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <div class="header h1" id="header-title" style="font-size:1.1rem;font-weight:700;">Catalog Manager</div>
+            <span id="plan-badge" class="demo-badge" style="background:#666; color:#fff;">BASIC</span>
+        </div>
         <div class="header-sub" id="header-sub">Loading...</div>
     </div>
     <span class="demo-badge" id="demo-badge" style="display:none;">DEMO</span>
@@ -269,6 +272,19 @@
                 </div>
             </div>
             <button class="btn-submit" onclick="saveStoreColor()">Save Color</button>
+
+            <div class="form-group" style="margin-top:24px; padding-top:24px; border-top:1px solid var(--border);">
+                <label>💰 Minimum Order Amount (€)</label>
+                <input type="number" id="store-min-order" placeholder="0.00">
+                <p style="font-size:0.65rem; color:var(--muted); margin-top:6px;">Customers won't be able to submit orders below this amount.</p>
+            </div>
+            <button class="btn-submit" onclick="saveStoreSettings()">Save Settings</button>
+            
+            <div id="pro-upgrade-box" style="background:linear-gradient(45deg, #FFD700, #FFA500); padding:20px; border-radius:14px; margin-top:30px; text-align:center; color:#000;">
+                <h3 style="font-weight:900;">🚀 UPGRADE TO PRO</h3>
+                <p style="font-size:0.8rem; margin:8px 0;">Unlimited products, featured carousel, and more.</p>
+                <button style="background:#000; color:#fff; border:none; padding:10px 20px; border-radius:20px; font-weight:700; font-family:'Outfit'; cursor:pointer;">Contact Sales</button>
+            </div>
         </div>
     </div>
 </div>
@@ -327,6 +343,22 @@ async function init() {
     renderStats();
     renderProducts();
     renderStoreTab();
+    updatePlanUI();
+}
+
+function updatePlanUI() {
+    const badge = document.getElementById('plan-badge');
+    const proBox = document.getElementById('pro-upgrade-box');
+    if (store.is_pro) {
+        badge.textContent = 'PRO';
+        badge.style.background = 'linear-gradient(45deg, #FFD700, #FFA500)';
+        badge.style.color = '#000';
+        proBox.style.display = 'none';
+    } else {
+        badge.textContent = 'BASIC';
+        badge.style.background = '#333';
+        proBox.style.display = 'block';
+    }
 }
 
 function applyTheme(color) {
@@ -361,6 +393,7 @@ function renderProducts() {
                 <div class="product-cat">${CAT_LABELS[p.category]} • ${p.price}€/${p.unit}</div>
             </div>
             <div class="product-actions">
+                <button class="btn-icon ${p.featured ? 'active' : ''}" style="${p.featured ? 'color:#FFD700;' : ''}" onclick="toggleFeatured(${p.id})">★</button>
                 <button class="toggle-btn ${p.available ? 'available' : 'unavailable'}" onclick="toggleProduct(${p.id})">
                     ${p.available ? '✅ Live' : '❌ Off'}
                 </button>
@@ -379,6 +412,7 @@ function renderStoreTab() {
     document.getElementById('store-name-display').textContent = store.name;
     document.getElementById('store-slug-display').textContent = `/${store.slug}`;
     document.getElementById('store-url-display').textContent = `${BASE}/catalog/${store.slug}`;
+    document.getElementById('store-min-order').value = store.min_order_amount || 0;
 }
 
 function toggleProduct(id) {
@@ -398,6 +432,28 @@ function toggleProduct(id) {
     btn.textContent = p.available ? '✅ Live' : '❌ Off';
     renderStats();
     if (tg) tg.HapticFeedback?.impactOccurred('light');
+}
+
+function toggleFeatured(id) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    
+    if (!store.is_pro && !isDemo) {
+        alert('⭐ Featured products is a PRO feature.');
+        return;
+    }
+
+    p.featured = !p.featured;
+
+    if (!isDemo) {
+        fetch('/catalog/api/product/featured', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, featured: p.featured, tg_user_id: tg?.initDataUnsafe?.user?.id })
+        });
+    }
+
+    renderProducts();
+    if (tg) tg.HapticFeedback?.impactOccurred('medium');
 }
 
 function deleteProduct(id) {
@@ -420,6 +476,12 @@ function selectAvail(val) {
 }
 
 function addProduct() {
+    if (!store.is_pro && products.length >= 5 && !isDemo) {
+        alert('⚠️ BASIC plan is limited to 5 products. Upgrade to PRO for unlimited listings!');
+        switchTab('store');
+        return;
+    }
+
     const name = document.getElementById('add-name').value.trim();
     const price = parseFloat(document.getElementById('add-price').value) || 0;
     const unit = document.getElementById('add-unit').value;
@@ -473,10 +535,34 @@ function selectColor(el) {
 function saveStoreColor() {
     const color = document.querySelector('.color-swatch.selected')?.dataset.color;
     if (!color || isDemo) return;
+    
+    if (!store.is_pro) {
+        alert('🎨 Custom colors is a PRO feature.');
+        return;
+    }
+
     fetch('/catalog/api/store/color', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug: store.slug, color, tg_user_id: tg?.initDataUnsafe?.user?.id })
     }).then(() => { if (tg) tg.HapticFeedback?.notificationOccurred('success'); });
+}
+
+function saveStoreSettings() {
+    const minOrder = parseFloat(document.getElementById('store-min-order').value) || 0;
+    if (isDemo) {
+        store.min_order_amount = minOrder;
+        alert('✅ Demo settings saved!');
+        return;
+    }
+
+    fetch('/catalog/api/store/settings', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ min_order_amount: minOrder, is_pro: store.is_pro, tg_user_id: tg?.initDataUnsafe?.user?.id })
+    }).then(() => { 
+        store.min_order_amount = minOrder;
+        if (tg) tg.HapticFeedback?.notificationOccurred('success'); 
+        alert('✅ Settings saved!');
+    });
 }
 
 function switchTab(tab) {
