@@ -51,12 +51,17 @@ router.post('/api/product/update', async (req, res) => {
 
     try {
         const check = await query(
-            `SELECT cp.id FROM catalog_products cp
+            `SELECT cp.id, cs.is_pro FROM catalog_products cp
              JOIN catalog_stores cs ON cs.id = cp.store_id
              WHERE cp.id = $1 AND cs.tg_owner_id = $2`,
             [id, tg_user_id]
         );
         if (!check.rows.length) return res.status(403).json({ error: 'Forbidden' });
+
+        const store = check.rows[0];
+        if (featured && !store.is_pro) {
+            return res.status(403).json({ error: 'Upgrade to PRO to feature products.' });
+        }
 
         await query(
             `UPDATE catalog_products 
@@ -100,14 +105,23 @@ router.post('/api/product/add', async (req, res) => {
     if (!name || !tg_user_id) return res.status(400).json({ error: 'Missing params' });
 
     try {
-        const storeRes = await query('SELECT id FROM catalog_stores WHERE tg_owner_id = $1', [tg_user_id]);
+        const storeRes = await query('SELECT id, is_pro FROM catalog_stores WHERE tg_owner_id = $1', [tg_user_id]);
         if (!storeRes.rows.length) return res.status(403).json({ error: 'No store found for this user' });
 
-        const store_id = storeRes.rows[0].id;
+        const store = storeRes.rows[0];
+
+        // Security check: Plan Limits
+        if (!store.is_pro) {
+            const countRes = await query('SELECT COUNT(*) FROM catalog_products WHERE store_id = $1', [store.id]);
+            if (parseInt(countRes.rows[0].count) >= 5) {
+                return res.status(403).json({ error: 'Basic plan limit reached (max 5 products). Upgrade to PRO for unlimited stock.' });
+            }
+        }
+
         const result = await query(
             `INSERT INTO catalog_products (store_id, name, category, description, photo_url, price, unit, available, featured)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
-            [store_id, name, category || 'flower', description || null, photo_url || null, price || 0, unit || 'g', available ?? true, featured ?? false]
+            [store.id, name, category || 'flower', description || null, photo_url || null, price || 0, unit || 'g', available ?? true, featured ?? false]
         );
         res.json({ ok: true, id: result.rows[0].id });
     } catch (e) {
@@ -145,8 +159,8 @@ router.post('/api/store/settings', async (req, res) => {
 
     try {
         await query(
-            'UPDATE catalog_stores SET name = $1, bio = $2, logo_url = $3, min_order_amount = $4, is_pro = $5 WHERE tg_owner_id = $6',
-            [name, bio, logo_url, min_order_amount || 0, is_pro || false, tg_user_id]
+            'UPDATE catalog_stores SET name = $1, bio = $2, logo_url = $3, min_order_amount = $4 WHERE tg_owner_id = $5',
+            [name, bio, logo_url, min_order_amount || 0, tg_user_id]
         );
         res.json({ ok: true });
     } catch (e) {
@@ -162,12 +176,17 @@ router.post('/api/product/featured', async (req, res) => {
 
     try {
         const check = await query(
-            `SELECT cp.id FROM catalog_products cp
+            `SELECT cp.id, cs.is_pro FROM catalog_products cp
              JOIN catalog_stores cs ON cs.id = cp.store_id
              WHERE cp.id = $1 AND cs.tg_owner_id = $2`,
             [id, tg_user_id]
         );
         if (!check.rows.length) return res.status(403).json({ error: 'Forbidden' });
+
+        const store = check.rows[0];
+        if (featured && !store.is_pro) {
+            return res.status(403).json({ error: 'Featured products are only available for PRO stores.' });
+        }
 
         await query('UPDATE catalog_products SET featured = $1 WHERE id = $2', [featured, id]);
         res.json({ ok: true });
