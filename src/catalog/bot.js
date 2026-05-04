@@ -79,8 +79,8 @@ bot.on('message:text', async (ctx) => {
 
 module.exports = {
     start: () => {
-        bot.start();
         console.log('✅ HashANDCrafts Catalog Bot started.');
+        return bot.start(); // Must return the Promise for .catch() in index.js
     },
     bot
 };
