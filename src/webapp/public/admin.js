@@ -114,12 +114,12 @@ function renderView(reports = []) {
         let actionButtons = '';
         if (club.status === 'pending') {
             actionButtons = `
-                <button class="btn-m btn-approve" onclick="handleAction(${club.id}, 'accept')" style="width:100%; margin-bottom:5px;">Aceptar y Enviar Billetera 📥</button>
+                <button class="btn-m btn-approve" onclick="handleAction(${club.id}, 'accept')" style="width:100%; margin-bottom:5px;">Aceptar y Enviar Credenciales 📥</button>
                 <button class="btn-m btn-reject" onclick="handleAction(${club.id}, 'reject')">Reject</button>
             `;
         } else if (club.status === 'accepted') {
             actionButtons = `
-                <button class="btn-m btn-approve" onclick="handleAction(${club.id}, 'publish')" style="width:100%; margin-bottom:5px; background:#FFD700; color:#000;">Confirmar Pago y Publicar 🚀</button>
+                <button class="btn-m btn-approve" onclick="handleAction(${club.id}, 'publish')" style="width:100%; margin-bottom:5px; background:#FFD700; color:#000;">Confirmar y Activar Perfil 🚀</button>
                 <button class="btn-m btn-reject" onclick="handleAction(${club.id}, 'reject')">Reject</button>
             `;
         } else if (club.status === 'verified') {
@@ -242,7 +242,7 @@ function renderAnalytics(data) {
     const citiesList = document.getElementById('top-cities-list');
     const clubsListAn = document.getElementById('top-clubs-list');
 
-    citiesList.innerHTML = data.topCities.map(c => `<li><span class="n">${c.city}</span> <span class="v">${c.count} plugs</span></li>`).join('');
+    citiesList.innerHTML = data.topCities.map(c => `<li><span class="n">${c.city}</span> <span class="v">${c.count} partners</span></li>`).join('');
     clubsListAn.innerHTML = data.topClubs.map(c => `<li><span class="n">${c.name}</span> <span class="v">${c.click_count} clicks</span></li>`).join('');
 }
 

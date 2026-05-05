@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VFPE - Europe's Verified Plug Directory 🔌</title>
+    <title>VFPE - Europe's Verified Provider Network 🌐</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -18,7 +18,7 @@
                 <button id="menu-btn" class="menu-btn" style="display:none;">☰</button>
                 <div class="logo">
                     <img src="/assets/logo.jpg" alt="VFPE Logo" class="brand-logo">
-                    <p>Europe's Verified Plug Directory 🔌</p>
+                    <p>Europe's Verified Provider Network 🌐</p>
                 </div>
             </div>
             <div class="stats">
@@ -32,7 +32,7 @@
             </div>
 
             <section id="search-section">
-                <input type="text" id="search-input" placeholder="Search by city or plug name...">
+                <input type="text" id="search-input" placeholder="Search by city or partner name...">
                 <div class="filters">
                     <select id="country-filter">
                         <option value="all">All Countries</option>
@@ -56,8 +56,8 @@
             </section>
 
             <section id="apply-section">
-                <h3>Is your plug not listed?</h3>
-                <button id="open-apply-modal">Apply for Verification →</button>
+                <h3>Partner not found?</h3>
+                <button id="open-apply-modal">Register as Provider →</button>
             </section>
         </main>
     </div>
@@ -102,18 +102,18 @@
                 <button id="detail-catalog-btn" class="btn-owner-catalog" style="display:none; width:100%; margin-bottom:12px; padding: 14px; font-size: 1rem; border-radius: 12px;">🛍️ VER CATÁLOGO</button>
                 <a id="detail-tg-link" href="#" class="cta-primary">💬 Contact on Telegram</a>
                 <a id="detail-ig-link" href="#" class="cta-secondary" style="display:none;">📸 Instagram</a>
-                <button id="detail-share-btn" class="cta-secondary">🔗 Share Plug</button>
+                <button id="detail-share-btn" class="cta-secondary">🔗 Share Profile</button>
             </div>
 
             <!-- About -->
             <div class="detail-about-section">
-                <h4>About this Plug</h4>
+                <h4>Provider Profile</h4>
                 <p id="detail-description"></p>
             </div>
 
             <!-- Report Button -->
             <div style="text-align:center; margin-bottom:20px;">
-                <button id="open-report-btn" style="background:none; border:none; color:#555; font-size:0.8rem; text-decoration:underline; cursor:pointer;">⚠️ Report an issue with this plug</button>
+                <button id="open-report-btn" style="background:none; border:none; color:#555; font-size:0.8rem; text-decoration:underline; cursor:pointer;">⚠️ Report an issue with this partner</button>
             </div>
 
             <!-- Verification box -->
@@ -137,9 +137,9 @@
     <div id="apply-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Apply for Verification</h2>
+            <h2>Register as Provider</h2>
             <form id="apply-form">
-                <input type="text" name="name" placeholder="Your plug's name" required>
+                <input type="text" name="name" placeholder="Partner name" required>
                 <select name="country" id="form-country" required>
                     <option value="" disabled selected>1. Select country</option>
                     <option value="ES">Spain</option>
@@ -160,8 +160,8 @@
                         <label style="display:flex;align-items:center;gap:6px;font-size:0.9rem;cursor:pointer;"><input type="checkbox" class="apply-tag" value="postal"> 📬 Postal</label>
                     </div>
                 </div>
-                <p class="disclaimer">⚠️ VFPE is a directory platform. We do not sell, distribute, or facilitate the acquisition of any substance. All plugs operate under local laws.</p>
-                <button type="submit">Submit Verification Request</button>
+                <p class="disclaimer">⚠️ VFPE is a directory platform. We do not sell, distribute, or facilitate the acquisition of any substance. All partners operate under local laws.</p>
+                <button type="submit">Submit Registration Request</button>
             </form>
         </div>
     </div>
@@ -170,7 +170,7 @@
     <div id="edit-modal" class="modal">
         <div class="modal-content">
             <span class="close" id="close-edit">&times;</span>
-            <h2>Manage My Plug</h2>
+            <h2>Admin Console</h2>
             
             <!-- V2: Owner Analytics Dashboard -->
             <div class="owner-stats-grid" id="owner-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:20px; background:#111; padding:15px; border-radius:12px; border:1px solid #222;">
@@ -188,22 +188,22 @@
                 </div>
             </div>
 
-            <p style="font-size: 0.8rem; color: #8e8e93; margin-bottom: 1.5rem;">Update your plug's visible information.</p>
+            <p style="font-size: 0.8rem; color: #8e8e93; margin-bottom: 1.5rem;">Update your profile information.</p>
             <form id="edit-form">
                 <input type="hidden" name="id" id="edit-id">
-                <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">Plug Name (Read-only)</label>
+                <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">Profile Name (Read-only)</label>
                 <input type="text" id="edit-name-display" disabled style="opacity: 0.6;">
                 <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">Instagram @username</label>
-                <input type="text" name="instagram" id="edit-instagram" placeholder="@yourplug">
+                <input type="text" name="instagram" id="edit-instagram" placeholder="@yourbrand">
                 <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">🖼 Photo URL (Logo/Store Photo)</label>
                 <input type="text" name="photo_url" id="edit-photo-url" placeholder="https://cloudinary.com/...">
-                <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">Plug Description</label>
-                <textarea name="description" id="edit-description" placeholder="Update description..." maxlength="200"></textarea>
+                <label style="font-size: 0.7rem; color: #00d26a; display: block; margin-bottom: 5px;">Partner Description</label>
+                <textarea name="description" id="edit-description" placeholder="Update profile..." maxlength="200"></textarea>
                 
                 <!-- Advanced Plan Feature -->
                 <div id="edit-event-group" style="display:none; border: 1px solid #FFD700; padding: 12px; border-radius: 12px; margin-bottom: 15px; background: rgba(255, 215, 0, 0.05);">
                     <label style="font-size: 0.7rem; color: #FFD700; display: block; margin-bottom: 5px;">⚡ Anuncio 24h (Solo Advanced)</label>
-                    <input type="text" name="event_message" id="edit-event-message" placeholder="Ej: ¡Nuevo stock de flores! 🔥" style="border-color: #FFD700;">
+                    <input type="text" name="event_message" id="edit-event-message" placeholder="Ej: Disponibilidad actualizada 🔥" style="border-color: #FFD700;">
                     <small style="color:#888; font-size: 0.7rem;">Si escribes algo, se activará por 24h.</small>
                 </div>
 
@@ -242,7 +242,7 @@
     <div id="report-modal" class="modal">
         <div class="modal-content">
             <span class="close" id="close-report">&times;</span>
-            <h2>⚠️ Report Plug</h2>
+            <h2>⚠️ Report Provider</h2>
             <p style="color:#888; font-size:0.85rem; margin-bottom:1.2rem;">Help us keep the directory safe. What is the issue?</p>
             <select id="report-reason" style="margin-bottom:15px;">
                 <option value="inactive">Inactive / No response</option>
@@ -264,8 +264,8 @@
             <button id="close-menu" class="close-menu-btn">✕</button>
         </div>
         <div class="side-menu-content">
-            <p style="font-size:0.7rem; color:#666; text-transform:uppercase; font-weight:800; letter-spacing:1px; margin-bottom:15px; padding-left:10px;">Plug Management</p>
-            <button id="open-edit-btn" class="menu-item-btn">⚙️ Manage My Plug</button>
+            <p style="font-size:0.7rem; color:#666; text-transform:uppercase; font-weight:800; letter-spacing:1px; margin-bottom:15px; padding-left:10px;">Provider Management</p>
+            <button id="open-edit-btn" class="menu-item-btn">⚙️ Admin Console</button>
             <button id="open-catalog-manager-btn" class="menu-item-btn gold">📦 Manage Catalog</button>
             <hr style="border:none; border-top:1px solid #222; margin:20px 0;">
             <p style="font-size:0.7rem; color:#666; text-transform:uppercase; font-weight:800; letter-spacing:1px; margin-bottom:15px; padding-left:10px;">Support</p>

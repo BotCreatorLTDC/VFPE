@@ -508,7 +508,7 @@
 
         <div class="grid" id="product-grid"></div>
 
-        <div class="powered-by">Powered by <span>VFPE</span> — Europe's Verified Plug Directory</div>
+        <div class="powered-by">Powered by <span>VFPE</span> — Official Verified Network</div>
     </div>
 
     <!-- Floating Cart Button -->
@@ -530,7 +530,7 @@
     <div class="cart-overlay" id="cart-overlay">
         <div class="cart-sheet">
             <div class="modal-handle"></div>
-            <h2 style="font-size:1.5rem; font-weight:900; margin-bottom:20px;">Shopping Cart</h2>
+            <h2 style="font-size:1.5rem; font-weight:900; margin-bottom:20px;">Request Summary</h2>
             
             <div id="cart-items"></div>
 
@@ -553,11 +553,11 @@
 
             <div class="cart-footer">
                 <div class="cart-total-row">
-                    <span class="total-lbl">Total Order</span>
-                    <span class="total-val" id="cart-total">0.00€</span>
+                    <span class="total-lbl">Total Valuation</span>
+                    <span class="total-val" id="cart-total">0.00#</span>
                 </div>
-                <div id="min-order-msg" class="min-order-msg">Minimum order is <span>0.00€</span></div>
-                <button class="btn-order" id="btn-submit-order" onclick="submitOrder()">🚀 Send Order to Plug</button>
+                <div id="min-order-msg" class="min-order-msg">Minimum requirement is <span>0.00#</span></div>
+                <button class="btn-order" id="btn-submit-order" onclick="submitOrder()">🚀 Submit Request to Partner</button>
             </div>
         </div>
     </div>
@@ -565,9 +565,9 @@
     <!-- Success Screen -->
     <div class="success-overlay" id="success-overlay">
         <div class="checkmark-circle">✓</div>
-        <h2 style="font-size:2rem; font-weight:900; margin-bottom:10px;">ORDER SENT!</h2>
+        <h2 style="font-size:2rem; font-weight:900; margin-bottom:10px;">REQUEST PROCESSED!</h2>
         <p style="color:var(--muted); font-size:1.1rem; line-height:1.5; margin-bottom:30px;">
-            The plug has received your order.<br>They will contact you on Telegram soon.
+            The partner has received your request.<br>Connection will be established soon.
         </p>
         <button class="btn-order" style="width:200px;" onclick="location.reload()">Back to Catalog</button>
     </div>
@@ -599,12 +599,12 @@
             theme_color: '#00d26a', min_order_amount: 50, is_pro: true
         };
         const DEMO_PRODUCTS = [
-            { id: 1, name: 'OG Kush',       category: 'flower',  price: 10, unit: 'g', description: 'Classic West Coast genetics. Earthy, pine, and lemon notes.', photo_url: '', available: true,  featured: true  },
-            { id: 2, name: 'Blue Dream',     category: 'flower',  price: 12, unit: 'g', description: 'Sweet berry aroma with full-body relaxation.',                photo_url: '', available: true,  featured: false },
-            { id: 3, name: 'Live Resin 710', category: 'extract', price: 40, unit: 'g', description: 'Full-spectrum extract. Top-shelf terpene profile.',           photo_url: '', available: true,  featured: false },
-            { id: 4, name: 'Gorilla Glue',   category: 'flower',  price: 10, unit: 'g', description: 'Heavy-handed euphoria and relaxation.',                       photo_url: '', available: false, featured: false },
+            { id: 1, name: 'OG Kush',       category: 'flower',  price: 10, unit: '@', description: 'Classic West Coast genetics. Earthy, pine, and lemon notes.', photo_url: '', available: true,  featured: true  },
+            { id: 2, name: 'Blue Dream',     category: 'flower',  price: 12, unit: '@', description: 'Sweet berry aroma with full-body relaxation.',                photo_url: '', available: true,  featured: false },
+            { id: 3, name: 'Live Resin 710', category: 'extract', price: 40, unit: '@', description: 'Full-spectrum extract. Top-shelf terpene profile.',           photo_url: '', available: true,  featured: false },
+            { id: 4, name: 'Gorilla Glue',   category: 'flower',  price: 10, unit: '@', description: 'Heavy-handed euphoria and relaxation.',                       photo_url: '', available: false, featured: false },
             { id: 5, name: 'Mango Gummies',  category: 'edible',  price: 25, unit: 'pack', description: 'Tropical flavour, precisely dosed.',                          photo_url: '', available: true,  featured: false },
-            { id: 6, name: 'Hash Rosin',     category: 'extract', price: 60, unit: 'g', description: 'Cold-pressed solventless extraction. Pure and potent.',       photo_url: '', available: true,  featured: false },
+            { id: 6, name: 'Hash Rosin',     category: 'extract', price: 60, unit: '@', description: 'Cold-pressed solventless extraction. Pure and potent.',       photo_url: '', available: true,  featured: false },
         ];
 
         const params = new URLSearchParams(window.location.search);
@@ -667,7 +667,7 @@
                     <div class="featured-info">
                         <div style="font-size:0.7rem; color:var(--accent); font-weight:800;">TOP PICK</div>
                         <div style="font-weight:700; font-size:1rem; margin:2px 0;">${p.name}</div>
-                        <div style="font-size:0.85rem; font-weight:600;">${p.price}€ / ${p.unit}</div>
+                        <div style="font-size:0.85rem; font-weight:600;">${p.price}# / ${p.unit}</div>
                     </div>
                 </div>
             `).join('');
@@ -722,9 +722,9 @@
                     <div class="card-body">
                         <div class="card-category">${CATEGORY_LABELS[p.category]}</div>
                         <div class="card-name">${p.name}</div>
-                        <div class="card-price">${p.price}€<span>/${p.unit}</span></div>
+                        <div class="card-price">${p.price}#<span>/${p.unit}</span></div>
                         <button class="btn-add-cart" onclick="event.stopPropagation(); addToCart(${p.id})">
-                            ADD TO CART
+                            SELECT ITEM
                         </button>
                     </div>
                 </div>
@@ -757,7 +757,7 @@
 
             float.style.display = totalQty > 0 ? 'flex' : 'none';
             count.textContent = totalQty;
-            totalEl.textContent = totalMoney.toFixed(2) + '€';
+            totalEl.textContent = totalMoney.toFixed(2) + '#';
 
             // Min order check - Fix: ensure minAmount is a number
             const minAmount = parseFloat(store?.min_order_amount) || 0;
@@ -766,15 +766,15 @@
             
             if (totalMoney > 0 && totalMoney < minAmount) {
                 minMsg.style.display = 'block';
-                minMsg.querySelector('span').textContent = minAmount.toFixed(2) + '€';
+                minMsg.querySelector('span').textContent = minAmount.toFixed(2) + '#';
                 submitBtn.style.opacity = '0.5';
                 submitBtn.style.pointerEvents = 'none';
-                submitBtn.textContent = `Minimum order is ${minAmount.toFixed(2)}€`;
+                submitBtn.textContent = `Minimum requirement is ${minAmount.toFixed(2)}#`;
             } else {
                 minMsg.style.display = 'none';
                 submitBtn.style.opacity = '1';
                 submitBtn.style.pointerEvents = 'auto';
-                submitBtn.textContent = '🚀 Send Order to Plug';
+                submitBtn.textContent = '🚀 Submit Request to Partner';
             }
 
             if (cart.length === 0) {
@@ -784,7 +784,7 @@
                     <div class="cart-item">
                         <div class="cart-item-info">
                             <div class="cart-item-name">${item.name}</div>
-                            <div class="cart-item-price">${parseFloat(item.price).toFixed(2)}€ / ${item.unit}</div>
+                            <div class="cart-item-price">${parseFloat(item.price).toFixed(2)}# / ${item.unit}</div>
                         </div>
                         <div class="cart-controls">
                             <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
@@ -824,7 +824,7 @@
                 return;
             }
             
-            const summary = cart.map(item => `- ${item.qty}x ${item.name} (${(item.price * item.qty).toFixed(2)}€)`).join('\n');
+            const summary = cart.map(item => `- ${item.qty}x ${item.name} (${(item.price * item.qty).toFixed(2)}#)`).join('\n');
             const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0).toFixed(2);
             
             const orderData = {
@@ -880,7 +880,7 @@
                 ${p.photo_url ? `<img src="${p.photo_url}" class="modal-img" alt="${p.name}">` : ''}
                 <div class="modal-category">${CATEGORY_LABELS[p.category]}</div>
                 <h2 class="modal-name">${p.name}</h2>
-                <div class="card-price" style="font-size:1.5rem; margin-bottom:15px;">${price.toFixed(2)}€ <span style="font-size:1rem;">/${p.unit}</span></div>
+                <div class="card-price" style="font-size:1.5rem; margin-bottom:15px;">${price.toFixed(2)}# <span style="font-size:1rem;">/${p.unit}</span></div>
                 ${p.description ? `<p class="modal-desc">${p.description}</p>` : ''}
                 <div class="modal-status-row">
                     <div class="status-dot ${!p.available ? 'unavailable' : ''}"></div>
@@ -899,7 +899,7 @@
                         </div>
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                             <span style="font-size:0.9rem; font-weight:700; color:var(--muted);">SUBTOTAL</span>
-                            <span style="font-size:1.3rem; font-weight:900; color:var(--accent);" id="modal-subtotal">${price.toFixed(2)}€</span>
+                            <span style="font-size:1.3rem; font-weight:900; color:var(--accent);" id="modal-subtotal">${price.toFixed(2)}#</span>
                         </div>
                         <button class="btn-order" onclick="addToCart(${p.id}, modalQty); document.getElementById('modal').classList.remove('open');">
                             ADD TO ORDER
@@ -921,7 +921,7 @@
             if (modalQty < 1) modalQty = 1;
 
             document.getElementById('modal-qty-val').textContent = modalQty;
-            document.getElementById('modal-subtotal').textContent = (price * modalQty).toFixed(2) + '€';
+            document.getElementById('modal-subtotal').textContent = (price * modalQty).toFixed(2) + '#';
             
             if (tg) tg.HapticFeedback?.impactOccurred('light');
         }

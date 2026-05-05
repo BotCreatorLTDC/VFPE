@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const nearMeBtn = document.createElement('button');
     nearMeBtn.id = 'near-me-btn';
     nearMeBtn.innerHTML = '📍';
-    nearMeBtn.title = 'Plugs near me';
+    nearMeBtn.title = 'Partners near me';
     document.getElementById('map-container').appendChild(nearMeBtn);
     nearMeBtn.onclick = () => {
         if (!navigator.geolocation) return alert('Geolocation not supported');
@@ -165,10 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isDemoOwner) showOwnerTools(DEMO_CLUBS[0]);
             return;
         }
-        statusMessage.textContent = 'Loading verified plugs...';
+        statusMessage.textContent = 'Loading verified network...';
         try {
             const data = await fetch('/api/clubs').then(r => r.json());
-            if (!Array.isArray(data)) { statusMessage.textContent = '⚠️ Failed to load plugs'; return; }
+            if (!Array.isArray(data)) { statusMessage.textContent = '⚠️ Failed to load network'; return; }
             allClubs = data;
             clubCount.textContent = allClubs.length;
             statusMessage.textContent = '';
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderClubs(clubs) {
         clubList.innerHTML = '';
         if (clubs.length === 0) {
-            statusMessage.textContent = search => `No results. Try a different filter.`;
+            statusMessage.textContent = `No results. Try a different filter.`;
             return;
         }
         statusMessage.textContent = '';
@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ reason, details, reporter_handle: tgUsername || 'anonymous' })
             });
             if (res.ok) {
-                alert('Thank you. Our moderators will review this plug.');
+                alert('Thank you. Our moderators will review this partner.');
                 reportModal.style.display = 'none';
             }
         } catch { alert('Error sending report.'); }
@@ -433,13 +433,13 @@ document.addEventListener('DOMContentLoaded', () => {
             navigator.clipboard.writeText(url).then(() => {
                 const btn = document.getElementById('detail-share-btn');
                 btn.textContent = '✅ Copied!';
-                setTimeout(() => { btn.textContent = '🔗 Share Plug'; }, 2000);
+                setTimeout(() => { btn.textContent = '🔗 Share Profile'; }, 2000);
             });
         };
 
         // Description
         document.getElementById('detail-description').textContent =
-            club.description || 'Verified plug operating under local guidelines.';
+            club.description || 'Verified provider operating under local guidelines.';
 
         // Show screen
         detailScreen.style.display = 'flex';
@@ -610,7 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('❌ Error: ' + (result.error || 'Unknown'));
             }
         } catch { alert('❌ Connection error.'); }
-        finally { btn.disabled = false; btn.textContent = 'Submit Verification Request'; }
+        finally { btn.disabled = false; btn.textContent = 'Submit Registration Request'; }
     };
 
     // ─── OWNER SELF-MANAGEMENT (unchanged) ───────────────────────────────────
@@ -713,7 +713,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             });
             if (res.ok) { document.getElementById('edit-modal').style.display = 'none'; fetchClubs(); }
-            else alert('Failed to update plug.');
+            else alert('Failed to update profile.');
         };
     }
 
@@ -722,8 +722,8 @@ document.addEventListener('DOMContentLoaded', () => {
         tg.expand();
         tg.ready();
         if (isEnglish) {
-            searchInput.placeholder = 'Search plug or city...';
-            openApplyBtn.textContent = 'Apply for Verification';
+            searchInput.placeholder = 'Search partner or city...';
+            openApplyBtn.textContent = 'Register as Provider';
         }
         const startParam = tg.initDataUnsafe?.start_param;
         if (startParam?.startsWith('club_')) {
