@@ -132,12 +132,35 @@ moderatorBot.command("admin", async (ctx) => {
     }
 });
 
+moderatorBot.command("groups", async (ctx) => {
+    if (!isAdmin(ctx)) return;
+    try {
+        const res = await query("SELECT chat_id, title FROM moderated_groups WHERE active = TRUE ORDER BY title ASC");
+        if (res.rows.length === 0) return ctx.reply("No hay grupos registrados todavía.");
+        
+        const list = res.rows.map(g => `📌 *${g.title}*\nID: \`${g.chat_id}\``).join("\n\n");
+        await ctx.reply(`📋 *Grupos Moderados*\n━━━━━━━━━━━━━━\n\n${list}`, { parse_mode: "Markdown" });
+    } catch (e) { ctx.reply("Error al listar grupos."); }
+});
+
 /**
  * AUTO-MODERATION & ANTI-FLOOD
  */
 
 moderatorBot.on("message", async (ctx, next) => {
     const userId = ctx.from.id;
+    if (isAdmin(ctx) && ctx.chat.type === 'private') return next();
+
+    // AUTO-LEARN GROUPS
+    if (ctx.chat.type === 'group' || ctx.chat.type === 'supergroup') {
+        try {
+            await query(
+                "INSERT INTO moderated_groups (chat_id, title) VALUES ($1, $2) ON CONFLICT (chat_id) DO UPDATE SET title = EXCLUDED.title, active = TRUE",
+                [ctx.chat.id, ctx.chat.title]
+            );
+        } catch (e) { console.error("[Moderator] Error tracking group:", e.message); }
+    }
+
     if (isAdmin(ctx)) return next();
 
     // EXCEPTION: Check if user is a Verified Plug

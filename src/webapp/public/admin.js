@@ -141,9 +141,14 @@ function renderView(reports = []) {
                     <span>🖱 ${club.click_count || 0} clicks</span>
                     <div style="display:flex; gap:5px;">
                         ${club.catalog_slug ? `
-                            <button onclick="window.open('/catalog/manage.html?slug=${club.catalog_slug}', '_blank')" style="background:#00d26a; border:none; color:#000; padding:2px 8px; border-radius:5px; font-size:0.7rem; font-weight:bold; cursor:pointer;">
-                                📦 Catálogo
-                            </button>
+                            <div style="display:flex; align-items:center; gap:4px;">
+                                <button onclick="window.open('/catalog/manage.html?slug=${club.catalog_slug}', '_blank')" style="background:#00d26a; border:none; color:#000; padding:2px 8px; border-radius:5px; font-size:0.7rem; font-weight:bold; cursor:pointer;" title="Gestionar Catálogo">
+                                    📦
+                                </button>
+                                <button onclick="toggleCatalog(${club.id}, ${!club.catalog_active})" style="background:${club.catalog_active ? '#00d26a' : '#444'}; border:none; color:${club.catalog_active ? '#000' : '#888'}; padding:2px 8px; border-radius:5px; font-size:0.6rem; font-weight:900; cursor:pointer;" title="Activar/Desactivar Catálogo">
+                                    ${club.catalog_active ? 'CAT ON' : 'CAT OFF'}
+                                </button>
+                            </div>
                         ` : ''}
                         ${club.status === 'verified' ? `
                             <button onclick="copyDeepLink(${club.id})" style="background:#444; border:none; color:#fff; padding:2px 8px; border-radius:5px; font-size:0.7rem; cursor:pointer;">

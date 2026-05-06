@@ -93,6 +93,14 @@ CREATE TABLE IF NOT EXISTS moderation_rules (
     action TEXT DEFAULT 'delete' CHECK (action IN ('delete', 'warn', 'ban'))
 );
 
+-- NEW: Table to track groups where the moderator bot is present
+CREATE TABLE IF NOT EXISTS moderated_groups (
+    chat_id BIGINT PRIMARY KEY,
+    title TEXT,
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Initial moderation rules based on spec
 INSERT INTO moderation_rules (rule_type, pattern)
 SELECT 'keyword', pattern FROM (

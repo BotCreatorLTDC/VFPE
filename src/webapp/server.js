@@ -301,7 +301,15 @@ async function runMigrations() {
         await query('ALTER TABLE catalog_products ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT FALSE');
         await query('ALTER TABLE catalog_products ADD COLUMN IF NOT EXISTS order_index INTEGER DEFAULT 0');
         
-        console.log('✅ All migrations checked and applied.');
+        // moderated_groups — ensure env community group is tracked
+        if (process.env.COMMUNITY_GROUP_ID) {
+            await query(
+                "INSERT INTO moderated_groups (chat_id, title) VALUES ($1, 'Community Group') ON CONFLICT (chat_id) DO NOTHING",
+                [process.env.COMMUNITY_GROUP_ID]
+            );
+        }
+        
+        console.log("Migrations applied successfully");
     } catch (e) {
         console.error('❌ Migration error:', e);
     }
@@ -313,7 +321,7 @@ runMigrations();
 app.get('/api/admin/clubs', adminAuth, async (req, res) => {
     try {
         const result = await query(`
-            SELECT c.*, cs.slug as catalog_slug 
+            SELECT c.*, cs.slug as catalog_slug, cs.active as catalog_active 
             FROM clubs c 
             LEFT JOIN catalog_stores cs ON c.tg_user_id = cs.tg_owner_id
             ORDER BY c.created_at DESC
@@ -321,6 +329,23 @@ app.get('/api/admin/clubs', adminAuth, async (req, res) => {
         res.json(result.rows);
     } catch (err) {
         res.status(500).json({ error: "Failed" });
+    }
+});
+
+app.post('/api/admin/catalog-toggle', adminAuth, async (req, res) => {
+    const { club_id, active } = req.body;
+    try {
+        const clubRes = await query("SELECT tg_user_id FROM clubs WHERE id = $1", [club_id]);
+        if (clubRes.rows.length === 0) return res.status(404).json({ error: "Club not found" });
+        
+        await query(
+            "UPDATE catalog_stores SET active = $1 WHERE tg_owner_id = $2",
+            [active, clubRes.rows[0].tg_user_id]
+        );
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Catalog toggle error:', err);
+        res.status(500).json({ error: "Failed to toggle catalog" });
     }
 });
 
@@ -407,6 +432,26 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
                     text: channelMsg,
                     parse_mode: 'Markdown'
                 }).catch(err => console.error("Error broadcast channel:", err.message));
+            }
+
+            // MODERATOR BOT: Broadcast to all moderated groups
+            if (club && process.env.MODERATOR_BOT_TOKEN) {
+                try {
+                    const groupsRes = await query("SELECT chat_id FROM moderated_groups WHERE active = TRUE");
+                    const announcement = `📢 *NUEVA VERIFICACIÓN VFPE*\n━━━━━━━━━━━━━━\n\n` +
+                                       `🌿 El club *${club.name}* ya es miembro oficial verificado en *${club.city}*.\n\n` +
+                                       `📍 Ciudad: ${club.city}\n` +
+                                       `💬 Contacto: ${club.telegram_username}\n\n` +
+                                       `✅ _Busca su perfil en nuestra Mini App oficial._`;
+
+                    for (const row of groupsRes.rows) {
+                        await axios.post(`https://api.telegram.org/bot${process.env.MODERATOR_BOT_TOKEN}/sendMessage`, {
+                            chat_id: row.chat_id,
+                            text: announcement,
+                            parse_mode: 'Markdown'
+                        }).catch(e => console.error(`Failed broadcast to group ${row.chat_id}:`, e.message));
+                    }
+                } catch (e) { console.error("Moderator broadcast error:", e.message); }
             }
 
             // Direct Message to Owner (Confirmation)
