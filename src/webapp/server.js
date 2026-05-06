@@ -301,11 +301,16 @@ async function runMigrations() {
         await query('ALTER TABLE catalog_products ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT FALSE');
         await query('ALTER TABLE catalog_products ADD COLUMN IF NOT EXISTS order_index INTEGER DEFAULT 0');
         
-        // moderated_groups — ensure env community group is tracked
-        if (process.env.COMMUNITY_GROUP_ID) {
+        // moderated_groups — ensure official community groups are tracked
+        const officialGroups = [
+            { id: -2071623669722, title: 'VeriFy Plug Europe®' },
+            { id: -1001877457836, title: 'VFPE Community' }
+        ];
+
+        for (const g of officialGroups) {
             await query(
-                "INSERT INTO moderated_groups (chat_id, title) VALUES ($1, 'Community Group') ON CONFLICT (chat_id) DO NOTHING",
-                [process.env.COMMUNITY_GROUP_ID]
+                "INSERT INTO moderated_groups (chat_id, title) VALUES ($1, $2) ON CONFLICT (chat_id) DO UPDATE SET title = EXCLUDED.title, active = TRUE",
+                [g.id, g.title]
             );
         }
         
