@@ -239,11 +239,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const tagsHtml = tags.map(t => `<span class="tag-chip">${getTagEmoji(t)} ${t}</span>`).join('');
 
             const card = document.createElement('div');
-            card.className = `club-card ${club.is_premium ? 'premium' : ''}`;
+            // SECURITY: Gold border and PREMIUM badge are EXCLUSIVE to Advanced plan
+            const isAdvancedPlan = (club.selected_plan === 'Advanced');
+            card.className = `club-card ${isAdvancedPlan ? 'premium' : ''}`;
             card.innerHTML = `
                 <div class="card-photo ${photoClass}" style="${photoStyle}">
                     <div class="card-photo-overlay">
-                        <span class="badge ${club.is_premium ? 'premium-badge' : ''}">${club.is_premium ? '⭐ PREMIUM' : '✅ VERIFIED'}</span>
+                        <span class="badge ${isAdvancedPlan ? 'premium-badge' : ''}">${isAdvancedPlan ? '⭐ PREMIUM' : '✅ VERIFIED'}</span>
                         <button class="card-like-btn ${isLiked ? 'liked' : ''}" data-id="${club.id}">
                             ${isLiked ? '❤️' : '🤍'} ${club.likes_count || 0}
                         </button>
@@ -379,10 +381,11 @@ document.addEventListener('DOMContentLoaded', () => {
             hero.className = `detail-hero club-gradient-${idx}`;
         }
 
-        // Badges
+        // SECURITY: Badge ⭐ PREMIUM is EXCLUSIVE to Advanced plan
+        const isAdvancedPlan = (club.selected_plan === 'Advanced');
         const badgesEl = document.getElementById('detail-badges');
         badgesEl.innerHTML = `<span class="detail-badge verified">✅ VERIFIED</span>` +
-            (club.is_premium ? `<span class="detail-badge premium">⭐ PREMIUM</span>` : '');
+            (isAdvancedPlan ? `<span class="detail-badge premium">⭐ PREMIUM</span>` : '');
 
         // Name & location
         document.getElementById('detail-name').textContent     = club.name;

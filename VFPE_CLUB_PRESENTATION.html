@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFPE - Presentación para Clubs 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --card: #0e0e0e;
+            --accent: #00d26a;
+            --gold: #FFD700;
+            --text: #ffffff;
+            --muted: #a0a0a0;
+            --border: rgba(255,255,255,0.08);
+            --gradient-pro: linear-gradient(135deg, #00d26a 0%, #00964b 100%);
+            --gradient-advanced: linear-gradient(135deg, #FFD700 0%, #b8860b 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #111;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+        }
+
+        /* ── PAGE STRUCTURE ── */
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 10mm auto;
+            background: var(--bg);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        @media print {
+            body { 
+                background: #000; 
+                margin: 0;
+                padding: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .page {
+                margin: 0;
+                border: none;
+                box-shadow: none;
+                page-break-after: always;
+                height: 297mm;
+                overflow: hidden; /* Ensure content doesn't bleed into next page */
+            }
+        }
+
+        /* ── UI COMPONENTS ── */
+        .section-title {
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            color: var(--accent);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .feature-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .feature-box h3 {
+            color: var(--accent);
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+
+        .screenshot-container {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: #111;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+
+        .screenshot-container img {
+            width: 100%;
+            display: block;
+        }
+
+        .img-caption {
+            font-size: 0.85rem;
+            color: var(--muted);
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* ── TABLES ── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: #111;
+            color: var(--accent);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .check { color: var(--accent); font-weight: bold; }
+        .cross { color: #ff4d4d; opacity: 0.4; }
+        .star  { color: var(--gold); }
+
+        .footer {
+            margin-top: auto;
+            font-size: 0.85rem;
+            color: var(--muted);
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 1: COVER -->
+    <div class="page" style="justify-content: center; align-items: center; text-align: center; background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);">
+        <img src="file:///Users/web/Documents/german/vfplug/assets/logo.jpg" style="width: 160px; height: 160px; border-radius: 35px; margin-bottom: 40px; border: 2px solid var(--accent);">
+        <h1 style="font-size: 4.5rem; color: var(--accent);">VFPE</h1>
+        <p style="font-size: 1.6rem; color: var(--muted); letter-spacing: 6px;">PARTNERSHIP 2026</p>
+        <div style="position: absolute; bottom: 30mm; color: var(--muted); font-size: 1rem;">
+            Guía Oficial para Clubs y Proveedores Verificados
+        </div>
+    </div>
+
+    <!-- PAGE 2: ECOSYSTEM (HOME) -->
+    <div class="page">
+        <h2 class="section-title">Interfaz Principal</h2>
+        <div class="grid-2">
+            <div>
+                <div class="screenshot-container">
+                    <img src="file:///Users/web/Documents/german/vfplug/assets/Final_Presentation/1-home.jpg">
+                </div>
+                <p class="img-caption">Home con mapa interactivo.</p>
+            </div>
+            <div>
+                <div class="screenshot-container">
+                    <img src="file:///Users/web/Documents/german/vfplug/assets/Final_Presentation/2-lista-plugs.jpg">
+                </div>
+                <p class="img-caption">Directorio de clubes verificados.</p>
+            </div>
+        </div>
+        <div class="feature-box">
+            <h3>Visibilidad Inmediata</h3>
+            <p>Nuestra plataforma conecta a miles de usuarios activos con los mejores clubes de Europa de forma segura y eficiente.</p>
+        </div>
+        <div class="footer"><span>VerifyPlug Europe</span><span>Página 2</span></div>
+    </div>
+
+    <!-- PAGE 3: PERFIL DETALLADO -->
+    <div class="page">
+        <h2 class="section-title">Perfil del Club</h2>
+        <div style="display: flex; gap: 30px; align-items: flex-start;">
+            <div style="flex: 1.2;">
+                <div class="screenshot-container">
+                    <img src="file:///Users/web/Documents/german/vfplug/assets/Final_Presentation/4-perfil-detallado.jpg">
+                </div>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
+                <div class="feature-box">
+                    <h3>Identidad Visual</h3>
+                    <p>Muestra tu logo, fotos reales, descripción detallada y tags de servicio para captar la atención.</p>
+                </div>
+                <div class="feature-box">
+                    <h3>Engagement</h3>
+                    <p>Sistema de likes, favoritos y valoraciones de usuarios reales.</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer"><span>VerifyPlug Europe</span><span>Página 3</span></div>
+    </div>
+
+    <!-- PAGE 4: GESTIÓN OWNER -->
+    <div class="page">
+        <h2 class="section-title">Panel de Control</h2>
+        <div class="grid-2">
+            <div>
+                <div class="screenshot-container">
+                    <img src="file:///Users/web/Documents/german/vfplug/assets/Final_Presentation/5-barra-lateral-dueños.jpg">
+                </div>
+                <p class="img-caption">Menú de gestión para dueños.</p>
+            </div>
+            <div class="feature-box" style="display: flex; flex-direction: column; justify-content: center;">
+                <h3>Gestión Simple</h3>
+                <p style="margin-bottom: 15px;">Accede a tus estadísticas (clics, vistas) y edita tu perfil instantáneamente.</p>
+                <ul style="list-style: none; padding-left: 0; color: var(--muted); font-size: 0.95rem;">
+                    <li style="margin-bottom: 8px;">✓ Edición de perfil en vivo</li>
+                    <li style="margin-bottom: 8px;">✓ Gestión de catálogo</li>
+                    <li style="margin-bottom: 8px;">✓ Anuncios de eventos (Advanced)</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer"><span>VerifyPlug Europe</span><span>Página 4</span></div>
+    </div>
+
+    <!-- PAGE 5: CATALOGO -->
+    <div class="page">
+        <h2 class="section-title">Catálogo Digital</h2>
+        <div class="grid-2">
+            <div>
+                <div class="screenshot-container">
+                    <img src="file:///Users/web/Documents/german/vfplug/assets/Final_Presentation/6-main-catalogo.jpg">
+                </div>
+                <p class="img-caption">Vista principal del catálogo.</p>
+            </div>
+            <div>
+                <div class="screenshot-container">
+                    <img src="file:///Users/web/Documents/german/vfplug/assets/Final_Presentation/7-ficha-producto.jpg">
+                </div>
+                <p class="img-caption">Ficha de producto detallada.</p>
+            </div>
+        </div>
+        <div class="feature-box">
+            <h3>Venta Directa</h3>
+            <p>Tus productos se presentan con fotos de alta calidad, precios y unidades, facilitando la decisión del cliente.</p>
+        </div>
+        <div class="footer"><span>VerifyPlug Europe</span><span>Página 5</span></div>
+    </div>
+
+    <!-- PAGE 6: FLUJO DE PEDIDO -->
+    <div class="page">
+        <h2 class="section-title">Flujo de Pedido</h2>
+        <div class="grid-2">
+            <div>
+                <div class="screenshot-container">
+                    <img src="file:///Users/web/Documents/german/vfplug/assets/Final_Presentation/8-carrito.jpg">
+                </div>
+                <p class="img-caption">1. Carrito de compra integrado.</p>
+            </div>
+            <div>
+                <div class="screenshot-container">
+                    <img src="file:///Users/web/Documents/german/vfplug/assets/Final_Presentation/10-mensaje-que-recibe-plug-con-carrito.jpg">
+                </div>
+                <p class="img-caption">2. Notificación directa en tu chat.</p>
+            </div>
+        </div>
+        <div class="feature-box">
+            <h3>De la App a tu Chat</h3>
+            <p>Recibe los pedidos automáticamente en tu Telegram privado con el nombre del cliente, dirección y lista de productos. Sin intermediarios.</p>
+        </div>
+        <div class="footer"><span>VerifyPlug Europe</span><span>Página 6</span></div>
+    </div>
+
+    <!-- PAGE 7: TABLA DE PLANES -->
+    <div class="page">
+        <h2 class="section-title">Planes y Beneficios</h2>
+        <table style="font-size: 0.95rem;">
+            <thead>
+                <tr>
+                    <th>Funcionalidad</th>
+                    <th style="text-align: center;">Basic</th>
+                    <th style="text-align: center;">PRO</th>
+                    <th style="text-align: center;">Advanced</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Listado verificado en mapa</td><td style="text-align: center;" class="check">✓</td><td style="text-align: center;" class="check">✓</td><td style="text-align: center;" class="check">✓</td></tr>
+                <tr><td>Catálogo Digital</td><td style="text-align: center;" class="check">Máx 5</td><td style="text-align: center;" class="check">Ilimitado</td><td style="text-align: center;" class="check">Ilimitado</td></tr>
+                <tr><td>Color de marca personalizado</td><td style="text-align: center;" class="cross">✕</td><td style="text-align: center;" class="check">✓</td><td style="text-align: center;" class="check">✓</td></tr>
+                <tr><td>Broadcast en canal oficial</td><td style="text-align: center;" class="cross">✕</td><td style="text-align: center;" class="check">✓</td><td style="text-align: center;" class="check">✓</td></tr>
+                <tr><td><strong>Borde Dorado Premium</strong></td><td style="text-align: center;" class="cross">✕</td><td style="text-align: center;" class="cross">✕</td><td style="text-align: center;" class="star">★</td></tr>
+                <tr><td><strong>Badge ⭐ PREMIUM</strong></td><td style="text-align: center;" class="cross">✕</td><td style="text-align: center;" class="cross">✕</td><td style="text-align: center;" class="star">★</td></tr>
+                <tr><td><strong>Anuncios de Eventos ⚡</strong></td><td style="text-align: center;" class="cross">✕</td><td style="text-align: center;" class="cross">✕</td><td style="text-align: center;" class="check">✓</td></tr>
+                <tr><td>Posición Prioritaria</td><td style="text-align: center;" class="cross">✕</td><td style="text-align: center;" class="cross">✕</td><td style="text-align: center;" class="check">✓</td></tr>
+            </tbody>
+        </table>
+        <div class="footer"><span>VerifyPlug Europe</span><span>Página 7</span></div>
+    </div>
+
+    <!-- PAGE 8: PRICING -->
+    <div class="page">
+        <h2 class="section-title">Tarifas y Registro</h2>
+        <table style="margin-bottom: 30px;">
+            <thead>
+                <tr>
+                    <th>Suscripción</th>
+                    <th style="text-align: center;">Basic</th>
+                    <th style="text-align: center;">PRO</th>
+                    <th style="text-align: center;">Advanced</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>3 Meses</strong></td><td style="text-align: center;">75€ /mes</td><td style="text-align: center;">120€ /mes</td><td style="text-align: center;">150€ /mes</td></tr>
+                <tr><td><strong>6 Meses</strong></td><td style="text-align: center;">65€ /mes</td><td style="text-align: center;">100€ /mes</td><td style="text-align: center;">130€ /mes</td></tr>
+                <tr><td><strong>9 Meses</strong></td><td style="text-align: center;">55€ /mes</td><td style="text-align: center;">90€ /mes</td><td style="text-align: center;">110€ /mes</td></tr>
+                <tr><td><strong>12 Meses</strong></td><td style="text-align: center; color: var(--accent);">50€ /mes</td><td style="text-align: center; color: var(--accent);">80€ /mes</td><td style="text-align: center; color: var(--accent);">100€ /mes</td></tr>
+            </tbody>
+        </table>
+        <div class="feature-box" style="border-color: var(--accent); text-align: center;">
+            <h3 style="margin-bottom: 10px;">¡Únete hoy mismo!</h3>
+            <p>Contacta con soporte: <strong>@VerifyPlugEU</strong></p>
+        </div>
+        <div class="footer"><span>VerifyPlug Europe</span><span>Página 8</span></div>
+    </div>
+
+</body>
+</html>

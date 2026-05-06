@@ -196,12 +196,22 @@ router.post('/api/product/featured', async (req, res) => {
     }
 });
 
-// POST update store theme color (owner only)
+// POST update store theme color (owner only — PRO and Advanced plans)
 router.post('/api/store/color', async (req, res) => {
     const { slug, color, tg_user_id } = req.body;
     if (!slug || !color || !tg_user_id) return res.status(400).json({ error: 'Missing params' });
 
     try {
+        // SECURITY: Theme color customization is exclusive to PRO and Advanced plans
+        const storeCheck = await query(
+            'SELECT id, is_pro FROM catalog_stores WHERE slug = $1 AND tg_owner_id = $2',
+            [slug, tg_user_id]
+        );
+        if (!storeCheck.rows.length) return res.status(403).json({ error: 'Forbidden' });
+        if (!storeCheck.rows[0].is_pro) {
+            return res.status(403).json({ error: 'Theme customization is exclusive to PRO and Advanced plans.' });
+        }
+
         await query(
             'UPDATE catalog_stores SET theme_color = $1 WHERE slug = $2 AND tg_owner_id = $3',
             [color, slug, tg_user_id]

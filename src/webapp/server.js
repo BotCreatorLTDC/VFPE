@@ -11,6 +11,24 @@ const PORT = process.env.PORT || 3000;
 // Admin IDs from environment
 const ADMIN_IDS = (process.env.ADMIN_IDS || "").split(',').map(id => id.trim());
 
+// ── PRICING TABLE ─────────────────────────────────────────────────────────────
+// Price per month (€) by plan and duration in months
+const PLAN_PRICES = {
+    Basic:    { 3: 75,  6: 65,  9: 55,  12: 50  },
+    PRO:      { 3: 120, 6: 100, 9: 90,  12: 80  },
+    Advanced: { 3: 150, 6: 130, 9: 110, 12: 100 }
+};
+
+// Subscription duration in days by month count
+const MONTHS_TO_DAYS = { 3: 90, 6: 180, 9: 270, 12: 365 };
+
+function getPlanPrice(plan, durationMonths) {
+    const planRates = PLAN_PRICES[plan] || PLAN_PRICES['Basic'];
+    const months = [3, 6, 9, 12].includes(Number(durationMonths)) ? Number(durationMonths) : 3;
+    const pricePerMonth = planRates[months];
+    return { pricePerMonth, total: pricePerMonth * months, months };
+}
+
 const allowedOrigins = [
     process.env.WEBAPP_URL,
     'https://vfpe.onrender.com',
@@ -184,17 +202,21 @@ app.post('/api/verify', async (req, res) => {
     }
 });
 
-// NEW: Endpoint to save the selected plan from pricing.html
+// Endpoint to save the selected plan + duration from pricing.html
 app.post('/api/select-plan', async (req, res) => {
-    const { username, plan } = req.body;
+    const { username, plan, duration_months } = req.body;
     if (!username || !plan) return res.status(400).json({ error: "Missing parameters" });
 
     const tgUser = username.startsWith('@') ? username : `@${username}`;
+    const validDurations = [3, 6, 9, 12];
+    const months = validDurations.includes(Number(duration_months)) ? Number(duration_months) : 3;
+
+    if (!PLAN_PRICES[plan]) return res.status(400).json({ error: "Invalid plan" });
 
     try {
         await query(
-            "UPDATE clubs SET selected_plan = $1 WHERE telegram_username = $2 AND status = 'pending'",
-            [plan, tgUser]
+            "UPDATE clubs SET selected_plan = $1, duration_months = $2 WHERE telegram_username = $3 AND status = 'pending'",
+            [plan, months, tgUser]
         );
         res.json({ success: true });
     } catch (err) {
@@ -266,6 +288,9 @@ app.post('/api/my-club/update', async (req, res) => {
 // --- DATABASE MIGRATIONS (Ensure columns exist) ---
 async function runMigrations() {
     try {
+        // clubs — new pricing model
+        await query('ALTER TABLE clubs ADD COLUMN IF NOT EXISTS duration_months INTEGER DEFAULT 3');
+
         // catalog_stores
         await query('ALTER TABLE catalog_stores ADD COLUMN IF NOT EXISTS min_order_amount NUMERIC(10,2) DEFAULT 0');
         await query('ALTER TABLE catalog_stores ADD COLUMN IF NOT EXISTS is_pro BOOLEAN DEFAULT FALSE');
@@ -276,7 +301,7 @@ async function runMigrations() {
         await query('ALTER TABLE catalog_products ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT FALSE');
         await query('ALTER TABLE catalog_products ADD COLUMN IF NOT EXISTS order_index INTEGER DEFAULT 0');
         
-        console.log('✅ All catalog migrations checked and applied.');
+        console.log('✅ All migrations checked and applied.');
     } catch (e) {
         console.error('❌ Migration error:', e);
     }
@@ -326,14 +351,19 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
             const clubRes = await query("UPDATE clubs SET status = 'accepted' WHERE id = $1 RETURNING *", [id]);
             const club = clubRes.rows[0];
 
-            // Send Telegram Message
+            // Send Telegram Message with dynamic pricing
             if (club && club.tg_user_id && process.env.MAIN_BOT_TOKEN) {
                 const planStr = club.selected_plan ? `Plan ${club.selected_plan}` : "Plan Básico";
-                const priceMap = { 'Basic': '50€', 'PRO': '80€', 'Advanced': '100€' };
-                const priceStr = priceMap[club.selected_plan] || '50€';
+                const { pricePerMonth, total, months } = getPlanPrice(
+                    club.selected_plan || 'Basic',
+                    club.duration_months || 3
+                );
+                const priceStr = `${total}# (${pricePerMonth}#/mes × ${months} meses)`;
                 
                 const message = `¡Enhorabuena! Tu solicitud para el club *${club.name}* ha sido pre-aprobada para el *${planStr}*.\n\n` +
-                                `Para proceder a la publicación oficial, por favor realiza el pago de *${priceStr}* a cualquiera de las siguientes billeteras:\n\n` +
+                                `📅 *Duración elegida:* ${months} meses\n` +
+                                `💰 *Importe total:* *${priceStr}*\n\n` +
+                                `Para proceder a la publicación oficial, por favor realiza el pago a cualquiera de las siguientes billeteras:\n\n` +
                                 `🧡 *BTC:* \`bc1qds092w95zsfz6z6nr9axw6ccvt26rv8sz39czx\`\n` +
                                 `💎 *ETH:* \`0xdc7668CC500161e8AA8e8808673E2c1aB5cC844b\`\n` +
                                 `💵 *USDT (ERC20):* \`0xdc7668CC500161e8AA8e8808673E2c1aB5cC844b\`\n` +
@@ -349,14 +379,16 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
             }
         } 
         else if (action === 'publish') {
-            // STEP 2: Publish the application (verified) and grant 30 days subscription
-            // FIX: If plan is Advanced, automatically set is_premium = true
-            const checkRes = await query("SELECT selected_plan FROM clubs WHERE id = $1", [id]);
-            const currentPlan = checkRes.rows[0]?.selected_plan;
-            const setPremium = (currentPlan === 'Advanced');
+            // STEP 2: Publish the application (verified) and grant subscription based on chosen duration
+            // SECURITY: is_premium (gold border) ONLY for Advanced plan
+            const checkRes = await query("SELECT selected_plan, duration_months FROM clubs WHERE id = $1", [id]);
+            const currentPlan    = checkRes.rows[0]?.selected_plan || 'Basic';
+            const durationMonths = checkRes.rows[0]?.duration_months || 3;
+            const durationDays   = MONTHS_TO_DAYS[durationMonths] || 90;
+            const setPremium     = (currentPlan === 'Advanced');
 
             const clubRes = await query(
-                "UPDATE clubs SET status = 'verified', verified_at = CURRENT_TIMESTAMP, subscription_expires_at = CURRENT_TIMESTAMP + interval '30 days', is_premium = $2 WHERE id = $1 RETURNING *", 
+                `UPDATE clubs SET status = 'verified', verified_at = CURRENT_TIMESTAMP, subscription_expires_at = CURRENT_TIMESTAMP + interval '${durationDays} days', is_premium = $2 WHERE id = $1 RETURNING *`,
                 [id, setPremium]
             );
             const club = clubRes.rows[0];
@@ -391,7 +423,15 @@ app.post('/api/admin/action', adminAuth, async (req, res) => {
         else if (action === 'approve') await query("UPDATE clubs SET status = 'verified', verified_at = CURRENT_TIMESTAMP WHERE id = $1", [id]); // Legacy compatibility
         else if (action === 'reject') await query("UPDATE clubs SET status = 'rejected' WHERE id = $1", [id]);
         else if (action === 'delete') await query("DELETE FROM clubs WHERE id = $1", [id]);
-        else if (action === 'promote') await query("UPDATE clubs SET is_premium = NOT is_premium WHERE id = $1", [id]); // Toggle premium
+        else if (action === 'promote') {
+            // SECURITY: Gold border (is_premium) is EXCLUSIVE to Advanced plan
+            const planCheck = await query("SELECT selected_plan FROM clubs WHERE id = $1", [id]);
+            const plan = planCheck.rows[0]?.selected_plan;
+            if (plan !== 'Advanced') {
+                return res.status(400).json({ error: "El borde dorado (PREMIUM) es exclusivo del plan Advanced. Este club tiene el plan: " + (plan || 'sin plan') });
+            }
+            await query("UPDATE clubs SET is_premium = NOT is_premium WHERE id = $1", [id]);
+        }
         else return res.status(400).json({ error: "Invalid action" });
         res.json({ success: true });
     } catch (err) {
@@ -405,9 +445,18 @@ app.post('/api/admin/update', adminAuth, async (req, res) => {
     const { id, name, city, country, telegram_username, instagram, description, event_message, photo_url, service_tags } = req.body;
     
     try {
-        const expiry = event_message ? "CURRENT_TIMESTAMP + interval '24 hours'" : "NULL";
         const tagsArray = Array.isArray(service_tags) ? service_tags : [];
 
+        // SECURITY: Event messages (24h announcements) are EXCLUSIVE to Advanced plan
+        if (event_message && event_message.trim() !== '') {
+            const planCheck = await query("SELECT selected_plan FROM clubs WHERE id = $1", [id]);
+            const plan = planCheck.rows[0]?.selected_plan;
+            if (plan !== 'Advanced') {
+                return res.status(403).json({ error: `Los anuncios de evento son exclusivos del plan Advanced. Este club tiene el plan: ${plan || 'sin plan'}` });
+            }
+        }
+
+        const expiry = (event_message && event_message.trim()) ? "CURRENT_TIMESTAMP + interval '24 hours'" : "NULL";
         const queryStr = `UPDATE clubs 
             SET name = $1, city = $2, country = $3, telegram_username = $4, 
                 instagram = $5, description = $6, 
@@ -418,7 +467,8 @@ app.post('/api/admin/update', adminAuth, async (req, res) => {
         await query(queryStr, [
             name, city, country, telegram_username,
             instagram || null, description || null, id,
-            event_message || null, photo_url || null, tagsArray
+            (event_message && event_message.trim()) ? event_message.trim() : null,
+            photo_url || null, tagsArray
         ]);
         res.json({ success: true });
     } catch (err) {
