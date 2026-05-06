@@ -304,7 +304,8 @@ async function runMigrations() {
         // moderated_groups — ensure official community groups are tracked
         const officialGroups = [
             { id: -2071623669722, title: 'VeriFy Plug Europe®' },
-            { id: -1001877457836, title: 'VFPE Community' }
+            { id: -1001877457836, title: 'VFPE Community' },
+            { id: -1002688654102, title: 'VFPE Backup' }
         ];
 
         for (const g of officialGroups) {
