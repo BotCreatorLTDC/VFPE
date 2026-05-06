@@ -141,14 +141,9 @@ function renderView(reports = []) {
                     <span>🖱 ${club.click_count || 0} clicks</span>
                     <div style="display:flex; gap:5px;">
                         ${club.catalog_slug ? `
-                            <div style="display:flex; align-items:center; gap:4px;">
-                                <button onclick="window.open('/catalog/manage.html?slug=${club.catalog_slug}', '_blank')" style="background:#00d26a; border:none; color:#000; padding:2px 8px; border-radius:5px; font-size:0.7rem; font-weight:bold; cursor:pointer;" title="Gestionar Catálogo">
-                                    📦
-                                </button>
-                                <button onclick="toggleCatalog(${club.id}, ${!club.catalog_active})" style="background:${club.catalog_active ? '#00d26a' : '#444'}; border:none; color:${club.catalog_active ? '#000' : '#888'}; padding:2px 8px; border-radius:5px; font-size:0.6rem; font-weight:900; cursor:pointer;" title="Activar/Desactivar Catálogo">
-                                    ${club.catalog_active ? 'CAT ON' : 'CAT OFF'}
-                                </button>
-                            </div>
+                            <button onclick="window.open('/catalog/manage.html?slug=${club.catalog_slug}', '_blank')" style="background:${club.catalog_active ? '#00d26a' : '#444'}; border:none; color:${club.catalog_active ? '#000' : '#888'}; padding:2px 8px; border-radius:5px; font-size:0.7rem; font-weight:bold; cursor:pointer;" title="Ver Catálogo">
+                                📦 ${club.catalog_active ? 'ON' : 'OFF'}
+                            </button>
                         ` : ''}
                         ${club.status === 'verified' ? `
                             <button onclick="copyDeepLink(${club.id})" style="background:#444; border:none; color:#fff; padding:2px 8px; border-radius:5px; font-size:0.7rem; cursor:pointer;">
@@ -181,6 +176,11 @@ function openEditModal(id) {
     document.getElementById('edit-ig').value       = club.instagram || '';
     document.getElementById('edit-desc').value     = club.description || '';
     document.getElementById('edit-photo').value    = club.photo_url || '';
+    
+    const catalogCheckbox = document.getElementById('edit-catalog-active');
+    if (catalogCheckbox) {
+        catalogCheckbox.checked = (club.catalog_active === true || club.catalog_active === 1);
+    }
 
     // Service tags checkboxes
     const clubTags = Array.isArray(club.service_tags) ? club.service_tags : [];
@@ -212,8 +212,9 @@ document.getElementById('edit-form').onsubmit = async (e) => {
         const cb = document.getElementById(`tag-${t}`);
         return cb && cb.checked;
     });
+    const id = document.getElementById('edit-id').value;
     const data = {
-        id:               document.getElementById('edit-id').value,
+        id:               id,
         name:             document.getElementById('edit-name').value,
         city:             document.getElementById('edit-city').value,
         country:          document.getElementById('edit-country').value,
@@ -227,11 +228,15 @@ document.getElementById('edit-form').onsubmit = async (e) => {
 
     const res = await fetch('/api/admin/update', {
         method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json',
-            'x-admin-id': adminId
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
+    });
+
+    const catalogActive = document.getElementById('edit-catalog-active').checked;
+    await fetch('/api/admin/catalog-toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ admin_id: adminId, club_id: id, active: catalogActive })
     });
 
     if (res.ok) {

@@ -341,13 +341,30 @@ app.get('/api/admin/clubs', adminAuth, async (req, res) => {
 app.post('/api/admin/catalog-toggle', adminAuth, async (req, res) => {
     const { club_id, active } = req.body;
     try {
-        const clubRes = await query("SELECT tg_user_id FROM clubs WHERE id = $1", [club_id]);
+        const clubRes = await query("SELECT name, tg_user_id FROM clubs WHERE id = $1", [club_id]);
         if (clubRes.rows.length === 0) return res.status(404).json({ error: "Club not found" });
         
-        await query(
-            "UPDATE catalog_stores SET active = $1 WHERE tg_owner_id = $2",
-            [active, clubRes.rows[0].tg_user_id]
-        );
+        const club = clubRes.rows[0];
+        const tgOwnerId = club.tg_user_id;
+
+        // Check if catalog store already exists
+        const storeRes = await query("SELECT id FROM catalog_stores WHERE tg_owner_id = $1", [tgOwnerId]);
+        
+        if (storeRes.rows.length > 0) {
+            // Update existing
+            await query(
+                "UPDATE catalog_stores SET active = $1 WHERE tg_owner_id = $2",
+                [active, tgOwnerId]
+            );
+        } else if (active) {
+            // Create new store automatically
+            const slug = club.name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+            await query(
+                "INSERT INTO catalog_stores (slug, name, tg_owner_id, active) VALUES ($1, $2, $3, TRUE) ON CONFLICT (slug) DO NOTHING",
+                [slug, club.name, tgOwnerId]
+            );
+        }
+        
         res.json({ success: true });
     } catch (err) {
         console.error('Catalog toggle error:', err);
