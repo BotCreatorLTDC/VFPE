@@ -260,11 +260,36 @@ async function handleViolation(ctx, userId, reason) {
 
 moderatorBot.on("chat_member", async (ctx) => {
     const member = ctx.chatMember.new_chat_member;
+    
+    // Auto-learn when added to a group
+    if (ctx.chat.type === 'group' || ctx.chat.type === 'supergroup') {
+        try {
+            await query(
+                "INSERT INTO moderated_groups (chat_id, title) VALUES ($1, $2) ON CONFLICT (chat_id) DO UPDATE SET title = EXCLUDED.title, active = TRUE",
+                [ctx.chat.id, ctx.chat.title]
+            );
+            console.log(`[Moderator] Learned new group via chat_member: ${ctx.chat.title}`);
+        } catch (e) { console.error("[Moderator] Error tracking group:", e.message); }
+    }
+
     if (member?.status === "member") {
         await ctx.reply(
             `👋 Bienvenido a VFPE, ${member.user.first_name}!\nUsa @VerifyPlugEU_bot para encontrar plugs verificados. 🔌`,
             { parse_mode: "Markdown" }
         );
+    }
+});
+
+// Also listen for my_chat_member to detect when the bot itself is added/promoted
+moderatorBot.on("my_chat_member", async (ctx) => {
+    if (ctx.chat.type === 'group' || ctx.chat.type === 'supergroup') {
+        try {
+            await query(
+                "INSERT INTO moderated_groups (chat_id, title) VALUES ($1, $2) ON CONFLICT (chat_id) DO UPDATE SET title = EXCLUDED.title, active = TRUE",
+                [ctx.chat.id, ctx.chat.title]
+            );
+            console.log(`[Moderator] Learned/Updated my group status: ${ctx.chat.title}`);
+        } catch (e) { console.error("[Moderator] Error tracking group:", e.message); }
     }
 });
 
